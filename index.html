@@ -301,6 +301,50 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(
 
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
 
+/* 사용법 (튜토리얼): 첫 방문에 자동으로 열리고, 상단 "사용법" 버튼으로 다시 볼 수 있어요 */
+@media (max-width:400px){.top .logo{display:none}}  /* room for the ? button next to the title */
+.tour{position:fixed;left:0;right:0;bottom:0;z-index:31;max-width:560px;margin:0 auto;background:var(--surface);border-radius:26px 26px 0 0;padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;animation:up .35s cubic-bezier(.2,.9,.3,1.15);max-height:92%;overflow:auto;touch-action:pan-y;outline:none}
+.tour.still{animation:none}
+.tour-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tour-step{font-family:var(--f-display);font-size:14px;color:var(--muted)}
+.tour-pic{min-height:132px;display:grid;place-items:center;background:var(--surface-2);border-radius:20px;padding:14px;overflow:hidden}
+.tour h2{font-family:var(--f-display);font-weight:400;font-size:24px;margin:0;text-wrap:balance}
+.tour p{margin:0;color:var(--muted);line-height:1.6}
+.tour p b{font-weight:400;color:var(--ink);background:var(--gold-soft);padding:0 6px;border-radius:6px}
+.tour-dots{display:flex;justify-content:center;gap:6px}
+.tour-dots button{width:8px;height:8px;border-radius:50%;border:0;padding:0;background:var(--line);cursor:pointer}
+.tour-dots button[aria-current="true"]{background:var(--accent);width:22px;border-radius:4px}
+.tour-nav{display:grid;grid-template-columns:auto 1fr;gap:8px}
+.tour-nav .btn.primary{font-size:17px}
+/* small scene pieces used on the slides */
+.t-avatars{display:flex;align-items:flex-end;gap:10px}
+.t-avatars .avatar{animation:none;filter:none}
+.t-avatars .arrow{font-family:var(--f-display);font-size:24px;color:var(--muted);align-self:center}
+.t-verse{font-family:var(--f-verse);font-size:17px;line-height:1.9;text-align:center;color:var(--ink)}
+.t-verse .w.hid{background:var(--accent-soft);color:transparent;border-radius:6px;padding:0 4px;border-bottom:2px solid var(--accent)}
+.t-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:6px}
+.t-chip{font-family:var(--f-display);font-size:15px;padding:4px 12px;border-radius:12px;background:var(--surface);border:1.5px solid var(--line);box-shadow:0 2px 0 var(--line)}
+.t-chip.pick{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);box-shadow:0 2px 0 var(--accent-deep)}
+.t-modes{display:grid;gap:8px;width:100%}
+.t-mode{display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:10px;background:var(--surface);border-radius:14px;padding:8px 10px;font-family:var(--f-display)}
+.t-mode .micon{width:38px;height:38px;border-radius:12px}
+.t-mode .micon svg{width:22px;height:22px}
+.t-mode.m1{--mc:var(--m1)} .t-mode.m2{--mc:var(--m2)} .t-mode.m3{--mc:var(--m3)}
+.t-mode .star{width:20px;height:20px}
+.t-rows{display:grid;gap:6px;width:100%}
+.t-row{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:10px;background:var(--surface);border-radius:14px;padding:6px 10px;border-left:6px solid var(--sc,var(--line))}
+.t-row b{font-family:var(--f-display);font-weight:400;display:block;line-height:1.2}
+.t-row small{color:var(--muted);font-size:12px}
+.t-seg{width:100%;pointer-events:none}
+.t-quiz{display:grid;gap:8px;width:100%;justify-items:center}
+.t-hearts{display:flex;gap:2px;color:var(--bad)} .t-hearts .heart{width:22px;height:22px} .t-hearts .heart.off{color:var(--line)}
+.t-timer{width:100%;height:8px;border-radius:4px;background:var(--surface);overflow:hidden} .t-timer i{display:block;height:100%;width:62%;background:var(--gold)}
+.t-save{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;width:100%;pointer-events:none}
+.t-save .h-in{background:var(--surface);border:1.5px solid var(--line);font-size:14px;display:flex;align-items:center;color:var(--muted)}
+.t-board{width:100%;display:grid;gap:4px}
+.t-board div{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;background:var(--surface);border-radius:10px;padding:5px 10px;font-family:var(--f-display);font-size:14px}
+.t-board .rk{color:var(--gold-deep)}
+
 /* ---- 생기 있는 게임 느낌: 전신갑주 아바타, 진행 링, 시리즈 색, 모드 아이콘 ---- */
 .hero{background:radial-gradient(circle at 88% 8%,color-mix(in srgb,var(--accent-ink) 22%,transparent),transparent 45%),var(--accent);gap:14px}
 .hero-top{grid-template-columns:104px minmax(0,1fr);gap:12px;align-items:center}
@@ -464,7 +508,8 @@ const ICON={
   retry:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v5h5"/></svg>',
   blank:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4a2.5 2.5 0 1 1 5 0h4v4a2.5 2.5 0 1 1 0 5v3H4z"/></svg>',
   order:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h4l8 10h4M4 17h4l2-2.5M14 9.5L16 7h4"/><path d="M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>',
-  type:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4.5-1L20 7.5l-3.5-3.5L5 15.5z"/><path d="M14 6.5l3.5 3.5"/></svg>'
+  type:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4.5-1L20 7.5l-3.5-3.5L5 15.5z"/><path d="M14 6.5l3.5 3.5"/></svg>',
+  help:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.5a2.8 2.8 0 1 1 3.9 2.6c-.9.5-1.2 1-1.2 1.9"/><path d="M12 17.2h.01"/></svg>'
 };
 
 /* ---------- 진도 저장 ---------- */
@@ -800,7 +845,7 @@ function flash(sel,cls){const el=document.querySelector(sel);if(!el)return;el.cl
 
 /* ---------- 화면 상태 ---------- */
 let view={name:'home'},G=null,timers=[];
-const ui={hide:0,mask:new Set(),peek:new Set(),confirmReset:false,panel:null,msg:null,bk:'',bkIn:'',nameIn:'',acctName:'',pin:'',pin2:'',confirmNew:false,syncBusy:false,adv:false};
+const ui={hide:0,mask:new Set(),peek:new Set(),confirmReset:false,panel:null,msg:null,bk:'',bkIn:'',nameIn:'',acctName:'',pin:'',pin2:'',confirmNew:false,syncBusy:false,adv:false,tour:null};
 function clearTimers(){timers.forEach(f=>f());timers=[]}
 function go(v){clearTimers();stopSpeech();view=v;render();window.scrollTo(0,0)}
 
@@ -809,6 +854,7 @@ function header(title,back){
   return `<header class="top"><div class="top-in gut">
     ${back?`<button class="icon-btn" data-act="back" aria-label="뒤로">${ICON.back}</button>`:`<span class="logo" aria-hidden="true">${ICON.logo}</span>`}
     <h1 class="top-title">${esc(title)}${back?'':'<small>주평예수교회</small>'}</h1>
+    ${back?'':`<button class="icon-btn" data-act="tourOpen" aria-label="사용법 보기">${ICON.help}</button>`}
     <span class="xp-chip">Lv.${l.L} · ${S.xp} XP</span>
     <button class="icon-btn" data-act="sound" aria-label="효과음 ${S.sound?'끄기':'켜기'}">${S.sound?ICON.sOn:ICON.sOff}</button>
   </div></header>`;
@@ -825,7 +871,9 @@ function render(){
     case 'type':title='직접 써보기';back=true;body=typeView();break;
     case 'quiz':title='오늘의 도전';back=true;body=quizView();break;
   }
-  app.innerHTML=header(title,back)+`<main class="gut">${body}</main>`+(G&&G.result?resultSheet():'');
+  app.innerHTML=header(title,back)+`<main class="gut">${body}</main>`+(G&&G.result?resultSheet():'')+(ui.tour!=null?tourView():'');
+  // the tutorial sheet slides up once when opened, then stays put while paging; keep keyboard focus on it
+  if(ui.tour!=null){ui.tourFresh=false;const t=$('.tour');if(t&&!t.contains(document.activeElement))t.focus({preventScroll:true})}
 }
 
 /* ---------- 홈 ---------- */
@@ -875,7 +923,7 @@ function homeView(){
   <button class="cta" data-act="quiz"><span><span class="cta-main">오늘의 도전</span><span class="cta-sub">${sel?esc(sel.short):'전체 구절'}에서 10문제 · 문제당 ${df.qt/1000}초</span></span>${ICON.go}</button>
   ${boardView()}
   <div class="tabs" role="tablist" aria-label="시리즈">${tabs}</div>
-  <p class="tiny">구절을 눌러 빈칸 채우기, 순서 맞추기, 직접 써보기를 통과하면 별 3개로 그 난이도를 정복해요. 네 난이도를 모두 정복해 보세요.</p>
+  <p class="tiny">구절을 눌러 빈칸 채우기, 순서 맞추기, 직접 써보기를 통과하면 별 3개로 그 난이도를 정복해요. 네 난이도를 모두 정복해 보세요. <button class="link" data-act="tourOpen">사용법 보기</button></p>
   ${groups.map(s=>`<section class="group" style="--sc:var(--c${s.c})"><h2 class="sec"><span><span class="sheet-no">${s.sheet}</span> ${esc(s.name)}</span><span class="range">${s.range}</span></h2><ul class="vlist">${VERSES.filter(v=>v.s===s.id).map(row).join('')}</ul></section>`).join('')}
   ${keepView()}
   <p class="tiny" style="text-align:center">주평예수교회 말씀암송 · 교회 식구들과 함께 외워요</p>
@@ -920,6 +968,63 @@ function keepView(){
       ${note('bk')}${bk}</details>
   </section>`;
 }
+
+/* ---------- 사용법 (튜토리얼) ---------- */
+// Opens by itself on the first visit of a phone, and from the ? button / "사용법 보기" after that.
+const TOUR_KEY=KEY+'-tour';
+const tourSeen=()=>{try{return !!localStorage.getItem(TOUR_KEY)}catch(e){return true}};
+function tourSlides(){
+  const v1=VERSES[0],v2=VERSES[7],t=toks(v1).slice(0,7),hid=new Set([2,5]);
+  const demo=t.map((x,i)=>`<span class="w ${hid.has(i)?'hid':''}">${esc(x.w)}</span>`).join(' ')+' …';
+  const slides=[
+    {pic:`<div class="t-avatars">${avatar(1,88)}</div>`,h:'말씀암송 놀이터에 온 걸 환영해요!',
+     p:'주평예수교회 암송 말씀 <b>42구절</b>을 게임처럼 외우는 곳이에요. 어떻게 노는지 1분만 같이 둘러볼까요?'},
+    {pic:`<div class="t-rows"><div class="t-row" style="--sc:var(--c${seriesOf(v1.s).c})">${ring(v1.n)}<span><b>${esc(v1.t)}</b><small>${ref(v1)}</small></span>${pips(v1.n)}</div>
+       <div class="t-row" style="--sc:var(--c${seriesOf(v2.s).c})">${ring(v2.n)}<span><b>${esc(v2.t)}</b><small>${ref(v2)}</small></span>${pips(v2.n)}</div></div>`,
+     h:'먼저 구절을 골라요',
+     p:'홈 아래쪽 목록에서 구절을 누르면 말씀이 보여요. <b>가리기</b> 버튼으로 단어를 조금씩 숨기며 읽고, <b>들려주기</b>로 낭독을 들을 수 있어요. 위의 탭으로 시리즈를 고를 수 있어요.'},
+    {pic:`<div class="t-modes">
+       <div class="t-mode m1"><span class="micon">${ICON.blank}</span><span>빈칸 채우기</span><span class="star on"></span></div>
+       <div class="t-mode m2"><span class="micon">${ICON.order}</span><span>순서 맞추기</span><span class="star on"></span></div>
+       <div class="t-mode m3"><span class="micon">${ICON.type}</span><span>직접 써보기</span><span class="star"></span></div></div>`,
+     h:'세 가지 연습으로 별을 모아요',
+     p:'구절마다 <b>빈칸 채우기</b> → <b>순서 맞추기</b> → <b>직접 써보기</b> 세 가지 연습이 있어요. 하나를 통과할 때마다 별 1개, 별 3개를 모으면 그 구절을 <b>정복</b>한 거예요.'},
+    {pic:`<div><p class="t-verse">${demo}</p><div class="t-chips"><span class="t-chip pick">${esc(t[2].w)}</span><span class="t-chip">${esc(t[5].w)}</span><span class="t-chip">그러므로</span></div></div>`,
+     h:'이렇게 놀아요',
+     p:'가려진 자리에 들어갈 단어를 아래 단어 중에서 <b>순서대로</b> 눌러요. 틀리면 하트가 하나 깨지니 천천히 생각해요. 순서 맞추기는 흩어진 조각을 차례로 잇고, 직접 써보기는 말씀을 통째로 써 봐요.'},
+    {pic:`<div class="seg t-seg" aria-hidden="true">${[1,2,3,4].map(i=>`<button class="d${i}" aria-pressed="${i===2}" tabindex="-1">${DIFF[i].name}</button>`).join('')}</div>`,
+     h:'난이도는 네 단계',
+     p:'<b>쉬움</b>과 <b>보통</b>은 장절이 보이고, <b>어려움</b>과 <b>오직말씀</b>은 장절을 숨겨서 말씀만으로 맞혀야 해요. 어려울수록 XP를 더 받아요 (최대 ×3). 난이도마다 따로 정복할 수 있으니 쉬움부터 차근차근!'},
+    {pic:`<div class="t-quiz"><div class="t-hearts">${ICON.heart}${ICON.heart}${ICON.heart.replace('class="heart"','class="heart off"')}</div><div class="t-timer"><i></i></div>
+       <div class="t-chips"><span class="t-chip">${esc(v1.t)}</span><span class="t-chip pick">${esc(v2.t)}</span></div></div>`,
+     h:'오늘의 도전',
+     p:'노란 버튼을 누르면 <b>10문제</b> 퀴즈가 시작돼요. 시간 안에 맞는 말씀이나 장절을 골라요. 하루에 게임 3번이면 <b>오늘의 목표</b> 달성, 매일 하면 <b>연속</b> 기록이 쌓여요.'},
+    {pic:`<div class="t-avatars">${avatar(1,56)}<span class="arrow">→</span>${avatar(4,64)}<span class="arrow">→</span>${avatar(8,76)}</div>`,
+     h:'XP를 모아 전신갑주를 입어요',
+     p:'연습과 도전으로 XP를 얻으면 레벨이 오르고, 에베소서 6장의 <b>전신갑주</b>가 한 벌씩 입혀져요. 진리의 허리띠부터 성령의 검까지 다 갖추면 <b>말씀의 용사</b>!'}];
+  if(SYNC_URL&&!cloud)slides.push(
+    {pic:`<div class="t-quiz"><div class="t-save"><span class="h-in">닉네임</span><span class="h-in">비밀번호</span><span class="h-btn">진도 저장</span></div>
+       <div class="t-board"><div><span class="rk">1</span><span>은혜</span><span>1,240 XP</span></div><div><span class="rk">2</span><span>${esc(S.name||'나')}</span><span>980 XP</span></div></div></div>`,
+     h:'진도를 저장하고 친구들과 경쟁해요',
+     p:'맨 위 초록 상자에 <b>닉네임</b>과 숫자 <b>비밀번호</b>(4~6자리)를 넣고 <b>진도 저장</b>을 누르면 기록이 저장되고 순위표에 올라가요. 다른 폰에서 같은 걸 넣으면 이어서 할 수 있어요. 비밀번호는 꼭 기억해 두세요!'});
+  else slides.push(
+    {pic:`<div class="t-avatars">${avatar(3,80)}</div>`,h:'진도는 이 폰에 저장돼요',
+     p:'홈 아래 <b>백업 코드</b>로 기록을 글자 코드로 만들어 두면 다른 폰에서도 불러올 수 있어요. 그럼 이제 시작해 볼까요?'});
+  return slides;
+}
+function tourView(){
+  const ss=tourSlides(),i=Math.min(ui.tour,ss.length-1),s=ss[i],last=i===ss.length-1;
+  return `<div class="backdrop" data-act="tourClose"></div>
+  <div class="tour ${ui.tourFresh?'':'still'}" role="dialog" aria-modal="true" aria-labelledby="tourT" tabindex="-1">
+    <div class="tour-head"><span class="tour-step">사용법 ${i+1} / ${ss.length}</span><button class="link" data-act="tourClose">${last?'닫기':'건너뛰기'}</button></div>
+    <div class="tour-pic" aria-hidden="true">${s.pic}</div>
+    <h2 id="tourT">${s.h}</h2>
+    <p>${s.p}</p>
+    <div class="tour-dots">${ss.map((_,k)=>`<button data-act="tourDot" data-i="${k}" aria-label="${k+1}번째" aria-current="${k===i}"></button>`).join('')}</div>
+    <div class="tour-nav">${i?`<button class="btn ghost" data-act="tourPrev">이전</button>`:'<span></span>'}<button class="btn primary" data-act="${last?'tourClose':'tourNext'}">${last?'시작하기!':'다음'}</button></div>
+  </div>`;
+}
+function tourClose(){ui.tour=null;try{localStorage.setItem(TOUR_KEY,'1')}catch(e){}render()}
 
 /* ---------- 구절 보기 ---------- */
 const HIDE_NEXT=['일부 가리기','첫 글자만 보기','전부 가리기','다시 보기'];
@@ -1299,7 +1404,27 @@ app.addEventListener('click',e=>{
       catch(err){ui.msg={k:'bad',t:'백업 코드가 올바르지 않아요. 코드 전체를 빠짐없이 붙여 넣었는지 확인해 주세요.'};sfx('bad')}
       render();break;
     case 'syncNow':sync.at=0;render();syncNow();break;
+    case 'tourOpen':ui.tour=0;ui.tourFresh=true;render();break;
+    case 'tourNext':ui.tour++;render();break;
+    case 'tourPrev':ui.tour=Math.max(0,ui.tour-1);render();break;
+    case 'tourDot':ui.tour=i;render();break;
+    case 'tourClose':tourClose();break;
   }
+});
+// swipe left/right through the tutorial slides
+let swipeX=null;
+app.addEventListener('touchstart',e=>{swipeX=ui.tour!=null&&e.target.closest('.tour')?e.changedTouches[0].clientX:null},{passive:true});
+app.addEventListener('touchend',e=>{
+  if(swipeX==null)return;const dx=e.changedTouches[0].clientX-swipeX;swipeX=null;
+  if(Math.abs(dx)<50)return;
+  if(dx<0&&ui.tour<tourSlides().length-1)ui.tour++;else if(dx>0&&ui.tour>0)ui.tour--;else return;
+  render();
+},{passive:true});
+document.addEventListener('keydown',e=>{
+  if(ui.tour==null||e.target.matches('input,textarea'))return;
+  if(e.key==='Escape')tourClose();
+  else if(e.key==='ArrowRight'&&ui.tour<tourSlides().length-1){ui.tour++;render()}
+  else if(e.key==='ArrowLeft'&&ui.tour>0){ui.tour--;render()}
 });
 app.addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role="button"][data-act]')){e.preventDefault();e.target.click()}
@@ -1318,6 +1443,7 @@ app.addEventListener('toggle',e=>{if(e.target.matches('details.adv'))ui.adv=e.ta
 // pick up progress from the other phone when coming back; push before the app goes to the background
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'||sync.timer)syncNow()});
 
+if(!tourSeen()){ui.tour=0;ui.tourFresh=true}
 render();
 initCloud();
 computeId().then(()=>{syncNow();loadBoard()});
