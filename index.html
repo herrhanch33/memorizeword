@@ -559,7 +559,7 @@ function readBackup(s){
 }
 async function copyText(t){try{await navigator.clipboard.writeText(t);return true}catch(e){return false}}
 
-const SYNC_URL='';  // filled in by build-site.ps1 -SyncUrl; empty hides device sync
+const SYNC_URL='https://ubuntu-ai.tail4c443c.ts.net';  // filled in by build-site.ps1 -SyncUrl; empty hides device sync
 const SYNC_KEY=KEY+'-sync';
 const CODE_ABC='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 let syncCode=(()=>{try{return localStorage.getItem(SYNC_KEY)||''}catch(e){return ''}})();
