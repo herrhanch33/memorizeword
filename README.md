@@ -1,0 +1,2 @@
+# memorizeword
+Memorize the Word
