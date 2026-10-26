@@ -987,7 +987,6 @@ function check(){
 /* ---------- 오늘의 도전 (퀴즈) ---------- */
 const others=(v,k)=>pick(VERSES.filter(x=>x.n!==v.n),k);
 function halves(v){const w=toks(v).map(x=>x.w),h=Math.ceil(w.length/2);return {a:w.slice(0,h).join(' '),b:w.slice(h).join(' ')}}
-const cut=s=>s.length>48?s.slice(0,46)+'…':s;
 // showRef: at the easier difficulties a question shows the reference, verse number and sheet number as context; harder ones hide them
 function makeQ(v,kind,showRef){
   const sup=(num)=>showRef?`<sup class="vn">${num}</sup>`:'';
@@ -1002,7 +1001,7 @@ function makeQ(v,kind,showRef){
     return {n:v.n,label:'빈칸에 들어갈 말은?',sub:showRef?sref(v):'',body:`<p class="verse q-verse">${body}</p>`,opts:shuffle([{label:ans,ok:true},...pick(dp,3).map(w=>({label:w,ok:false}))]),answer:ans};
   }
   const me=halves(v);
-  return {n:v.n,label:'이어지는 말씀은?',sub:showRef?sref(v):'',body:`<p class="verse q-verse">${esc(me.a)} …</p>`,opts:shuffle([{label:cut(me.b),ok:true},...others(v,3).map(x=>({label:cut(halves(x).b),ok:false}))]),answer:cut(me.b)};
+  return {n:v.n,label:'이어지는 말씀은?',sub:showRef?sref(v):'',body:`<p class="verse q-verse">${esc(me.a)} …</p>`,opts:shuffle([{label:me.b,ok:true},...others(v,3).map(x=>({label:halves(x).b,ok:false}))]),answer:me.b};
 }
 function startQuiz(){
   const d=S.diff,df=DIFF[d];
