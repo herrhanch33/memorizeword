@@ -220,9 +220,13 @@ sup.vn{font-family:var(--f-display);font-size:.6em;color:var(--accent);margin-ri
 
 /* games */
 .gtop{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.gref{min-width:0}
-.gref b{font-family:var(--f-display);font-weight:400;font-size:17px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gref span{font-size:13px;color:var(--muted)}
+.gref{min-width:0;display:grid;gap:1px}
+.gref small{font-size:12px;color:var(--muted);line-height:1.3}
+.gref b{font-family:var(--f-display);font-weight:400;font-size:17px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
+.gref>span{font-size:13px;color:var(--muted)}
+.vhead{display:grid;gap:1px}
+.vhead small{font-size:12px;color:var(--muted)}
+.vhead b{font-family:var(--f-display);font-weight:400;font-size:17px;line-height:1.25;color:var(--accent-strong);word-break:keep-all}
 .hearts{display:flex;gap:3px;flex:none}
 .heart{color:var(--bad);display:block;width:24px;height:24px}
 .heart.lost{color:var(--line)}
@@ -477,6 +481,9 @@ const norm=w=>[...w].filter(c=>!SKIP.test(c)).join('');
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const pick=(a,k)=>shuffle(a).slice(0,k);
 const ref=v=>`${v.b} ${v.c}장 ${v.v}절`;
+// the heading printed on the church handout above each verse: "말씀암송 (1) 교회 시리즈 - 1"; the verse title goes under it
+const head=v=>{const s=seriesOf(v.s);return `${s.sheet} ${s.name} - ${v.n}`};
+const headHtml=(v,cls='')=>`<div class="vhead ${cls}"><small>${esc(head(v))}</small><b>${esc(v.t)}</b></div>`;
 const sref=v=>`${v.b} ${v.c}:${v.v}`;
 const fullText=v=>v.p.map(x=>x[1]).join(' ');
 const byN=n=>VERSES.find(v=>v.n===n);
@@ -1045,7 +1052,7 @@ function verseView(v){
   const d=S.diff,df=DIFF[d],st=stars(v.n),x=S.verses[v.n],best=x?x.t[d-1]:0,idx=VERSES.indexOf(v),prev=VERSES[idx-1],next=VERSES[idx+1];
   return `
   <article class="vcard" ${sc(v)}>
-    <div class="vc-head">${ring(v.n,true)}<div><div class="vc-series">${esc(seriesOf(v.s).name)}</div><h2 class="vc-title">${esc(v.t)}</h2><div class="vc-ref">${ref(v)}</div></div></div>
+    <div class="vc-head">${ring(v.n,true)}<div><div class="vc-series">${esc(head(v))}</div><h2 class="vc-title">${esc(v.t)}</h2><div class="vc-ref">${ref(v)}</div></div></div>
     <p class="verse">${studyText(v)}</p>
     <div class="vc-tools">
       <button class="btn small" data-act="hide">${HIDE_NEXT[ui.hide]}</button>
@@ -1076,10 +1083,11 @@ function verseView(v){
 }
 
 /* ---------- 공통 게임 UI ---------- */
-// at 어려움 the reference is hidden, at 오직말씀 the title too
+// the handout heading and title stay visible at every level (they are memorised with the verse);
+// only the chapter and verse are hidden at 어려움 and 오직말씀
 function gref(v){
   const df=DIFF[G.d];
-  return `<div class="gref"><b>${G.d>=4?`${v.n}번 구절`:`${v.n}. ${esc(v.t)}`}<span class="dchip">${df.name}</span></b><span>${df.ref?ref(v):'장·절은 비밀이에요'}</span></div>`;
+  return `<div class="gref"><small>${esc(head(v))}<span class="dchip">${df.name}</span></small><b>${esc(v.t)}</b><span>${df.ref?ref(v):'장·절은 비밀이에요'}</span></div>`;
 }
 function gameTop(v,done,total){
   return `<div class="gtop">${gref(v)}
@@ -1271,18 +1279,19 @@ function halves(v){const w=toks(v).map(x=>x.w),h=Math.ceil(w.length/2);return {a
 // showRef: at the easier difficulties a question shows the reference, verse number and sheet number as context; harder ones hide them
 function makeQ(v,kind,showRef){
   const sup=(num)=>showRef?`<sup class="vn">${num}</sup>`:'';
-  if(kind==='ref')return {n:v.n,label:'이 말씀은 어디에 있을까요?',body:`<p class="verse q-verse">${v.p.map(([num,txt])=>sup(num)+esc(txt)).join(' ')}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
-  if(kind==='title')return {n:v.n,label:'이 주제의 암송 구절은?',body:`<p class="q-title">${esc(v.t)}</p><p class="tiny">${esc(seriesOf(v.s).name)}${showRef?` · ${v.n}번`:''}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
+  const sub=headHtml(v,'q-head')+(showRef?`<div class="q-sub">${sref(v)}</div>`:'');
+  if(kind==='ref')return {n:v.n,label:'이 말씀은 어디에 있을까요?',sub:headHtml(v,'q-head'),body:`<p class="verse q-verse">${v.p.map(([num,txt])=>sup(num)+esc(txt)).join(' ')}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
+  if(kind==='title')return {n:v.n,label:'이 제목의 암송 구절은?',body:`<p class="tiny">${esc(head(v))}</p><p class="q-title">${esc(v.t)}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
   if(kind==='word'){
     const t=toks(v),cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=2),bi=cand[Math.floor(Math.random()*cand.length)],ans=norm(t[bi].w);
     const own=new Set(t.map(x=>norm(x.w)));
     let dp=[...new Set(VERSES.flatMap(x=>toks(x).map(y=>norm(y.w))))].filter(w=>!own.has(w)&&w.length>=2);
     const near=dp.filter(w=>Math.abs(w.length-ans.length)<=1);if(near.length>=3)dp=near;
     const body=t.map((x,i)=>(x.vn?sup(x.vn):'')+(i===bi?`<span class="slot cur" style="--len:${ans.length}"></span>`:esc(x.w))).join(' ');
-    return {n:v.n,label:'빈칸에 들어갈 말은?',sub:showRef?sref(v):'',body:`<p class="verse q-verse">${body}</p>`,opts:shuffle([{label:ans,ok:true},...pick(dp,3).map(w=>({label:w,ok:false}))]),answer:ans};
+    return {n:v.n,label:'빈칸에 들어갈 말은?',sub,body:`<p class="verse q-verse">${body}</p>`,opts:shuffle([{label:ans,ok:true},...pick(dp,3).map(w=>({label:w,ok:false}))]),answer:ans};
   }
   const me=halves(v);
-  return {n:v.n,label:'이어지는 말씀은?',sub:showRef?sref(v):'',body:`<p class="verse q-verse">${esc(me.a)} …</p>`,opts:shuffle([{label:me.b,ok:true},...others(v,3).map(x=>({label:halves(x).b,ok:false}))]),answer:me.b};
+  return {n:v.n,label:'이어지는 말씀은?',sub,body:`<p class="verse q-verse">${esc(me.a)} …</p>`,opts:shuffle([{label:me.b,ok:true},...others(v,3).map(x=>({label:halves(x).b,ok:false}))]),answer:me.b};
 }
 function startQuiz(){
   const d=S.diff,df=DIFF[d];
@@ -1296,7 +1305,7 @@ function quizView(){
   const q=G.qs[G.qi],a=G.answered;
   return `<div class="qtop"><span class="qcount">${G.qi+1} / ${G.qs.length}</span>${G.combo>=2?`<span class="combo">${G.combo}연속!${G.combo>=3?' ×1.5':''}</span>`:''}<span class="qscore">${G.score.toLocaleString()}점</span></div>
   <div class="timer" aria-hidden="true"><i id="tbar" class="${G.left<.25?'low':''}" style="width:${G.left*100}%"></i></div>
-  <section class="qcard"><div class="q-label">${q.label}</div>${q.sub?`<div class="q-sub">${q.sub}</div>`:''}${q.body}</section>
+  <section class="qcard"><div class="q-label">${q.label}</div>${q.sub||''}${q.body}</section>
   <div class="opts">${q.opts.map((o,i)=>`<button class="opt ${a?(o.ok?'right':(a.i===i?'wrong':'dim')):''}" data-act="ans" data-i="${i}" ${a?'disabled':''}>${esc(o.label)}</button>`).join('')}</div>
   ${a?`<div class="feedback ${a.ok?'good':'bad'}" aria-live="polite"><span>${a.ok?`정답! +${a.pts}점`:(a.i<0?'시간이 다 됐어요':'아쉬워요')}</span>${a.ok?'':`<button class="btn primary small" data-act="nextQ">${G.qi+1<G.qs.length?'다음 문제':'결과 보기'}</button>`}</div>`:''}`;
 }
