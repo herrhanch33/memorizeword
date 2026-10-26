@@ -27,6 +27,8 @@
   --accent:#2E7A4E; --accent-deep:#1D5636; --accent-strong:#22613D; --accent-ink:#FFFFFF; --accent-soft:#D3EBDB;
   --gold:#E8A920; --gold-deep:#B07C0C; --gold-on:#2B1D00; --gold-soft:#F8EAC6; --gold-ink:#7E5300;
   --bad:#C2452F; --bad-soft:#F8DDD6; --good:#2E7A4E; --sky:#3B82C4; --scrim:rgba(12,24,18,.45);
+  --c1:#3B82C4; --c2:#2E7A4E; --c3:#8A4FBF; --c4:#D9822B;  /* series: 교회 · 사도행전 · 고난의 종 · 복음 */
+  --m1:#3B82C4; --m2:#8A4FBF; --m3:#D9822B;                 /* modes: 빈칸 · 순서 · 써보기 */
   --f-display:'Jua','Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
   --f-body:'Gowun Dodum','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
   --f-verse:'Gowun Batang','Nanum Myeongjo','AppleMyungjo','Batang',serif;
@@ -35,12 +37,14 @@
   --bg:#0F1813; --surface:#17231C; --surface-2:#223229; --ink:#E3EEE7; --muted:#97AB9F; --line:#2D3F35;
   --accent:#6CC08C; --accent-deep:#3F8A5D; --accent-strong:#8AD6A6; --accent-ink:#0C1A12; --accent-soft:#1E3A29;
   --gold:#EDBB45; --gold-deep:#A57F1E; --gold-on:#241800; --gold-soft:#3A2F15; --gold-ink:#F4CF73;
-  --bad:#EF7C66; --bad-soft:#3F221C; --good:#6CC08C; --sky:#7DB6E8; --scrim:rgba(0,0,0,.6); color-scheme:dark}}
+  --bad:#EF7C66; --bad-soft:#3F221C; --good:#6CC08C; --sky:#7DB6E8; --scrim:rgba(0,0,0,.6); color-scheme:dark;
+  --c1:#7DB6E8; --c2:#6CC08C; --c3:#C39BE6; --c4:#F2A95C; --m1:#7DB6E8; --m2:#C39BE6; --m3:#F2A95C}}
 :root[data-theme="dark"]{
   --bg:#0F1813; --surface:#17231C; --surface-2:#223229; --ink:#E3EEE7; --muted:#97AB9F; --line:#2D3F35;
   --accent:#6CC08C; --accent-deep:#3F8A5D; --accent-strong:#8AD6A6; --accent-ink:#0C1A12; --accent-soft:#1E3A29;
   --gold:#EDBB45; --gold-deep:#A57F1E; --gold-on:#241800; --gold-soft:#3A2F15; --gold-ink:#F4CF73;
-  --bad:#EF7C66; --bad-soft:#3F221C; --good:#6CC08C; --sky:#7DB6E8; --scrim:rgba(0,0,0,.6); color-scheme:dark}
+  --bad:#EF7C66; --bad-soft:#3F221C; --good:#6CC08C; --sky:#7DB6E8; --scrim:rgba(0,0,0,.6); color-scheme:dark;
+  --c1:#7DB6E8; --c2:#6CC08C; --c3:#C39BE6; --c4:#F2A95C; --m1:#7DB6E8; --m2:#C39BE6; --m3:#F2A95C}
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -297,6 +301,61 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(
 
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
 
+/* ---- 생기 있는 게임 느낌: 전신갑주 아바타, 진행 링, 시리즈 색, 모드 아이콘 ---- */
+.hero{background:radial-gradient(circle at 88% 8%,color-mix(in srgb,var(--accent-ink) 22%,transparent),transparent 45%),var(--accent);gap:14px}
+.hero-top{grid-template-columns:104px minmax(0,1fr);gap:12px;align-items:center}
+.avatar-wrap{position:relative;display:grid;place-items:center;padding-bottom:10px}
+.avatar{display:block;filter:drop-shadow(0 6px 0 rgba(0,0,0,.18));animation:bob 3.2s ease-in-out infinite}
+.avatar.mini{display:inline-block;width:20px;height:25px;vertical-align:-7px;margin-right:5px;filter:none;animation:none}
+.lv-pill{position:absolute;left:50%;bottom:0;transform:translateX(-50%);background:var(--accent-ink);color:var(--accent);font-family:var(--f-display);font-size:14px;padding:2px 12px;border-radius:999px;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.lv-title{font-size:24px}
+.hero .tiny b{font-weight:400;color:var(--gold-ink);background:var(--gold-soft);padding:0 6px;border-radius:6px}
+.armor-row{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;background:color-mix(in srgb,var(--accent-ink) 12%,transparent);border-radius:16px;padding:8px 4px}
+.piece{display:grid;justify-items:center;gap:1px;color:color-mix(in srgb,var(--accent-ink) 38%,transparent);font-size:11px;line-height:1.2}
+.piece svg{width:26px;height:26px;transition:transform .3s ease}
+.piece.on{color:var(--gold)}
+.piece.on svg{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--gold) 70%,transparent))}
+.piece small{font-size:10.5px;color:inherit}
+.piece.on small{color:var(--accent-ink);opacity:.95}
+
+.ring{position:relative;width:44px;height:44px;flex:none;display:grid;place-items:center}
+.ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.ring .bg{fill:var(--surface-2);stroke:var(--line);stroke-width:4}
+.ring .fg{fill:none;stroke:var(--sc,var(--accent));stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .5s ease}
+.ring b{position:relative;font-family:var(--f-display);font-weight:400;font-size:17px;color:var(--sc,var(--accent-strong));font-variant-numeric:tabular-nums}
+.ring.full .bg{fill:var(--gold);stroke:var(--gold)} .ring.full .fg{stroke:var(--gold-deep)} .ring.full b{color:var(--gold-on)}
+.ring.lg{width:56px;height:56px} .ring.lg b{font-size:22px}
+.vrow{border-left:6px solid var(--sc,var(--line));padding-left:10px;transition:transform .15s ease}
+.vrow.done{background:linear-gradient(90deg,color-mix(in srgb,var(--gold) 14%,var(--surface)),var(--surface) 60%)}
+.vcard{border-top:6px solid var(--sc,var(--accent))}
+.vc-ref{color:var(--sc,var(--accent-strong))}
+.sec .sheet-no{color:var(--sc,var(--accent-strong))}
+.tab[aria-selected="true"]{background:var(--sc,var(--ink));color:#fff;border-color:var(--sc,var(--ink))}
+:root[data-theme="dark"] .tab[aria-selected="true"],.tab[aria-selected="true"]{text-shadow:0 1px 0 rgba(0,0,0,.2)}
+
+.mode{position:relative;overflow:hidden;border-width:2px}
+.mode.m1{--mc:var(--m1)} .mode.m2{--mc:var(--m2)} .mode.m3{--mc:var(--m3)}
+.mode-head{grid-template-columns:44px minmax(0,1fr) 26px}
+.micon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:color-mix(in srgb,var(--mc) 16%,var(--surface));color:var(--mc)}
+.micon svg{width:26px;height:26px}
+.mode.done{border-color:var(--gold)}
+.mode.done::after{content:"통과";position:absolute;top:10px;right:-28px;transform:rotate(35deg);background:var(--gold);color:var(--gold-on);font-family:var(--f-display);font-size:12px;padding:2px 32px;box-shadow:0 2px 0 var(--gold-deep)}
+.mode .btn.primary{background:var(--mc);border-color:var(--mc);box-shadow:0 4px 0 color-mix(in srgb,var(--mc) 70%,#000)}
+.mode .btn.primary:active{box-shadow:0 1px 0 color-mix(in srgb,var(--mc) 70%,#000)}
+
+.cta{background:linear-gradient(135deg,var(--gold),color-mix(in srgb,var(--gold) 80%,#fff) 50%,var(--gold))}
+.heart{transition:color .3s ease}
+.heart.bye{animation:heartbreak .65s ease forwards}
+.combo{animation:pop .3s ease,glow 1s ease-in-out infinite alternate}
+.lvup-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;text-align:left;background:linear-gradient(135deg,var(--gold-soft),var(--surface));border:2px solid var(--gold);border-radius:18px;padding:10px 14px;animation:pop .45s ease}
+.lvup-card b{font-family:var(--f-display);font-weight:400;font-size:19px;display:block;color:var(--gold-ink)}
+.lvup-card span{font-size:13px;color:var(--muted)}
+.lvup-card .avatar{animation:none}
+.sheet.pass .r-badge{animation:pop .5s ease}
+@keyframes bob{50%{transform:translateY(-4px)}}
+@keyframes heartbreak{0%{transform:scale(1)}35%{transform:scale(1.45) rotate(-12deg);color:var(--bad)}70%{transform:scale(.7) rotate(10deg);color:var(--bad)}100%{transform:scale(1);color:var(--line)}}
+@keyframes glow{from{box-shadow:0 0 0 0 color-mix(in srgb,var(--gold) 0%,transparent)}to{box-shadow:0 0 14px 2px color-mix(in srgb,var(--gold) 65%,transparent)}}
+
 @keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(4px)}}
 @keyframes pulse{50%{background:transparent}}
@@ -312,10 +371,10 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(
 <script>
 /* ---------- 구절 데이터 (말씀암송 1·2·3·4 인쇄물) ---------- */
 const SERIES=[
-  {id:'church',sheet:'말씀암송 (1)',name:'교회 시리즈',short:'교회',range:'1–7'},
-  {id:'acts',sheet:'말씀암송 (2)',name:'사도행전 시리즈',short:'사도행전',range:'8–20'},
-  {id:'isa',sheet:'말씀암송 (3)',name:'고난의 종의 노래 · 하나님을 만남',short:'고난의 종 · 하나님을 만남',range:'21–30'},
-  {id:'gospel',sheet:'말씀암송 (4)',name:'복음 시리즈',short:'복음',range:'31–42'}
+  {id:'church',c:1,sheet:'말씀암송 (1)',name:'교회 시리즈',short:'교회',range:'1–7'},
+  {id:'acts',c:2,sheet:'말씀암송 (2)',name:'사도행전 시리즈',short:'사도행전',range:'8–20'},
+  {id:'isa',c:3,sheet:'말씀암송 (3)',name:'고난의 종의 노래 · 하나님을 만남',short:'고난의 종 · 하나님을 만남',range:'21–30'},
+  {id:'gospel',c:4,sheet:'말씀암송 (4)',name:'복음 시리즈',short:'복음',range:'31–42'}
 ];
 const VERSES=[
   {n:1,s:'church',t:'교회를 향한 하나님의 비전',b:'고린도후서',c:4,v:'7',p:[[7,'우리가 이 보배를 질그릇에 가졌으니 이는 심히 큰 능력은 하나님께 있고 우리에게 있지 아니함을 알게 하려 함이라']]},
@@ -402,7 +461,10 @@ const ICON={
   go:'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="currentColor" opacity=".14"/><path d="M16 12.5v15l12-7.5z" fill="currentColor"/></svg>',
   heart:'<svg class="heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 5.3 3.2 1.7-2 3.2-3.2 5.3-3.2 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
-  retry:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v5h5"/></svg>'
+  retry:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v5h5"/></svg>',
+  blank:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4a2.5 2.5 0 1 1 5 0h4v4a2.5 2.5 0 1 1 0 5v3H4z"/></svg>',
+  order:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h4l8 10h4M4 17h4l2-2.5M14 9.5L16 7h4"/><path d="M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>',
+  type:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4.5-1L20 7.5l-3.5-3.5L5 15.5z"/><path d="M14 6.5l3.5 3.5"/></svg>'
 };
 
 /* ---------- 진도 저장 ---------- */
@@ -562,9 +624,9 @@ async function loadBoard(force){
   if(view.name==='home')render();
 }
 function boardRow(r,i){
-  const title=TITLES[Math.min(r.lv-1,TITLES.length-1)];
+  const title=ARMOR[Math.min(r.lv-1,ARMOR.length-1)].t;
   return `<li class="${r.id===myId?'me':''}"><span class="rk ${i<3?'top':''}">${i+1}</span>
-    <span class="nm">${esc(r.name)}${r.id===myId?' (나)':''}<span class="sub">Lv.${r.lv} ${title} · ${r.streak}일 연속 · 정복 ${r.m.map((c,k)=>`${DIFF[k+1].name[0]}${c}`).join(' ')}</span></span>
+    <span class="nm">${avatar(r.lv,22,'mini')}${esc(r.name)}${r.id===myId?' (나)':''}<span class="sub">Lv.${r.lv} ${title} · ${r.streak}일 연속 · 정복 ${r.m.map((c,k)=>`${DIFF[k+1].name[0]}${c}`).join(' ')}</span></span>
     <span class="xp">${r.xp.toLocaleString()} XP</span></li>`;
 }
 function boardView(){
@@ -636,9 +698,58 @@ function stars(n,d=S.diff){const x=S.verses[n];if(!x)return [false,false,false];
 const starCount=(n,d)=>stars(n,d).filter(Boolean).length;
 const mastered=(n,d)=>starCount(n,d)===3;
 function topMastered(n){let t=0;for(let d=1;d<=ND;d++)if(mastered(n,d))t=d;return t}
-const LV_XP=150;
-const TITLES=['새싹','어린 양','제자','일꾼','증인','파수꾼','등대','말씀의 용사'];
-function lvl(){const L=Math.floor(S.xp/LV_XP)+1;return {L,title:TITLES[Math.min(L-1,TITLES.length-1)],into:S.xp%LV_XP}}
+/* ---------- 레벨 = 전신갑주 (엡 6:13-17) · 한 레벨마다 갑주 한 벌씩 ---------- */
+const ARMOR=[
+  {t:'새싹',short:'새싹',piece:null,desc:'이제 막 말씀을 심기 시작했어요'},
+  {t:'진리의 허리띠',short:'허리띠',piece:'belt',ref:'엡 6:14',desc:'진리로 너희 허리띠를 띠고'},
+  {t:'의의 호심경',short:'호심경',piece:'plate',ref:'엡 6:14',desc:'의의 호심경을 붙이고'},
+  {t:'복음의 신',short:'신',piece:'shoes',ref:'엡 6:15',desc:'평안의 복음이 준비한 것으로 신을 신고'},
+  {t:'믿음의 방패',short:'방패',piece:'shield',ref:'엡 6:16',desc:'믿음의 방패를 가지고 악한 자의 모든 불화살을 소멸하고'},
+  {t:'구원의 투구',short:'투구',piece:'helmet',ref:'엡 6:17',desc:'구원의 투구와'},
+  {t:'성령의 검',short:'검',piece:'sword',ref:'엡 6:17',desc:'성령의 검 곧 하나님의 말씀을 가지라'},
+  {t:'말씀의 용사',short:'용사',piece:'full',ref:'엡 6:13',desc:'하나님의 전신갑주를 입었어요. 계속 XP를 모아 순위를 올려요'}];
+const LV_AT=[0,120,300,550,900,1350,1900,2600];  // XP needed to reach each level
+const TITLES=ARMOR.map(a=>a.t);
+function lvl(){
+  let L=1;while(L<LV_AT.length&&S.xp>=LV_AT[L])L++;
+  const need=L<LV_AT.length?LV_AT[L]-LV_AT[L-1]:0;
+  return {L,title:ARMOR[L-1].t,into:S.xp-LV_AT[L-1],need,next:ARMOR[L]||null};
+}
+const PIECE_ICON={
+  belt:'<svg viewBox="0 0 24 24"><rect x="2" y="9" width="20" height="6" rx="2" fill="currentColor" opacity=".5"/><rect x="9" y="7" width="6" height="10" rx="1.5" fill="currentColor"/></svg>',
+  plate:'<svg viewBox="0 0 24 24"><path d="M5 4h14v9q0 6-7 8-7-2-7-8z" fill="currentColor" opacity=".5"/><path d="M11 7h2v9h-2zM8 10h8v2H8z" fill="currentColor"/></svg>',
+  shoes:'<svg viewBox="0 0 24 24"><path d="M4 11h7l3 3h6v4H4z" fill="currentColor"/><path d="M4 11h7v3H4z" fill="currentColor" opacity=".5"/></svg>',
+  shield:'<svg viewBox="0 0 24 24"><path d="M4 4h16v9q0 7-8 9-8-2-8-9z" fill="currentColor" opacity=".5"/><path d="M11 7h2v10h-2zM8 10h8v2H8z" fill="currentColor"/></svg>',
+  helmet:'<svg viewBox="0 0 24 24"><path d="M5 14q0-9 7-9t7 9v1H5z" fill="currentColor" opacity=".5"/><rect x="3" y="14" width="18" height="4" rx="2" fill="currentColor"/></svg>',
+  sword:'<svg viewBox="0 0 24 24"><path d="M12 2l3 3v10H9V5z" fill="currentColor" opacity=".5"/><rect x="6" y="15" width="12" height="3" rx="1" fill="currentColor"/><rect x="10.5" y="18" width="3" height="4" rx="1" fill="currentColor"/></svg>'
+};
+// The little warrior: pieces appear as the level rises (belt → breastplate → shoes → shield → helmet → sword → full armor glow)
+function avatar(L,size=104,cls=''){
+  const has=p=>L>=ARMOR.findIndex(a=>a.piece===p)+1,full=L>=8;
+  const skin='#F3C9A2',hair='#3B2A1F',tunic='#F4EFE3',pants='#4A6FA5',silver='#D6DBE3',silverD='#8E97A4',gold='#F2C14E',goldD='#B8862B',ink='#2B2B2B';
+  return `<svg class="avatar ${cls}" viewBox="0 0 120 150" width="${size}" height="${Math.round(size*1.25)}" aria-hidden="true">
+    ${full?`<circle cx="60" cy="82" r="58" fill="${gold}" opacity=".28"><animate attributeName="r" values="55;61;55" dur="3s" repeatCount="indefinite"/></circle>
+      <g fill="${gold}"><path d="M14 40l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M104 26l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M102 122l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z"/></g>`:''}
+    <rect x="43" y="108" width="14" height="34" rx="7" fill="${pants}"/><rect x="63" y="108" width="14" height="34" rx="7" fill="${pants}"/>
+    ${has('shoes')?`<path d="M38 134h20v10q0 5-5 5H40q-4 0-4-4z" fill="${goldD}"/><path d="M62 134h20v10q0 5-5 5H66q-4 0-4-4z" fill="${goldD}"/><rect x="38" y="134" width="20" height="4" fill="${gold}"/><rect x="62" y="134" width="20" height="4" fill="${gold}"/>`
+      :`<rect x="41" y="138" width="18" height="10" rx="5" fill="#8A6A4F"/><rect x="61" y="138" width="18" height="10" rx="5" fill="#8A6A4F"/>`}
+    ${has('sword')?`<path d="M93 34l5 4v62h-10V38z" fill="${silver}" stroke="${silverD}" stroke-width="1.5"/>${full?`<path d="M90 40h4v40h-4z" fill="#fff" opacity=".7"/>`:''}<rect x="84" y="100" width="20" height="6" rx="2" fill="${gold}"/><rect x="90" y="106" width="8" height="16" rx="3" fill="#6B4A2B"/>`:''}
+    <path d="M38 78L26 106" stroke="${skin}" stroke-width="12" stroke-linecap="round"/><path d="M82 78l12 28" stroke="${skin}" stroke-width="12" stroke-linecap="round"/>
+    <rect x="34" y="64" width="52" height="52" rx="16" fill="${tunic}"/>
+    ${has('plate')?`<path d="M42 70h36v26q0 10-18 14-18-4-18-14z" fill="${silver}" stroke="${silverD}" stroke-width="2"/><path d="M58 78h4v16h-4zM52 84h16v4H52z" fill="${gold}"/>`:''}
+    ${has('belt')?`<rect x="34" y="100" width="52" height="10" fill="${goldD}"/><rect x="53" y="98" width="14" height="14" rx="3" fill="${gold}" stroke="${goldD}" stroke-width="2"/>`:''}
+    ${has('shield')?`<path d="M8 84h32v22q0 14-16 20-16-6-16-20z" fill="#3B6FD6" stroke="#223F8A" stroke-width="2.5"/><path d="M22 92h4v22h-4zM14 100h20v4H14z" fill="${gold}"/>`:''}
+    <circle cx="60" cy="42" r="23" fill="${skin}"/>
+    <path d="M37 40q4-22 23-22t23 22q-8-8-23-7-15-1-23 7z" fill="${hair}"/>
+    <circle cx="51" cy="44" r="2.6" fill="${ink}"/><circle cx="69" cy="44" r="2.6" fill="${ink}"/>
+    <path d="M52 52q8 7 16 0" stroke="${ink}" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+    <circle cx="45" cy="50" r="3" fill="#F08A8A" opacity=".45"/><circle cx="75" cy="50" r="3" fill="#F08A8A" opacity=".45"/>
+    ${has('helmet')?`<path d="M35 42q0-26 25-26t25 26v2H35z" fill="${silver}" stroke="${silverD}" stroke-width="2"/><rect x="31" y="40" width="58" height="7" rx="3.5" fill="${silverD}"/><path d="M56 16q4-10 8 0 2 6-4 6-6 0-4-6z" fill="#D9534F"/>`:''}
+  </svg>`;
+}
+function armorRow(L){
+  return `<div class="armor-row" aria-label="전신갑주 ${Math.min(L-1,6)}/6">${ARMOR.slice(1,7).map((a,i)=>`<span class="piece ${L>=i+2?'on':''}" title="${a.t}">${PIECE_ICON[a.piece]}<small>${a.short}</small></span>`).join('')}</div>`;
+}
 const filtered=()=>S.series==='all'?VERSES:VERSES.filter(v=>v.s===S.series);
 
 /* ---------- 소리 · 효과 ---------- */
@@ -719,9 +830,12 @@ function render(){
 
 /* ---------- 홈 ---------- */
 function pips(n){const s=stars(n);return `<span class="pips" aria-label="별 ${s.filter(Boolean).length}개 / 3개">${s.map(on=>`<i class="${on?'on':''}"></i>`).join('')}</span>`}
+// verse number inside a progress ring: stars at the current difficulty out of 3
+function ring(n,lg){const c=starCount(n),R=18,C=2*Math.PI*R;return `<span class="ring ${c===3?'full':''} ${lg?'lg':''}"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="${R}" class="bg"/><circle cx="22" cy="22" r="${R}" class="fg" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-c/3)).toFixed(1)}"/></svg><b>${n}</b></span>`}
+const sc=v=>`style="--sc:var(--c${seriesOf(v.s).c})"`;
 function row(v){
   const top=topMastered(v.n);
-  return `<li><button class="vrow ${mastered(v.n)?'done':''}" data-act="open" data-n="${v.n}"><span class="num">${v.n}</span><span class="vrow-main"><span class="vrow-title">${esc(v.t)}</span><span class="vrow-ref">${ref(v)}</span></span>
+  return `<li><button class="vrow ${mastered(v.n)?'done':''}" data-act="open" data-n="${v.n}" ${sc(v)}>${ring(v.n)}<span class="vrow-main"><span class="vrow-title">${esc(v.t)}</span><span class="vrow-ref">${ref(v)}</span></span>
     <span class="vrow-side">${pips(v.n)}${top?`<span class="lvtag d${top}">${DIFF[top].name} 정복</span>`:''}</span></button></li>`;
 }
 function namePanel(){
@@ -734,17 +848,18 @@ function homeView(){
   const l=lvl(),list=filtered(),d=S.diff,df=DIFF[d],m=list.filter(v=>mastered(v.n,d)).length,g=todayGames();
   const sel=S.series==='all'?null:seriesOf(S.series);
   const groups=sel?[sel]:SERIES;
-  const tabs=[{id:'all',short:'전체'},...SERIES].map(s=>`<button class="tab" role="tab" aria-selected="${S.series===s.id}" data-act="series" data-id="${s.id}">${esc(s.short)}</button>`).join('');
+  const tabs=[{id:'all',short:'전체'},...SERIES].map(s=>`<button class="tab" role="tab" aria-selected="${S.series===s.id}" data-act="series" data-id="${s.id}" ${s.c?`style="--sc:var(--c${s.c})"`:''}>${esc(s.short)}</button>`).join('');
   return `
   <section class="hero" aria-label="나의 기록">
     <div class="hero-top">
-      <div class="lv-badge"><span><small>LV</small>${l.L}</span></div>
+      <div class="avatar-wrap">${avatar(l.L)}<span class="lv-pill">Lv.${l.L}</span></div>
       <div class="lv-info">
         <div class="lv-name">${SYNC_URL&&!cloud?(S.name&&syncCode?`<span>${esc(S.name)}</span>`:''):S.name?`<span>${esc(S.name)}</span><button data-act="panel" data-p="name" aria-label="닉네임 바꾸기">✎</button>`:`<button data-act="panel" data-p="name">닉네임 정하기</button>`}</div>
         <div class="lv-title">${l.title}</div>
-        <div class="bar"><i style="width:${l.into/LV_XP*100}%"></i></div>
-        <p class="tiny">다음 레벨까지 ${LV_XP-l.into} XP</p></div>
+        <div class="bar"><i style="width:${l.need?l.into/l.need*100:100}%"></i></div>
+        <p class="tiny">${l.next?`다음 갑주 <b>${l.next.t}</b>까지 <span style="white-space:nowrap">${l.need-l.into} XP</span>`:'전신갑주 완성! 계속 XP를 모아 순위를 올려요'}</p></div>
     </div>
+    ${armorRow(l.L)}
     ${heroSave()}
     <div class="stats">
       <div class="stat"><b>${curStreak()}</b><span>일 연속</span></div>
@@ -761,7 +876,7 @@ function homeView(){
   ${boardView()}
   <div class="tabs" role="tablist" aria-label="시리즈">${tabs}</div>
   <p class="tiny">구절을 눌러 빈칸 채우기, 순서 맞추기, 직접 써보기를 통과하면 별 3개로 그 난이도를 정복해요. 네 난이도를 모두 정복해 보세요.</p>
-  ${groups.map(s=>`<section class="group"><h2 class="sec"><span><span class="sheet-no">${s.sheet}</span> ${esc(s.name)}</span><span class="range">${s.range}</span></h2><ul class="vlist">${VERSES.filter(v=>v.s===s.id).map(row).join('')}</ul></section>`).join('')}
+  ${groups.map(s=>`<section class="group" style="--sc:var(--c${s.c})"><h2 class="sec"><span><span class="sheet-no">${s.sheet}</span> ${esc(s.name)}</span><span class="range">${s.range}</span></h2><ul class="vlist">${VERSES.filter(v=>v.s===s.id).map(row).join('')}</ul></section>`).join('')}
   ${keepView()}
   <p class="tiny" style="text-align:center">주평예수교회 말씀암송 · 교회 식구들과 함께 외워요</p>
   <div class="foot">
@@ -824,8 +939,8 @@ function cycleHide(v){
 function verseView(v){
   const d=S.diff,df=DIFF[d],st=stars(v.n),x=S.verses[v.n],best=x?x.t[d-1]:0,idx=VERSES.indexOf(v),prev=VERSES[idx-1],next=VERSES[idx+1];
   return `
-  <article class="vcard">
-    <div class="vc-head"><span class="num lg">${v.n}</span><div><div class="vc-series">${esc(seriesOf(v.s).name)}</div><h2 class="vc-title">${esc(v.t)}</h2><div class="vc-ref">${ref(v)}</div></div></div>
+  <article class="vcard" ${sc(v)}>
+    <div class="vc-head">${ring(v.n,true)}<div><div class="vc-series">${esc(seriesOf(v.s).name)}</div><h2 class="vc-title">${esc(v.t)}</h2><div class="vc-ref">${ref(v)}</div></div></div>
     <p class="verse">${studyText(v)}</p>
     <div class="vc-tools">
       <button class="btn small" data-act="hide">${HIDE_NEXT[ui.hide]}</button>
@@ -836,17 +951,17 @@ function verseView(v){
   <section class="modes" aria-label="암송 연습">
     <h3 class="sec"><span>암송 연습 · ${df.name}</span><button class="link" data-act="home">난이도 바꾸기</button></h3>
     <div class="mast" aria-label="정복한 난이도">${[1,2,3,4].map(i=>`<span class="${mastered(v.n,i)?'on':''}">${DIFF[i].name}${mastered(v.n,i)?' ✓':''}</span>`).join('')}</div>
-    <div class="mode">
-      <div class="mode-head"><span class="star ${st[0]?'on':''}"></span><div><b>빈칸 채우기</b><span class="d">${d>=4?'모든 단어를 말씀 순서대로 눌러요':'빈칸에 들어갈 단어를 순서대로 눌러요'}${df.dist?' · 헷갈리는 단어 섞임':''}</span></div>${st[0]?'<span class="best">통과 ✓</span>':''}</div>
-      <button class="btn ${!st[0]?'primary':''}" data-act="blank">빈칸 채우기 시작</button>
+    <div class="mode m1 ${st[0]?'done':''}">
+      <div class="mode-head"><span class="micon">${ICON.blank}</span><div><b>빈칸 채우기</b><span class="d">${d>=4?'모든 단어를 말씀 순서대로 눌러요':'빈칸에 들어갈 단어를 순서대로 눌러요'}${df.dist?' · 헷갈리는 단어 섞임':''}</span></div><span class="star ${st[0]?'on':''}"></span></div>
+      <button class="btn ${!st[0]?'primary':''}" data-act="blank">${st[0]?'다시 하기':'시작하기'}</button>
     </div>
-    <div class="mode">
-      <div class="mode-head"><span class="star ${st[1]?'on':''}"></span><div><b>순서 맞추기</b><span class="d">${df.chunk===1?'한 단어씩 차례대로 이어요':'흩어진 말씀 조각을 차례대로 이어요'}</span></div>${st[1]?'<span class="best">통과 ✓</span>':''}</div>
-      <button class="btn ${st[0]&&!st[1]?'primary':''}" data-act="order">순서 맞추기 시작</button>
+    <div class="mode m2 ${st[1]?'done':''}">
+      <div class="mode-head"><span class="micon">${ICON.order}</span><div><b>순서 맞추기</b><span class="d">${df.chunk===1?'한 단어씩 차례대로 이어요':'흩어진 말씀 조각을 차례대로 이어요'}</span></div><span class="star ${st[1]?'on':''}"></span></div>
+      <button class="btn ${st[0]&&!st[1]?'primary':''}" data-act="order">${st[1]?'다시 하기':'시작하기'}</button>
     </div>
-    <div class="mode">
-      <div class="mode-head"><span class="star ${st[2]?'on':''}"></span><div><b>직접 써보기</b><span class="d">${df.hint==='on'?'첫 글자 힌트를 보고':df.hint==='opt'?'힌트는 선택,':'힌트 없이'} 구절을 써요 · ${df.pass}% 이상 통과</span></div>${best?`<span class="best">최고 ${best}%</span>`:''}</div>
-      <button class="btn ${st[1]&&!st[2]?'primary':''}" data-act="type">직접 써보기 시작</button>
+    <div class="mode m3 ${st[2]?'done':''}">
+      <div class="mode-head"><span class="micon">${ICON.type}</span><div><b>직접 써보기</b><span class="d">${df.hint==='on'?'첫 글자 힌트를 보고':df.hint==='opt'?'힌트는 선택,':'힌트 없이'} 구절을 써요 · ${df.pass}% 이상 통과${best?` · 최고 ${best}%`:''}</span></div><span class="star ${st[2]?'on':''}"></span></div>
+      <button class="btn ${st[1]&&!st[2]?'primary':''}" data-act="type">${st[2]?'다시 하기':'시작하기'}</button>
     </div>
   </section>
   <nav class="pager" aria-label="다른 구절">
@@ -863,7 +978,7 @@ function gref(v){
 }
 function gameTop(v,done,total){
   return `<div class="gtop">${gref(v)}
-    <div class="hearts" aria-label="남은 기회 ${G.hearts}개">${Array.from({length:G.maxH},(_,i)=>ICON.heart.replace('class="heart"',`class="heart ${i<G.hearts?'':'lost'}"`)).join('')}</div></div>
+    <div class="hearts" aria-label="남은 기회 ${G.hearts}개">${Array.from({length:G.maxH},(_,i)=>ICON.heart.replace('class="heart"',`class="heart ${i<G.hearts?'':'lost'} ${G.justLost&&i===G.hearts?'bye':''}"`)).join('')}</div></div>
     <div class="bar thin"><i style="width:${total?done/total*100:0}%"></i></div>`;
 }
 function btns(list){return list.map(([label,act,cls,extra])=>`<button class="btn ${cls||''}" data-act="${act}" ${extra||''}>${label}</button>`).join('')}
@@ -877,7 +992,8 @@ function resultSheet(){
     <p>${r.msg}</p>
     ${st}
     ${r.extra||''}
-    <div class="r-xp"><span>+${r.xp} XP</span>${r.newStar?'<span>새 별 획득</span>':''}${r.levelUp?`<span class="lvup">레벨 업! Lv.${lvl().L} ${lvl().title}</span>`:''}</div>
+    <div class="r-xp"><span>+${r.xp} XP</span>${r.newStar?'<span>새 별 획득</span>':''}</div>
+    ${r.levelUp?`<div class="lvup-card">${avatar(lvl().L,62)}<div><b>레벨 업! ${esc(lvl().title)}</b><span>${esc(ARMOR[lvl().L-1].desc)}${ARMOR[lvl().L-1].ref?` (${ARMOR[lvl().L-1].ref})`:''}</span></div></div>`:''}
     <div class="r-actions">${r.actions}</div>
   </div>`;
 }
@@ -888,6 +1004,8 @@ function wrapResult(n,starIdx,before,lvBefore,base){
   if(base.pass&&!before.every(Boolean)&&after.every(Boolean)){base.title=`${DIFF[S.diff].name} 정복!`;base.msg+=` ${DIFF[S.diff].name} 난이도의 별 3개를 모두 모았어요.${S.diff<ND?' 다음 난이도에도 도전해 보세요.':''}`}
   return base;
 }
+// the heart that was just lost breaks on the next render, then stays grey
+function loseHeart(){G.justLost=true;const g=G;setTimeout(()=>{if(G===g)G.justLost=false},700)}
 function failResult(xp){
   const lvB=lvl().L;recordGame(xp);
   G.result={pass:false,title:'아쉬워요',msg:'기회를 모두 썼어요. 구절을 한 번 더 읽고 다시 도전해 봐요.',xp,levelUp:lvl().L>lvB,
@@ -930,7 +1048,7 @@ function onChip(i){
   }else{
     G.hearts--;G.mistakes++;sfx('bad');buzz();
     if(G.hearts<=0)return failResult(2);
-    render();flash(`[data-act="chip"][data-i="${i}"]`,'shake');
+    loseHeart();render();flash(`[data-act="chip"][data-i="${i}"]`,'shake');
   }
 }
 function finishBlank(){
@@ -970,7 +1088,7 @@ function onPiece(id){
   }else{
     G.hearts--;G.mistakes++;sfx('bad');buzz();
     if(G.hearts<=0)return failResult(2);
-    render();flash(`[data-act="piece"][data-i="${id}"]`,'shake');
+    loseHeart();render();flash(`[data-act="piece"][data-i="${id}"]`,'shake');
   }
 }
 function finishOrder(){
