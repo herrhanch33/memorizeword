@@ -58,6 +58,21 @@ button{font:inherit;color:inherit}
 .logo{color:var(--accent);display:grid;place-items:center;width:34px;height:42px;flex:none}
 .top-title{flex:1;min-width:0;margin:0;font-family:var(--f-display);font-weight:400;font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
 .top-title small{display:block;font-family:var(--f-body);font-size:12px;color:var(--muted);letter-spacing:.02em}
+.save-row{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:center}
+.save-row.done{grid-template-columns:1fr auto auto}
+.save-row.new{grid-template-columns:1fr auto auto;margin-top:2px}
+.save-row.new .save-status{grid-column:1/-1;white-space:normal}
+.save-row.new .h-in{grid-column:1/2}
+.h-in{min-width:0;width:100%;min-height:42px;border-radius:12px;border:0;padding:0 12px;font:inherit;font-size:16px;background:var(--surface);color:var(--ink)}
+.h-in:focus{outline:3px solid var(--gold)}
+.h-btn{min-height:42px;border:0;border-radius:12px;padding:0 14px;font-family:var(--f-display);font-size:15px;background:var(--gold);color:var(--gold-on);cursor:pointer;white-space:nowrap;box-shadow:0 3px 0 var(--gold-deep)}
+.h-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--gold-deep)}
+.h-btn.ghost{background:color-mix(in srgb,var(--accent-ink) 18%,transparent);color:inherit;box-shadow:none}
+.save-status{font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hero .note{background:var(--surface);color:var(--ink)}
+.hero .note.good{background:var(--accent-soft);color:var(--accent-strong)}
+.hero .note.bad{background:var(--bad-soft);color:var(--bad)}
+.hero .tiny{margin:0}
 .adv summary{cursor:pointer;font-family:var(--f-display);font-size:16px;color:var(--muted)}
 .adv[open] summary{color:var(--ink);margin-bottom:4px}
 .xp-chip{font-family:var(--f-display);font-size:14px;background:var(--gold-soft);color:var(--gold-ink);padding:4px 10px;border-radius:999px;white-space:nowrap;flex:none;font-variant-numeric:tabular-nums}
@@ -583,15 +598,15 @@ async function account(kind){
   ui.syncBusy=true;ui.msg=null;render();
   try{
     const {status,j}=await acctPost(kind==='signup'?'/v1/signup':'/v1/login',{name,pin});
-    if(status===409)throw '이미 쓰고 있는 닉네임이에요. 내 진도라면 "불러오기"를, 아니면 다른 이름을 정해 주세요.';
-    if(status===404)throw '그 닉네임으로 저장된 진도가 없어요. 처음이라면 "저장 시작하기"를 눌러 주세요.';
-    if(status===401)throw '비밀번호가 맞지 않아요.';
+    if(status===409)throw '방금 누군가 그 닉네임으로 시작했어요. 내 진도라면 비밀번호를 넣어 "진도 저장"을, 아니면 다른 이름을 정해 주세요.';
+    if(status===404){ui.confirmNew=true;ui.pin2='';ui.syncBusy=false;render();{const f=$('#pin2');if(f)f.focus()}return}
+    if(status===401)throw '비밀번호가 맞지 않아요. 처음이라면 아직 안 쓴 다른 닉네임을 정해 주세요.';
     if(status===429)throw '여러 번 틀렸어요. 10분 뒤에 다시 해 보세요.';
     if(status===400)throw j&&j.error==='name'?'닉네임에 쓸 수 없는 글자가 있어요.':'비밀번호는 숫자 4~6자리예요.';
     if(!(status===200||status===201)||!j||!j.code)throw 0;
     S.name=String(j.name).slice(0,10);syncCode=String(j.code);
     try{localStorage.setItem(SYNC_KEY,syncCode)}catch(e){}
-    ui.panel=null;ui.pin='';ui.pin2='';
+    ui.panel=null;ui.pin='';ui.pin2='';ui.confirmNew=false;
     await syncNow();
     ui.msg=sync.err?{k:'',t:'계정은 만들어졌지만 아직 저장하지 못했어요. 인터넷이 되면 자동으로 저장돼요.'}
       :{k:'good',t:kind==='signup'?`${S.name}님, 이제부터 진도가 자동으로 저장돼요.`:`${S.name}님, 불러왔어요! 이 폰의 기록과 합쳤어요.`};
@@ -602,7 +617,7 @@ async function account(kind){
 function logout(){
   syncCode='';myId='';board.rows=null;board.at=0;clearTimeout(sync.timer);sync.at=0;sync.err='';
   try{localStorage.removeItem(SYNC_KEY)}catch(e){}
-  ui.msg={k:'',t:'저장을 껐어요. 이 폰의 기록은 그대로 남고, 언제든 "불러오기"로 다시 이을 수 있어요.'};
+  ui.msg={k:'',t:'저장을 껐어요. 이 폰의 기록은 그대로 남고, 같은 닉네임과 비밀번호로 "진도 저장"을 누르면 다시 이어져요.'};
 }
 
 /* ---------- 날짜 · 레벨 · 별 ---------- */
@@ -674,7 +689,7 @@ function flash(sel,cls){const el=document.querySelector(sel);if(!el)return;el.cl
 
 /* ---------- 화면 상태 ---------- */
 let view={name:'home'},G=null,timers=[];
-const ui={hide:0,mask:new Set(),peek:new Set(),confirmReset:false,panel:null,msg:null,bk:'',bkIn:'',nameIn:'',acctName:'',pin:'',pin2:'',syncBusy:false,adv:false};
+const ui={hide:0,mask:new Set(),peek:new Set(),confirmReset:false,panel:null,msg:null,bk:'',bkIn:'',nameIn:'',acctName:'',pin:'',pin2:'',confirmNew:false,syncBusy:false,adv:false};
 function clearTimers(){timers.forEach(f=>f());timers=[]}
 function go(v){clearTimers();stopSpeech();view=v;render();window.scrollTo(0,0)}
 
@@ -725,11 +740,12 @@ function homeView(){
     <div class="hero-top">
       <div class="lv-badge"><span><small>LV</small>${l.L}</span></div>
       <div class="lv-info">
-        <div class="lv-name">${S.name?`<span>${esc(S.name)}</span>${syncCode?'':`<button data-act="panel" data-p="name" aria-label="닉네임 바꾸기">✎</button>`}`:`<button data-act="panel" data-p="name">닉네임 정하기</button>`}</div>
+        <div class="lv-name">${SYNC_URL&&!cloud?(S.name&&syncCode?`<span>${esc(S.name)}</span>`:''):S.name?`<span>${esc(S.name)}</span><button data-act="panel" data-p="name" aria-label="닉네임 바꾸기">✎</button>`:`<button data-act="panel" data-p="name">닉네임 정하기</button>`}</div>
         <div class="lv-title">${l.title}</div>
         <div class="bar"><i style="width:${l.into/LV_XP*100}%"></i></div>
         <p class="tiny">다음 레벨까지 ${LV_XP-l.into} XP</p></div>
     </div>
+    ${heroSave()}
     <div class="stats">
       <div class="stat"><b>${curStreak()}</b><span>일 연속</span></div>
       <div class="stat"><b>${Math.min(g,3)}<em>/3</em></b><span>오늘의 목표</span></div>
@@ -755,29 +771,27 @@ function homeView(){
 }
 
 const timeStr=t=>new Date(t).toLocaleTimeString('ko-KR',{hour:'numeric',minute:'2-digit'});
-function acctForm(kind){
-  const signup=kind==='signup',busy=ui.syncBusy?'disabled':'';
-  return `<div class="keep-block"><b>${signup?'내 진도 저장 시작하기':'내 진도 불러오기'}</b>
-    <p class="tiny">${signup?'닉네임은 순위표에 보이는 이름이에요. 비밀번호는 숫자 4~6자리로 정하고 꼭 기억해 두세요.':'저장할 때 정한 닉네임과 비밀번호를 넣어 주세요. 이 폰의 기록과 합쳐져요.'}</p>
-    <input id="acctName" class="name-in" value="${esc(ui.acctName)}" maxlength="10" autocomplete="nickname" placeholder="닉네임" aria-label="닉네임">
-    <input id="pin" class="name-in" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="${esc(ui.pin)}" autocomplete="${signup?'new-password':'current-password'}" placeholder="비밀번호 (숫자 4~6자리)" aria-label="비밀번호">
-    ${signup?`<input id="pin2" class="name-in" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="${esc(ui.pin2)}" autocomplete="new-password" placeholder="비밀번호 한 번 더" aria-label="비밀번호 확인">`:''}
-    <div class="row"><button class="btn small primary" data-act="${kind}" ${busy}>${ui.syncBusy?'잠시만요…':signup?'저장 시작':'불러오기'}</button><button class="btn small ghost" data-act="panelClose">취소</button></div>
-    <p class="tiny">${signup?'이미 저장한 적이 있으면 ':'처음이면 '}<button class="link" data-act="panel" data-p="${signup?'login':'signup'}">${signup?'불러오기':'저장 시작하기'}</button></p></div>`;
+// The save box inside the hero: one nickname + PIN row. "진도 저장" logs in, and a name the
+// server doesn't know yet asks for the PIN once more and then signs up.
+function heroSave(){
+  if(!SYNC_URL||cloud)return '';
+  const note=ui.msg&&ui.msgAt==='sync'?`<p class="note ${ui.msg.k}" role="status">${esc(ui.msg.t)}</p>`:'';
+  const busy=ui.syncBusy?'disabled':'';
+  if(syncCode)return `<div class="save-row done">
+      <span class="save-status" role="status">${sync.err?esc(sync.err):sync.at?'저장됨 ✓ '+timeStr(sync.at):'저장 중…'}</span>
+      <button class="h-btn ghost" data-act="syncNow">지금 저장</button><button class="h-btn ghost" data-act="logout">끄기</button></div>${note}`;
+  return `<div class="save-row">
+      <input id="acctName" class="h-in" value="${esc(ui.acctName||S.name)}" maxlength="10" autocomplete="nickname" placeholder="닉네임" aria-label="닉네임">
+      <input id="pin" class="h-in" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="${esc(ui.pin)}" autocomplete="current-password" placeholder="비밀번호" aria-label="비밀번호 (숫자 4~6자리)">
+      <button class="h-btn" data-act="save" ${busy}>${ui.syncBusy?'잠시만요…':'진도 저장'}</button></div>
+    ${ui.confirmNew?`<div class="save-row new"><span class="save-status"><b>${esc(ui.acctName.trim())}</b>은(는) 처음이에요. 비밀번호를 한 번 더:</span>
+      <input id="pin2" class="h-in" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="${esc(ui.pin2)}" autocomplete="new-password" placeholder="비밀번호 확인" aria-label="비밀번호 확인">
+      <button class="h-btn" data-act="signup" ${busy}>${ui.syncBusy?'잠시만요…':'시작하기'}</button><button class="h-btn ghost" data-act="newNo">취소</button></div>`
+    :`<p class="tiny">닉네임과 숫자 비밀번호(4~6자리)를 정하고 누르면 진도가 저장되고 순위표에 올라가요. 다른 폰에서도 같은 걸 넣으면 이어서 해요.</p>`}
+    ${note}`;
 }
 function keepView(){
   const note=at=>ui.msg&&ui.msgAt===at?`<p class="note ${ui.msg.k}" role="status">${esc(ui.msg.t)}</p>`:'';
-  let sy='';
-  if(SYNC_URL&&!cloud){
-    sy=syncCode?`<div class="keep-block"><b>${esc(S.name)}님의 진도가 저장되고 있어요</b>
-        <p class="tiny">게임이 끝날 때마다 알아서 저장돼요. 다른 폰에서는 "내 진도 불러오기"에 같은 닉네임과 비밀번호를 넣으면 돼요.</p>
-        <p class="tiny" role="status">${sync.err?esc(sync.err):sync.at?'마지막 저장 '+timeStr(sync.at):'저장 중…'}</p>
-        <div class="row"><button class="btn small" data-act="syncNow">지금 저장</button><button class="btn small ghost" data-act="logout">이 폰에서 끄기</button></div></div>`
-    :ui.panel==='signup'||ui.panel==='login'?acctForm(ui.panel)
-    :`<div class="keep-block"><b>내 진도 저장하기</b>
-        <p class="tiny">닉네임과 비밀번호를 정하면 진도가 저장돼요. 폰을 바꿔도 이어서 할 수 있고, 친구들 순위표에도 올라가요.</p>
-        <div class="row"><button class="btn small primary" data-act="panel" data-p="signup">저장 시작하기</button><button class="btn small" data-act="panel" data-p="login">불러오기</button></div></div>`;
-  }
   const bk=ui.panel==='backup'?`<textarea class="code" id="bkOut" rows="3" readonly aria-label="백업 코드">${esc(ui.bk)}</textarea>
       <p class="tiny">카카오톡 '나에게 보내기'나 메모에 붙여 두세요.</p>
       <div class="row"><button class="btn small" data-act="bkCopy">다시 복사</button><button class="btn small ghost" data-act="panelClose">닫기</button></div>`
@@ -785,10 +799,8 @@ function keepView(){
       <div class="row"><button class="btn small primary" data-act="bkLoad">불러오기</button><button class="btn small ghost" data-act="panelClose">취소</button></div>`
     :`<div class="row"><button class="btn small" data-act="bkMake">백업 코드 만들기</button><button class="btn small" data-act="panel" data-p="restore">백업 불러오기</button></div>`;
   const advOpen=ui.adv||ui.panel==='backup'||ui.panel==='restore';
-  return `<section class="keep" aria-label="내 진도 저장">
-    <h2 class="sec"><span>${sy?'내 진도 저장':'기록 지키기'}</span></h2>
-    ${sy?note('sync')+sy:''}
-    <details class="adv keep-block" ${advOpen?'open':''}><summary>${sy?'고급: 백업 코드':'백업 코드'}</summary>
+  return `<section class="keep" aria-label="백업 코드">
+    <details class="adv keep-block" ${advOpen?'open':''}><summary>${SYNC_URL&&!cloud?'고급: 백업 코드':'백업 코드'}</summary>
       <p class="tiny">진도를 글자 코드로 저장해 두었다가 언제든 다시 불러올 수 있어요. 불러오면 지금 기록과 합쳐져요.</p>
       ${note('bk')}${bk}</details>
   </section>`;
@@ -1120,7 +1132,7 @@ app.addEventListener('click',e=>{
   if(!el||el.disabled)return;
   unlockAudio();
   const a=el.dataset.act,n=+el.dataset.n||view.n,i=+el.dataset.i;
-  if(/^(bk|sync|panel|signup|login|logout|toKeep)/.test(a))ui.msgAt=/^bk/.test(a)||el.dataset.p==='restore'?'bk':'sync';
+  if(/^(bk|sync|panel|signup|login|logout|toKeep|save|newNo)/.test(a))ui.msgAt=/^bk/.test(a)||el.dataset.p==='restore'?'bk':'sync';
   switch(a){
     case 'back':back();break;
     case 'sound':S.sound=!S.sound;save();if(S.sound)unlockAudio();render();break;
@@ -1134,7 +1146,9 @@ app.addEventListener('click',e=>{
     case 'nameSave':S.name=ui.nameIn.trim().replace(/[<>]/g,'').slice(0,10);ui.panel=null;save();render();if(S.name)loadBoard(true);break;
     case 'nameClear':S.name='';ui.panel=null;save();render();break;
     case 'boardRefresh':board.at=0;board.rows=null;render();loadBoard(true);break;
-    case 'toKeep':ui.panel='signup';ui.acctName=S.name;ui.msg=null;render();{const k=$('.keep');if(k)k.scrollIntoView({behavior:reduceMotion()?'auto':'smooth',block:'start'});const f=$('#acctName');if(f&&!f.value)f.focus()}break;
+    case 'toKeep':window.scrollTo({top:0,behavior:reduceMotion()?'auto':'smooth'});{const f=$('#acctName');if(f)f.focus()}break;
+    case 'save':ui.confirmNew=false;account('login');break;
+    case 'newNo':ui.confirmNew=false;ui.pin2='';render();break;
     case 'signup':case 'login':account(a);break;
     case 'logout':logout();render();break;
     case 'order':startOrder(n);break;
@@ -1171,7 +1185,7 @@ app.addEventListener('click',e=>{
 });
 app.addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role="button"][data-act]')){e.preventDefault();e.target.click()}
-  if(e.key==='Enter'&&/^(nameIn|acctName|pin|pin2)$/.test(e.target.id)){e.preventDefault();const b=$(e.target.id==='nameIn'?'[data-act="nameSave"]':'[data-act="signup"],[data-act="login"]');if(b)b.click()}
+  if(e.key==='Enter'&&/^(nameIn|acctName|pin|pin2)$/.test(e.target.id)){e.preventDefault();const b=$(e.target.id==='nameIn'?'[data-act="nameSave"]':e.target.id==='pin2'?'[data-act="signup"]':'[data-act="save"],[data-act="signup"],[data-act="login"]');if(b)b.click()}
 });
 app.addEventListener('input',e=>{
   const t=e.target;
