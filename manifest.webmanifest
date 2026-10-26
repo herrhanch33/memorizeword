@@ -1,7 +1,7 @@
 {
-  "name": "말씀암송 놀이터",
+  "name": "주평예수교회 말씀암송 놀이터",
   "short_name": "말씀암송",
-  "description": "성경 말씀 암송 게임",
+  "description": "주평예수교회 성경 말씀 암송 게임",
   "lang": "ko",
   "start_url": "./",
   "scope": "./",
