@@ -127,6 +127,38 @@ main{max-width:560px;margin:0 auto;padding-block:16px 48px;display:flex;flex-dir
 .note.good{background:var(--accent-soft);color:var(--accent-strong)}
 .note.bad{background:var(--bad-soft);color:var(--bad)}
 
+/* 닉네임 · 난이도 · 순위표 */
+.lv-name{display:flex;align-items:center;gap:6px;font-size:14px;min-width:0}
+.lv-name span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lv-name button{background:color-mix(in srgb,var(--accent-ink) 18%,transparent);border:0;color:inherit;border-radius:999px;padding:3px 10px;font-family:var(--f-display);font-size:13px;cursor:pointer;flex:none}
+.name-in{width:100%;min-height:46px;font-size:18px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:0 12px;font-family:var(--f-body)}
+.name-in:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.diffbox{display:grid;gap:8px}
+.diffbox .tiny{text-align:center}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--surface-2);border-radius:14px;padding:4px}
+.seg button{border:0;border-radius:11px;background:transparent;min-height:40px;padding:4px 2px;font-family:var(--f-display);font-size:14px;cursor:pointer;color:var(--muted);white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 2px 0 var(--line)}
+.seg button.d4[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.mast{display:flex;gap:6px;flex-wrap:wrap}
+.mast span{font-size:12px;padding:4px 9px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
+.mast span.on{background:var(--gold-soft);color:var(--gold-ink)}
+.vrow-side{display:grid;gap:4px;justify-items:end}
+.lvtag{font-size:11px;padding:2px 7px;border-radius:999px;background:var(--gold-soft);color:var(--gold-ink);font-family:var(--f-display);white-space:nowrap}
+.lvtag.d4{background:var(--ink);color:var(--bg)}
+.gref .dchip{display:inline-block;margin-left:6px;font-size:12px;padding:1px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);vertical-align:middle;font-family:var(--f-body)}
+.board{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:10px}
+.board .sec{font-size:17px}
+.board ol{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.board li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border-radius:12px;background:var(--surface-2)}
+.board li.me{outline:2px solid var(--accent);outline-offset:-2px}
+.board li.gap{background:none;text-align:center;color:var(--muted);padding:0;display:block}
+.board .rk{font-family:var(--f-display);font-size:16px;color:var(--muted);text-align:center}
+.board .rk.top{color:var(--gold-deep)}
+.board .nm{font-family:var(--f-display);font-size:16px;line-height:1.2;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board .sub{display:block;font-size:12px;color:var(--muted);font-family:var(--f-body)}
+.board .xp{font-family:var(--f-display);font-variant-numeric:tabular-nums;white-space:nowrap}
+.board .row{display:flex;flex-wrap:wrap;gap:8px}
+
 /* buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:6px 16px;line-height:1.3;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);font-family:var(--f-display);font-size:16px;cursor:pointer;box-shadow:0 3px 0 var(--line);text-align:center}
 .btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
@@ -260,13 +292,22 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(
 <canvas id="fx" hidden aria-hidden="true"></canvas>
 
 <script>
-/* ---------- 구절 데이터 (말씀암송 2·3·4 인쇄물) ---------- */
+/* ---------- 구절 데이터 (말씀암송 1·2·3·4 인쇄물) ---------- */
 const SERIES=[
+  {id:'church',sheet:'말씀암송 (1)',name:'교회 시리즈',short:'교회',range:'1–7'},
   {id:'acts',sheet:'말씀암송 (2)',name:'사도행전 시리즈',short:'사도행전',range:'8–20'},
   {id:'isa',sheet:'말씀암송 (3)',name:'고난의 종의 노래 · 하나님을 만남',short:'고난의 종 · 하나님을 만남',range:'21–30'},
   {id:'gospel',sheet:'말씀암송 (4)',name:'복음 시리즈',short:'복음',range:'31–42'}
 ];
 const VERSES=[
+  {n:1,s:'church',t:'교회를 향한 하나님의 비전',b:'고린도후서',c:4,v:'7',p:[[7,'우리가 이 보배를 질그릇에 가졌으니 이는 심히 큰 능력은 하나님께 있고 우리에게 있지 아니함을 알게 하려 함이라']]},
+  {n:2,s:'church',t:'교회를 향한 하나님의 비전(2) · 우리의 존재를 통해 그리스도를 드러냄',b:'고린도후서',c:4,v:'6',p:[[6,'어두운 데에 빛이 비치라 말씀하셨던 그 하나님께서 예수 그리스도의 얼굴에 있는 하나님의 영광을 아는 빛을 우리 마음에 비추셨느니라']]},
+  {n:3,s:'church',t:'교회를 향한 하나님의 비전(4) · 고난으로 드러나는 주님',b:'고린도후서',c:4,v:'10',p:[[10,'우리가 항상 예수의 죽음을 몸에 짊어짐은 예수의 생명이 또한 우리 몸에 나타나게 하려 함이라']]},
+  {n:4,s:'church',t:'교회를 향한 하나님의 비전(5) · 우리의 사역',b:'고린도후서',c:4,v:'12',p:[[12,'그런즉 사망은 우리 안에서 역사하고 생명은 너희 안에서 역사하느니라']]},
+  {n:5,s:'church',t:'교회(1) : 믿음의 공동체',b:'갈라디아서',c:2,v:'20',p:[[20,'내가 그리스도와 함께 십자가에 못 박혔나니 그런즉 이제는 내가 사는 것이 아니요 오직 내 안에 그리스도께서 사시는 것이라 이제 내가 육체 가운데 사는 것은 나를 사랑하사 나를 위하여 자기 자신을 버리신 하나님의 아들을 믿는 믿음 안에서 사는 것이라']]},
+  {n:6,s:'church',t:'교회(2) : 사랑의 공동체',b:'요한복음',c:13,v:'34-35',p:[[34,'새 계명을 너희에게 주노니 서로 사랑하라 내가 너희를 사랑한 것 같이 너희도 서로 사랑하라'],[35,'너희가 서로 사랑하면 이로써 모든 사람이 너희가 내 제자인 줄 알리라']]},
+  {n:7,s:'church',t:'교회(3) : 소망의 공동체',b:'골로새서',c:3,v:'2-3',p:[[2,'위의 것을 생각하고 땅의 것을 생각하지 말라'],[3,'이는 너희가 죽었고 너희 생명이 그리스도와 함께 하나님 안에 감추어졌음이라']]},
+
   {n:8,s:'acts',t:'그리스도 부활의 증인들',b:'사도행전',c:1,v:'5',p:[[5,'요한은 물로 세례를 베풀었으나 너희는 몇 날이 못되어 성령으로 세례를 받으리라 하셨느니라']]},
   {n:9,s:'acts',t:'승천의 선물, 성령',b:'사도행전',c:1,v:'8',p:[[8,'오직 성령이 너희에게 임하시면 너희가 권능을 받고 예루살렘과 온 유대와 사마리아와 땅 끝까지 이르러 내 증인이 되리라 하시니라']]},
   {n:10,s:'acts',t:'부활의 메시아',b:'사도행전',c:2,v:'36',p:[[36,'그런즉 이스라엘 온 집은 확실히 알지니 너희가 십자가에 못 박은 이 예수를 하나님이 주와 그리스도가 되게 하셨느니라 하니라']]},
@@ -320,8 +361,19 @@ const fullText=v=>v.p.map(x=>x[1]).join(' ');
 const byN=n=>VERSES.find(v=>v.n===n);
 const seriesOf=id=>SERIES.find(s=>s.id===id);
 function toks(v){const out=[];v.p.forEach(([num,txt])=>txt.split(/\s+/).filter(Boolean).forEach((w,k)=>out.push({w,vn:k===0?num:null})));return out}
-const vnHtml=x=>x.vn?`<sup class="vn">${x.vn}</sup>`:'';
-const LNAME=['','쉬움','보통','어려움'];
+// verse numbers are hidden in a game at the harder difficulties (they give the reference away)
+const vnHtml=x=>x.vn&&(!G||!G.d||DIFF[G.d].vn)?`<sup class="vn">${x.vn}</sup>`:'';
+
+/* ---------- 난이도 ---------- */
+// ratio: share of words blanked · dist: decoy chips · chunk: max words per order piece · hint: typing first-letter hint
+// ref/vn: show reference / verse numbers during a game · qt: quiz seconds per question · mult: XP multiplier · pass: typing pass %
+const ND=4;
+const DIFF=[null,
+  {name:'쉬움',ratio:.3,dist:0,chunk:3,hint:'on',ref:true,vn:true,qt:25000,mult:1,pass:90,desc:'빈칸 적음 · 장절 보임 · 첫 글자 힌트'},
+  {name:'보통',ratio:.55,dist:2,chunk:2,hint:'opt',ref:true,vn:true,qt:20000,mult:1.5,pass:90,desc:'빈칸 절반 · 헷갈리는 단어 섞임 · 힌트는 선택'},
+  {name:'어려움',ratio:.8,dist:4,chunk:2,hint:'none',ref:false,vn:false,qt:12000,mult:2,pass:90,desc:'빈칸 많음 · 장절 숨김 · 힌트 없음 · 문제당 12초'},
+  {name:'오직말씀',ratio:1,dist:6,chunk:1,hint:'none',ref:false,vn:false,qt:8000,mult:3,pass:95,desc:'전부 빈칸 · 한 단어씩 · 95% 통과 · 문제당 8초'}];
+const D=()=>DIFF[S.diff];
 
 const ICON={
   back:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
@@ -337,8 +389,21 @@ const ICON={
 
 /* ---------- 진도 저장 ---------- */
 const KEY='malsseum-amsong-v1';
-function blank(){return {xp:0,streak:0,lastDay:null,today:{day:null,games:0},verses:{},sound:true,series:'all',updatedAt:0}}
-function load(){try{const r=localStorage.getItem(KEY);if(r)return Object.assign(blank(),JSON.parse(r))}catch(e){}return blank()}
+const z4=()=>[0,0,0,0];
+function blank(){return {xp:0,streak:0,lastDay:null,today:{day:null,games:0},verses:{},name:'',diff:2,sound:true,series:'all',updatedAt:0}}
+// A verse record keeps b (blank cleared), o (order cleared) and t (best typing %) per difficulty, index = difficulty-1.
+// Older records had one blank level 1-3, one order flag and one typing score; those map onto 쉬움/보통/어려움.
+function migrateVerse(x){
+  if(!x||typeof x!=='object')return null;
+  if(Array.isArray(x.b))return x;
+  const b=+x.b||0,o=x.o?1:0;
+  return {b:[b>=1?1:0,b>=2?1:0,b>=3?1:0,0],o:[o,o,0,0],t:[+x.t||0,0,0,0],last:+x.last||0};
+}
+function migrateAll(vv){const out={};Object.keys(vv||{}).forEach(k=>{const m=migrateVerse(vv[k]);if(m)out[k]=m});return out}
+function load(){
+  try{const r=localStorage.getItem(KEY);if(r){const s=Object.assign(blank(),JSON.parse(r));s.verses=migrateAll(s.verses);s.diff=Math.min(ND,Math.max(1,+s.diff||2));s.name=String(s.name||'').slice(0,10);return s}}catch(e){}
+  return blank();
+}
 let S=load();
 function save(){S.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}queueCloud();queueSync()}
 
@@ -349,13 +414,20 @@ function merge(a,b){
   m.streak=later.streak||0;m.lastDay=later.lastDay||null;
   const ta=a.today||{},tb=b.today||{};
   m.today=(ta.day||'')>(tb.day||'')?ta:(tb.day||'')>(ta.day||'')?tb:{day:ta.day||null,games:Math.max(ta.games||0,tb.games||0)};
+  m.name=((a.updatedAt||0)>=(b.updatedAt||0)?a.name:b.name)||a.name||b.name||'';
   m.verses={};
+  const mx=(p,q)=>z4().map((_,i)=>Math.max(p[i]||0,q[i]||0));
   new Set([...Object.keys(a.verses||{}),...Object.keys(b.verses||{})]).forEach(k=>{
-    const x=(a.verses||{})[k]||{},y=(b.verses||{})[k]||{};
-    m.verses[k]={b:Math.max(x.b||0,y.b||0),o:!!(x.o||y.o),t:Math.max(x.t||0,y.t||0),last:Math.max(x.last||0,y.last||0)};
+    const x=migrateVerse((a.verses||{})[k])||{b:z4(),o:z4(),t:z4()},y=migrateVerse((b.verses||{})[k])||{b:z4(),o:z4(),t:z4()};
+    m.verses[k]={b:mx(x.b,y.b),o:mx(x.o,y.o),t:mx(x.t,y.t),last:Math.max(x.last||0,y.last||0)};
   });
   m.updatedAt=Math.max(a.updatedAt||0,b.updatedAt||0);
   return m;
+}
+// what the leaderboard shows about me; sent with each sync when a nickname is set
+function pubSummary(){
+  const m=z4();VERSES.forEach(v=>{for(let d=1;d<=ND;d++)if(mastered(v.n,d))m[d-1]++});
+  return {name:S.name,xp:S.xp,lv:lvl().L,streak:curStreak(),m,at:Date.now()};
 }
 
 let cloud=null,cloudBusy=false,cloudDirty=false,cloudTimer=null;
@@ -378,7 +450,7 @@ async function initCloud(){
     if(!id)return;
     const docRef=db.doc('data/users/'+id+'/progress');
     const snap=await docRef.get();
-    if(snap.exists){S=merge(S,snap.data());try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+    if(snap.exists){S=merge(S,clean(snap.data()));try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
     cloud=docRef;
     render();
     queueCloud();
@@ -389,9 +461,11 @@ async function initCloud(){
 // Backup/sync data is untrusted: keep only known fields with the right types
 function clean(d){
   const num=x=>Math.max(0,Math.floor(+x||0)),day=x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)?x:null;
-  const o={xp:num(d.xp),streak:num(d.streak),lastDay:day(d.lastDay),today:{day:day(d.today&&d.today.day),games:num(d.today&&d.today.games)},verses:{},updatedAt:num(d.updatedAt)};
+  const arr=(a,cap)=>z4().map((_,i)=>Array.isArray(a)?Math.min(cap,num(a[i])):0);
+  const o={xp:num(d.xp),streak:num(d.streak),lastDay:day(d.lastDay),today:{day:day(d.today&&d.today.day),games:num(d.today&&d.today.games)},
+    name:String(d.name||'').replace(/[<>]/g,'').trim().slice(0,10),verses:{},updatedAt:num(d.updatedAt)};
   const vv=d.verses&&typeof d.verses==='object'?d.verses:{};
-  VERSES.forEach(v=>{const x=vv[v.n];if(x&&typeof x==='object')o.verses[v.n]={b:Math.min(3,num(x.b)),o:!!x.o,t:Math.min(100,num(x.t)),last:num(x.last)}});
+  VERSES.forEach(v=>{const x=migrateVerse(vv[v.n]);if(x)o.verses[v.n]={b:arr(x.b,1),o:arr(x.o,1),t:arr(x.t,100),last:num(x.last)}});
   return o;
 }
 const BK='MALSSEUM1:';
@@ -431,6 +505,7 @@ async function syncNow(){
       let tag=null;
       if(g.status===200){const remote=clean(await g.json());S=merge(S,remote);tag=g.headers.get('ETag')}
       else if(g.status!==404)throw g.status;
+      S.pub=S.name?pubSummary():null;
       const p=await syncFetch('PUT',S,tag?{'If-Match':tag}:{'If-None-Match':'*'});
       if(p.status===412)continue;
       if(!p.ok)throw p.status;
@@ -442,6 +517,52 @@ async function syncNow(){
   sync.busy=false;
   if(view.name==='home')render();
   if(sync.dirty){sync.dirty=false;syncNow()}
+  else if(!sync.err)loadBoard();
+}
+
+/* ---------- 친구들 순위표 ---------- */
+const board={rows:null,at:0,busy:false,err:''};
+let myId='';
+// the server lists each entry under a short hash of its sync code, so the page can mark my own row without sending the code
+async function computeId(){
+  myId='';
+  if(!syncCode||!crypto.subtle)return;
+  try{const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(syncCode));myId=[...new Uint8Array(h)].slice(0,5).map(b=>b.toString(16).padStart(2,'0')).join('')}catch(e){}
+}
+async function loadBoard(force){
+  if(!SYNC_URL||!syncCode||!S.name||board.busy)return;
+  if(!force&&Date.now()-board.at<60000)return;
+  board.busy=true;
+  try{
+    const r=await fetch(SYNC_URL.replace(/\/+$/,'')+'/v1/board',{cache:'no-store'});
+    if(!r.ok)throw 0;
+    const j=await r.json();
+    board.rows=(Array.isArray(j.rows)?j.rows:[]).slice(0,50).map(x=>({id:String(x.id||''),name:String(x.name||'').slice(0,10),xp:+x.xp||0,lv:+x.lv||1,streak:+x.streak||0,m:z4().map((_,i)=>+(x.m||[])[i]||0)}));
+    board.err='';board.at=Date.now();
+  }catch(e){board.err='순위표를 불러오지 못했어요'}
+  board.busy=false;
+  if(view.name==='home')render();
+}
+function boardRow(r,i){
+  const title=TITLES[Math.min(r.lv-1,TITLES.length-1)];
+  return `<li class="${r.id===myId?'me':''}"><span class="rk ${i<3?'top':''}">${i+1}</span>
+    <span class="nm">${esc(r.name)}${r.id===myId?' (나)':''}<span class="sub">Lv.${r.lv} ${title} · ${r.streak}일 연속 · 정복 ${r.m.map((c,k)=>`${DIFF[k+1].name[0]}${c}`).join(' ')}</span></span>
+    <span class="xp">${r.xp.toLocaleString()} XP</span></li>`;
+}
+function boardView(){
+  if(!SYNC_URL||cloud)return '';
+  const joined=syncCode&&S.name;
+  let body;
+  if(!joined)body=`<p class="tiny">${!S.name?'닉네임을 정하고 ':''}${!syncCode?'기기 동기화를 켜면 ':''}친구들과 XP 순위를 겨룰 수 있어요.</p>
+    <div class="row">${!S.name?`<button class="btn small" data-act="panel" data-p="name">닉네임 정하기</button>`:''}${!syncCode?`<button class="btn small" data-act="toKeep">동기화 켜기</button>`:''}</div>`;
+  else if(!board.rows)body=`<p class="tiny">${board.err||'불러오는 중…'}</p>`;
+  else if(!board.rows.length)body=`<p class="tiny">아직 아무도 없어요. 첫 게임을 하면 내 이름이 올라가요.</p>`;
+  else{
+    const top=board.rows.slice(0,10),mi=board.rows.findIndex(r=>r.id===myId);
+    body=`<ol>${top.map(boardRow).join('')}${mi>=10?`<li class="gap">…</li>${boardRow(board.rows[mi],mi)}`:''}</ol>
+      <p class="tiny">정복: 쉬움·보통·어려움·오직말씀 순으로 정복한 구절 수예요.${board.err?' · '+esc(board.err):''}</p>`;
+  }
+  return `<section class="board" aria-label="친구들 순위표"><h2 class="sec"><span>친구들 순위표</span>${joined?`<button class="link" data-act="boardRefresh">새로고침</button>`:''}</h2>${body}</section>`;
 }
 async function syncOn(code,link){
   syncCode=code;ui.syncBusy=true;ui.msg=null;render();
@@ -451,11 +572,12 @@ async function syncOn(code,link){
     if(sync.err)throw 0;
     try{localStorage.setItem(SYNC_KEY,code)}catch(e){}
     ui.panel=null;ui.syncIn='';ui.msg={k:'good',t:link?'연결됐어요! 두 기기의 진도를 합쳤어요.':'동기화를 켰어요. 다른 기기에서 아래 코드를 넣으세요.'};
+    await computeId();loadBoard(true);
   }catch(e){syncCode='';sync.err='';ui.msg={k:'bad',t:typeof e==='string'?e:'동기화 서버에 연결할 수 없어요. 인터넷 연결을 확인해 주세요.'}}
   ui.syncBusy=false;render();
 }
 function syncOff(){
-  const c=syncCode;syncCode='';clearTimeout(sync.timer);sync.at=0;sync.err='';
+  const c=syncCode;syncCode='';myId='';board.rows=null;board.at=0;clearTimeout(sync.timer);sync.at=0;sync.err='';
   try{localStorage.removeItem(SYNC_KEY)}catch(e){}
   ui.msg={k:'',t:`동기화를 껐어요. 다시 켜려면 '코드로 연결'에 ${fmtCode(c)} 를 넣으세요.`};
 }
@@ -471,10 +593,11 @@ function recordGame(xp){
   if(!S.today||S.today.day!==t)S.today={day:t,games:0};
   S.today.games++;S.xp+=xp;save();
 }
-const vs=n=>S.verses[n]||(S.verses[n]={b:0,o:false,t:0,last:0});
-function stars(n){const x=S.verses[n]||{};return [(x.b||0)>=1,!!x.o,(x.t||0)>=90]}
-const starCount=n=>stars(n).filter(Boolean).length;
-const mastered=n=>starCount(n)===3;
+const vs=n=>S.verses[n]||(S.verses[n]={b:z4(),o:z4(),t:z4(),last:0});
+function stars(n,d=S.diff){const x=S.verses[n];if(!x)return [false,false,false];const i=d-1;return [!!x.b[i],!!x.o[i],(x.t[i]||0)>=DIFF[d].pass]}
+const starCount=(n,d)=>stars(n,d).filter(Boolean).length;
+const mastered=(n,d)=>starCount(n,d)===3;
+function topMastered(n){let t=0;for(let d=1;d<=ND;d++)if(mastered(n,d))t=d;return t}
 const LV_XP=150;
 const TITLES=['새싹','어린 양','제자','일꾼','증인','파수꾼','등대','말씀의 용사'];
 function lvl(){const L=Math.floor(S.xp/LV_XP)+1;return {L,title:TITLES[Math.min(L-1,TITLES.length-1)],into:S.xp%LV_XP}}
@@ -512,7 +635,7 @@ function flash(sel,cls){const el=document.querySelector(sel);if(!el)return;el.cl
 
 /* ---------- 화면 상태 ---------- */
 let view={name:'home'},G=null,timers=[];
-const ui={hide:0,mask:new Set(),peek:new Set(),confirmReset:false,panel:null,msg:null,bk:'',bkIn:'',syncIn:'',syncBusy:false};
+const ui={hide:0,mask:new Set(),peek:new Set(),confirmReset:false,panel:null,msg:null,bk:'',bkIn:'',syncIn:'',nameIn:'',syncBusy:false};
 function clearTimers(){timers.forEach(f=>f());timers=[]}
 function go(v){clearTimers();stopSpeech();view=v;render();window.scrollTo(0,0)}
 
@@ -532,7 +655,7 @@ function render(){
   switch(view.name){
     case 'home':body=homeView();break;
     case 'verse':title=`${v.n}. ${v.t}`;back=true;body=verseView(v);break;
-    case 'blank':title='빈칸 채우기 · '+LNAME[G.L];back=true;body=blankView();break;
+    case 'blank':title='빈칸 채우기 · '+DIFF[G.d].name;back=true;body=blankView();break;
     case 'order':title='순서 맞추기';back=true;body=orderView();break;
     case 'type':title='직접 써보기';back=true;body=typeView();break;
     case 'quiz':title='오늘의 도전';back=true;body=quizView();break;
@@ -542,9 +665,19 @@ function render(){
 
 /* ---------- 홈 ---------- */
 function pips(n){const s=stars(n);return `<span class="pips" aria-label="별 ${s.filter(Boolean).length}개 / 3개">${s.map(on=>`<i class="${on?'on':''}"></i>`).join('')}</span>`}
-function row(v){return `<li><button class="vrow ${mastered(v.n)?'done':''}" data-act="open" data-n="${v.n}"><span class="num">${v.n}</span><span class="vrow-main"><span class="vrow-title">${esc(v.t)}</span><span class="vrow-ref">${ref(v)}</span></span>${pips(v.n)}</button></li>`}
+function row(v){
+  const top=topMastered(v.n);
+  return `<li><button class="vrow ${mastered(v.n)?'done':''}" data-act="open" data-n="${v.n}"><span class="num">${v.n}</span><span class="vrow-main"><span class="vrow-title">${esc(v.t)}</span><span class="vrow-ref">${ref(v)}</span></span>
+    <span class="vrow-side">${pips(v.n)}${top?`<span class="lvtag d${top}">${DIFF[top].name} 정복</span>`:''}</span></button></li>`;
+}
+function namePanel(){
+  return `<div class="keep-block"><b>닉네임</b>
+    <p class="tiny">${SYNC_URL&&!cloud?'순위표에 보이는 이름이에요. 동기화를 켜면 친구들 순위표에 올라가요.':'홈 화면에 보이는 이름이에요.'} 최대 10자.</p>
+    <input id="nameIn" class="name-in" value="${esc(ui.nameIn)}" maxlength="10" autocomplete="nickname" placeholder="예: 한씨" aria-label="닉네임">
+    <div class="row"><button class="btn small primary" data-act="nameSave">저장</button>${S.name?`<button class="btn small ghost" data-act="nameClear">이름 지우기</button>`:''}<button class="btn small ghost" data-act="panelClose">취소</button></div></div>`;
+}
 function homeView(){
-  const l=lvl(),list=filtered(),m=list.filter(v=>mastered(v.n)).length,g=todayGames();
+  const l=lvl(),list=filtered(),d=S.diff,df=DIFF[d],m=list.filter(v=>mastered(v.n,d)).length,g=todayGames();
   const sel=S.series==='all'?null:seriesOf(S.series);
   const groups=sel?[sel]:SERIES;
   const tabs=[{id:'all',short:'전체'},...SERIES].map(s=>`<button class="tab" role="tab" aria-selected="${S.series===s.id}" data-act="series" data-id="${s.id}">${esc(s.short)}</button>`).join('');
@@ -552,19 +685,27 @@ function homeView(){
   <section class="hero" aria-label="나의 기록">
     <div class="hero-top">
       <div class="lv-badge"><span><small>LV</small>${l.L}</span></div>
-      <div class="lv-info"><div class="lv-title">${l.title}</div>
+      <div class="lv-info">
+        <div class="lv-name">${S.name?`<span>${esc(S.name)}</span><button data-act="panel" data-p="name" aria-label="닉네임 바꾸기">✎</button>`:`<button data-act="panel" data-p="name">닉네임 정하기</button>`}</div>
+        <div class="lv-title">${l.title}</div>
         <div class="bar"><i style="width:${l.into/LV_XP*100}%"></i></div>
         <p class="tiny">다음 레벨까지 ${LV_XP-l.into} XP</p></div>
     </div>
     <div class="stats">
       <div class="stat"><b>${curStreak()}</b><span>일 연속</span></div>
       <div class="stat"><b>${Math.min(g,3)}<em>/3</em></b><span>오늘의 목표</span></div>
-      <div class="stat"><b>${m}<em>/${list.length}</em></b><span>정복한 구절</span></div>
+      <div class="stat"><b>${m}<em>/${list.length}</em></b><span>${df.name} 정복</span></div>
     </div>
   </section>
-  <button class="cta" data-act="quiz"><span><span class="cta-main">오늘의 도전</span><span class="cta-sub">${sel?esc(sel.short):'전체 구절'}에서 10문제 · 문제당 20초</span></span>${ICON.go}</button>
+  ${ui.panel==='name'?namePanel():''}
+  <section class="diffbox" aria-label="난이도">
+    <div class="seg">${[1,2,3,4].map(i=>`<button class="d${i}" aria-pressed="${d===i}" data-act="diff" data-d="${i}">${DIFF[i].name}</button>`).join('')}</div>
+    <p class="tiny">${df.desc} · XP ×${df.mult}</p>
+  </section>
+  <button class="cta" data-act="quiz"><span><span class="cta-main">오늘의 도전</span><span class="cta-sub">${sel?esc(sel.short):'전체 구절'}에서 10문제 · 문제당 ${df.qt/1000}초</span></span>${ICON.go}</button>
+  ${boardView()}
   <div class="tabs" role="tablist" aria-label="시리즈">${tabs}</div>
-  <p class="tiny">구절을 눌러 빈칸 채우기, 순서 맞추기, 직접 써보기를 통과하면 별 3개로 그 구절을 정복해요.</p>
+  <p class="tiny">구절을 눌러 빈칸 채우기, 순서 맞추기, 직접 써보기를 통과하면 별 3개로 그 난이도를 정복해요. 네 난이도를 모두 정복해 보세요.</p>
   ${groups.map(s=>`<section class="group"><h2 class="sec"><span><span class="sheet-no">${s.sheet}</span> ${esc(s.name)}</span><span class="range">${s.range}</span></h2><ul class="vlist">${VERSES.filter(v=>v.s===s.id).map(row).join('')}</ul></section>`).join('')}
   ${keepView()}
   <div class="foot">
@@ -623,7 +764,7 @@ function cycleHide(v){
   if(ui.hide===1){const t=toks(v);ui.mask=new Set(pick(t.map((x,i)=>i),Math.ceil(t.length*.45)))}
 }
 function verseView(v){
-  const st=stars(v.n),x=S.verses[v.n]||{},idx=VERSES.indexOf(v),prev=VERSES[idx-1],next=VERSES[idx+1];
+  const d=S.diff,df=DIFF[d],st=stars(v.n),x=S.verses[v.n],best=x?x.t[d-1]:0,idx=VERSES.indexOf(v),prev=VERSES[idx-1],next=VERSES[idx+1];
   return `
   <article class="vcard">
     <div class="vc-head"><span class="num lg">${v.n}</span><div><div class="vc-series">${esc(seriesOf(v.s).name)}</div><h2 class="vc-title">${esc(v.t)}</h2><div class="vc-ref">${ref(v)}</div></div></div>
@@ -635,17 +776,18 @@ function verseView(v){
     ${ui.hide?'<p class="tiny">가려진 단어를 누르면 살짝 보여요.</p>':''}
   </article>
   <section class="modes" aria-label="암송 연습">
-    <h3 class="sec">암송 연습</h3>
+    <h3 class="sec"><span>암송 연습 · ${df.name}</span><button class="link" data-act="home">난이도 바꾸기</button></h3>
+    <div class="mast" aria-label="정복한 난이도">${[1,2,3,4].map(i=>`<span class="${mastered(v.n,i)?'on':''}">${DIFF[i].name}${mastered(v.n,i)?' ✓':''}</span>`).join('')}</div>
     <div class="mode">
-      <div class="mode-head"><span class="star ${st[0]?'on':''}"></span><div><b>빈칸 채우기</b><span class="d">빈칸에 들어갈 단어를 순서대로 눌러요</span></div></div>
-      <div class="lv-row">${[1,2,3].map(L=>`<button class="btn lvbtn ${(x.b||0)>=L?'done':''}" data-act="blank" data-l="${L}">${LNAME[L]}${(x.b||0)>=L?' ✓':''}</button>`).join('')}</div>
+      <div class="mode-head"><span class="star ${st[0]?'on':''}"></span><div><b>빈칸 채우기</b><span class="d">${d>=4?'모든 단어를 말씀 순서대로 눌러요':'빈칸에 들어갈 단어를 순서대로 눌러요'}${df.dist?' · 헷갈리는 단어 섞임':''}</span></div>${st[0]?'<span class="best">통과 ✓</span>':''}</div>
+      <button class="btn ${!st[0]?'primary':''}" data-act="blank">빈칸 채우기 시작</button>
     </div>
     <div class="mode">
-      <div class="mode-head"><span class="star ${st[1]?'on':''}"></span><div><b>순서 맞추기</b><span class="d">흩어진 말씀 조각을 차례대로 이어요</span></div>${x.o?'<span class="best">통과 ✓</span>':''}</div>
+      <div class="mode-head"><span class="star ${st[1]?'on':''}"></span><div><b>순서 맞추기</b><span class="d">${df.chunk===1?'한 단어씩 차례대로 이어요':'흩어진 말씀 조각을 차례대로 이어요'}</span></div>${st[1]?'<span class="best">통과 ✓</span>':''}</div>
       <button class="btn ${st[0]&&!st[1]?'primary':''}" data-act="order">순서 맞추기 시작</button>
     </div>
     <div class="mode">
-      <div class="mode-head"><span class="star ${st[2]?'on':''}"></span><div><b>직접 써보기</b><span class="d">첫 글자 힌트만 보고 구절을 써요 · 90% 이상 통과</span></div>${x.t?`<span class="best">최고 ${x.t}%</span>`:''}</div>
+      <div class="mode-head"><span class="star ${st[2]?'on':''}"></span><div><b>직접 써보기</b><span class="d">${df.hint==='on'?'첫 글자 힌트를 보고':df.hint==='opt'?'힌트는 선택,':'힌트 없이'} 구절을 써요 · ${df.pass}% 이상 통과</span></div>${best?`<span class="best">최고 ${best}%</span>`:''}</div>
       <button class="btn ${st[1]&&!st[2]?'primary':''}" data-act="type">직접 써보기 시작</button>
     </div>
   </section>
@@ -656,9 +798,14 @@ function verseView(v){
 }
 
 /* ---------- 공통 게임 UI ---------- */
+// at 어려움 the reference is hidden, at 오직말씀 the title too
+function gref(v){
+  const df=DIFF[G.d];
+  return `<div class="gref"><b>${G.d>=4?`${v.n}번 구절`:`${v.n}. ${esc(v.t)}`}<span class="dchip">${df.name}</span></b><span>${df.ref?ref(v):'장·절은 비밀이에요'}</span></div>`;
+}
 function gameTop(v,done,total){
-  return `<div class="gtop"><div class="gref"><b>${v.n}. ${esc(v.t)}</b><span>${ref(v)}</span></div>
-    <div class="hearts" aria-label="남은 기회 ${G.hearts}개">${[0,1,2].map(i=>ICON.heart.replace('class="heart"',`class="heart ${i<G.hearts?'':'lost'}"`)).join('')}</div></div>
+  return `<div class="gtop">${gref(v)}
+    <div class="hearts" aria-label="남은 기회 ${G.hearts}개">${Array.from({length:G.maxH},(_,i)=>ICON.heart.replace('class="heart"',`class="heart ${i<G.hearts?'':'lost'}"`)).join('')}</div></div>
     <div class="bar thin"><i style="width:${total?done/total*100:0}%"></i></div>`;
 }
 function btns(list){return list.map(([label,act,cls,extra])=>`<button class="btn ${cls||''}" data-act="${act}" ${extra||''}>${label}</button>`).join('')}
@@ -680,7 +827,7 @@ function wrapResult(n,starIdx,before,lvBefore,base){
   const after=stars(n);
   base.newStar=starIdx>=0&&!before[starIdx]&&after[starIdx];
   base.levelUp=lvl().L>lvBefore;
-  if(base.pass&&!before.every(Boolean)&&after.every(Boolean)){base.title='구절 정복!';base.msg+=' 별 3개를 모두 모았어요.'}
+  if(base.pass&&!before.every(Boolean)&&after.every(Boolean)){base.title=`${DIFF[S.diff].name} 정복!`;base.msg+=` ${DIFF[S.diff].name} 난이도의 별 3개를 모두 모았어요.${S.diff<ND?' 다음 난이도에도 도전해 보세요.':''}`}
   return base;
 }
 function failResult(xp){
@@ -691,15 +838,16 @@ function failResult(xp){
 }
 
 /* ---------- 빈칸 채우기 ---------- */
-function startBlank(n,L){
-  const v=byN(n),t=toks(v),ratio=[0,.3,.55,.8][L];
-  const cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=(L===3?1:2));
-  const k=Math.min(cand.length,Math.max(2,Math.round(t.length*ratio)));
-  const blanks=pick(cand,k).sort((a,b)=>a-b);
+function startBlank(n){
+  const d=S.diff,df=DIFF[d],v=byN(n),t=toks(v);
+  const cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=(d>=3?1:2));
+  const k=Math.min(cand.length,Math.max(2,Math.round(t.length*df.ratio)));
+  const blanks=d>=4?t.map((x,i)=>i):pick(cand,k).sort((a,b)=>a-b);
   const own=new Set(t.map(x=>norm(x.w)));
   const pool=[...new Set(VERSES.filter(x=>x.n!==n).flatMap(x=>toks(x).map(y=>norm(y.w))))].filter(w=>w.length>=2&&!own.has(w));
-  const chips=shuffle([...blanks.map(i=>norm(t[i].w)),...pick(pool,[0,0,2,4][L])]).map(w=>({w,used:false}));
-  G={type:'blank',n,L,t,blanks,cur:0,chips,hearts:3,mistakes:0,result:null};
+  const chips=shuffle([...blanks.map(i=>norm(t[i].w)),...pick(pool,df.dist)]).map(w=>({w,used:false}));
+  const maxH=d>=4?5:3;  // a whole verse one word at a time deserves a couple more hearts
+  G={type:'blank',n,d,t,blanks,cur:0,chips,hearts:maxH,maxH,mistakes:0,result:null};
   go({name:'blank',n});
 }
 function blankView(){
@@ -728,23 +876,23 @@ function onChip(i){
   }
 }
 function finishBlank(){
-  const n=G.n,x=vs(n),before=stars(n),lvB=lvl().L,perfect=G.mistakes===0,xp=G.L*10+(perfect?10:0);
-  if(G.L>(x.b||0))x.b=G.L;x.last=Date.now();recordGame(xp);
-  const nextBtn=G.L<3?[`${LNAME[G.L+1]} 단계 도전`,'blank','primary',`data-n="${n}" data-l="${G.L+1}"`]:['순서 맞추기 도전','order','primary',`data-n="${n}"`];
-  G.result=wrapResult(n,0,before,lvB,{pass:true,title:perfect?'완벽해요!':'통과!',msg:`빈칸 채우기 ${LNAME[G.L]} 단계를 마쳤어요${perfect?' · 실수 없이 성공':''}.`,xp,
-    actions:btns([nextBtn,['다시 하기','retry'],['구절로 돌아가기','toVerse','ghost']])});
+  const n=G.n,d=G.d,x=vs(n),before=stars(n),lvB=lvl().L,perfect=G.mistakes===0,xp=Math.round(20*DIFF[d].mult)+(perfect?10:0);
+  x.b[d-1]=1;x.last=Date.now();recordGame(xp);
+  G.result=wrapResult(n,0,before,lvB,{pass:true,title:perfect?'완벽해요!':'통과!',msg:`빈칸 채우기(${DIFF[d].name})를 마쳤어요${perfect?' · 실수 없이 성공':''}.`,xp,
+    actions:btns([['순서 맞추기 도전','order','primary',`data-n="${n}"`],['다시 하기','retry'],['구절로 돌아가기','toVerse','ghost']])});
   render();celebrate();sfx('win');
 }
 
 /* ---------- 순서 맞추기 ---------- */
 function startOrder(n){
-  const t=toks(byN(n)),size=t.length<=10?1:t.length<=22?2:3,chunks=[];
+  const d=S.diff,t=toks(byN(n)),size=Math.min(DIFF[d].chunk,t.length<=10?1:t.length<=22?2:3),chunks=[];
   let cur=null;
   t.forEach(x=>{if(!cur||x.vn||cur.ws.length>=size){cur={ws:[],vn:x.vn};chunks.push(cur)}cur.ws.push(x.w)});
   chunks.forEach((c,i)=>{c.id=i;c.text=c.ws.join(' ');c.key=norm(c.text)});
   let order=shuffle(chunks.map(c=>c.id));
   if(order.length>2&&order.every((id,i)=>id===i))order=shuffle(order);
-  G={type:'order',n,chunks,order,used:new Set(),placed:0,hearts:3,mistakes:0,result:null};
+  const maxH=d>=4?5:3;
+  G={type:'order',n,d,chunks,order,used:new Set(),placed:0,hearts:maxH,maxH,mistakes:0,result:null};
   go({name:'order',n});
 }
 function orderView(){
@@ -768,15 +916,15 @@ function onPiece(id){
   }
 }
 function finishOrder(){
-  const n=G.n,x=vs(n),before=stars(n),lvB=lvl().L,perfect=G.mistakes===0,xp=25+(perfect?10:0);
-  x.o=true;x.last=Date.now();recordGame(xp);
+  const n=G.n,d=G.d,x=vs(n),before=stars(n),lvB=lvl().L,perfect=G.mistakes===0,xp=Math.round(25*DIFF[d].mult)+(perfect?10:0);
+  x.o[d-1]=1;x.last=Date.now();recordGame(xp);
   G.result=wrapResult(n,1,before,lvB,{pass:true,title:perfect?'완벽해요!':'통과!',msg:`말씀 조각을 모두 맞췄어요${perfect?' · 실수 없이 성공':''}.`,xp,
     actions:btns([['직접 써보기 도전','type','primary',`data-n="${n}"`],['다시 하기','retry'],['구절로 돌아가기','toVerse','ghost']])});
   render();celebrate();sfx('win');
 }
 
 /* ---------- 직접 써보기 ---------- */
-function startType(n){G={type:'type',n,hint:true,input:'',res:null,passed:false,recorded:false,result:null};go({name:'type',n})}
+function startType(n){G={type:'type',n,d:S.diff,hint:DIFF[S.diff].hint==='on',input:'',res:null,passed:false,recorded:false,result:null};go({name:'type',n})}
 function grade(v,input){
   const orig=fullText(v),oc=[],pos=[];
   [...orig].forEach((ch,i)=>{if(!SKIP.test(ch)){oc.push(ch);pos.push(i)}});
@@ -801,16 +949,16 @@ function gradeHtml(r){
   return out;
 }
 function typeView(){
-  const v=byN(G.n),t=toks(v),r=G.res;
+  const v=byN(G.n),t=toks(v),r=G.res,df=DIFF[G.d],pass=df.pass;
   const hint=t.map(x=>vnHtml(x)+`<span class="ini">${esc([...norm(x.w)||x.w][0])}</span>`).join(' ');
-  return `<div class="gtop"><div class="gref"><b>${v.n}. ${esc(v.t)}</b><span>${ref(v)}</span></div></div>
-  <div class="hintbox ${G.hint?'':'off'}" aria-label="첫 글자 힌트">${G.hint?hint:'힌트를 껐어요. 힌트 없이 통과하면 보너스 XP를 받아요.'}</div>
+  return `<div class="gtop">${gref(v)}</div>
+  ${df.hint==='none'?'':`<div class="hintbox ${G.hint?'':'off'}" aria-label="첫 글자 힌트">${G.hint?hint:'힌트를 껐어요. 힌트 없이 통과하면 보너스 XP를 받아요.'}</div>`}
   <label class="lbl" for="typeBox">기억나는 대로 구절을 써 보세요. 띄어쓰기와 문장부호는 채점하지 않아요.</label>
   <textarea id="typeBox" rows="6" lang="ko" maxlength="600" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="여기에 구절을 써 보세요">${esc(G.input)}</textarea>
-  <div class="row"><button class="btn ghost" data-act="toggleHint">힌트 ${G.hint?'끄기':'켜기'}</button><button class="btn primary" data-act="check">채점하기</button></div>
+  <div class="row">${df.hint==='opt'?`<button class="btn ghost" data-act="toggleHint">힌트 ${G.hint?'끄기':'켜기'}</button>`:''}<button class="btn primary" data-act="check">채점하기</button></div>
   ${r?`<section class="gradebox" id="grade" aria-live="polite">
-    <div class="pct ${r.score>=90?'ok':'no'}">${r.score}%</div>
-    <p class="tiny">${r.score>=90?'통과 기준 90%를 넘었어요.':'90% 이상이면 통과예요.'} 빠진 글자 ${r.missed}개 · 더 쓴 글자 ${r.extra}개</p>
+    <div class="pct ${r.score>=pass?'ok':'no'}">${r.score}%</div>
+    <p class="tiny">${r.score>=pass?`통과 기준 ${pass}%를 넘었어요.`:`${pass}% 이상이면 통과예요.`} 빠진 글자 ${r.missed}개 · 더 쓴 글자 ${r.extra}개</p>
     <p class="verse" style="font-size:18px">${gradeHtml(r)}</p>
     <p class="tiny">밑줄 친 부분이 빠졌거나 틀린 곳이에요.</p>
     <div class="row"><button class="btn" data-act="clearType">처음부터 다시 쓰기</button></div>
@@ -819,47 +967,49 @@ function typeView(){
 function check(){
   const box=$('#typeBox');G.input=box?box.value:G.input;
   if(!G.input.trim()){flash('#typeBox','shake');return}
-  const n=G.n,v=byN(n),x=vs(n),before=stars(n),lvB=lvl().L;
+  const n=G.n,d=G.d,df=DIFF[d],v=byN(n),x=vs(n),before=stars(n),lvB=lvl().L;
   G.res=grade(v,G.input);
-  if(G.res.score>(x.t||0))x.t=G.res.score;x.last=Date.now();
-  if(G.res.score>=90&&!G.passed){
+  if(G.res.score>(x.t[d-1]||0))x.t[d-1]=G.res.score;x.last=Date.now();
+  if(G.res.score>=df.pass&&!G.passed){
     G.passed=true;G.recorded=true;
-    const xp=40+(G.hint?0:15);recordGame(xp);
+    const xp=Math.round(40*df.mult)+(df.hint==='opt'&&!G.hint?15:0);recordGame(xp);
     const idx=VERSES.indexOf(v),next=VERSES[idx+1];
     G.result=wrapResult(n,2,before,lvB,{pass:true,title:G.res.score===100?'한 글자도 틀리지 않았어요!':'통과!',msg:`정확도 ${G.res.score}%${G.hint?'':' · 힌트 없이 성공'}.`,xp,
       actions:btns([...(next?[[`다음 구절 · ${next.n}번`,'open','primary',`data-n="${next.n}"`]]:[]),['결과 자세히 보기','closeSheet'],['구절로 돌아가기','toVerse','ghost']])});
     render();celebrate();sfx('win');
   }else{
     if(!G.recorded){G.recorded=true;recordGame(3)}else save();
-    render();sfx(G.res.score>=90?'ok':'bad');
+    render();sfx(G.res.score>=df.pass?'ok':'bad');
     const gEl=$('#grade');if(gEl)gEl.scrollIntoView({behavior:reduceMotion()?'auto':'smooth',block:'start'});
   }
 }
 
 /* ---------- 오늘의 도전 (퀴즈) ---------- */
-const QT=20000;
 const others=(v,k)=>pick(VERSES.filter(x=>x.n!==v.n),k);
 function halves(v){const w=toks(v).map(x=>x.w),h=Math.ceil(w.length/2);return {a:w.slice(0,h).join(' '),b:w.slice(h).join(' ')}}
 const cut=s=>s.length>48?s.slice(0,46)+'…':s;
-function makeQ(v,kind){
-  if(kind==='ref')return {n:v.n,label:'이 말씀은 어디에 있을까요?',body:`<p class="verse q-verse">${v.p.map(([num,txt])=>`<sup class="vn">${num}</sup>${esc(txt)}`).join(' ')}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
-  if(kind==='title')return {n:v.n,label:'이 주제의 암송 구절은?',body:`<p class="q-title">${esc(v.t)}</p><p class="tiny">${esc(seriesOf(v.s).name)} · ${v.n}번</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
+// showRef: at the easier difficulties a question shows the reference, verse number and sheet number as context; harder ones hide them
+function makeQ(v,kind,showRef){
+  const sup=(num)=>showRef?`<sup class="vn">${num}</sup>`:'';
+  if(kind==='ref')return {n:v.n,label:'이 말씀은 어디에 있을까요?',body:`<p class="verse q-verse">${v.p.map(([num,txt])=>sup(num)+esc(txt)).join(' ')}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
+  if(kind==='title')return {n:v.n,label:'이 주제의 암송 구절은?',body:`<p class="q-title">${esc(v.t)}</p><p class="tiny">${esc(seriesOf(v.s).name)}${showRef?` · ${v.n}번`:''}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
   if(kind==='word'){
     const t=toks(v),cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=2),bi=cand[Math.floor(Math.random()*cand.length)],ans=norm(t[bi].w);
     const own=new Set(t.map(x=>norm(x.w)));
     let dp=[...new Set(VERSES.flatMap(x=>toks(x).map(y=>norm(y.w))))].filter(w=>!own.has(w)&&w.length>=2);
     const near=dp.filter(w=>Math.abs(w.length-ans.length)<=1);if(near.length>=3)dp=near;
-    const body=t.map((x,i)=>vnHtml(x)+(i===bi?`<span class="slot cur" style="--len:${ans.length}"></span>`:esc(x.w))).join(' ');
-    return {n:v.n,label:'빈칸에 들어갈 말은?',sub:sref(v),body:`<p class="verse q-verse">${body}</p>`,opts:shuffle([{label:ans,ok:true},...pick(dp,3).map(w=>({label:w,ok:false}))]),answer:ans};
+    const body=t.map((x,i)=>(x.vn?sup(x.vn):'')+(i===bi?`<span class="slot cur" style="--len:${ans.length}"></span>`:esc(x.w))).join(' ');
+    return {n:v.n,label:'빈칸에 들어갈 말은?',sub:showRef?sref(v):'',body:`<p class="verse q-verse">${body}</p>`,opts:shuffle([{label:ans,ok:true},...pick(dp,3).map(w=>({label:w,ok:false}))]),answer:ans};
   }
   const me=halves(v);
-  return {n:v.n,label:'이어지는 말씀은?',sub:sref(v),body:`<p class="verse q-verse">${esc(me.a)} …</p>`,opts:shuffle([{label:cut(me.b),ok:true},...others(v,3).map(x=>({label:cut(halves(x).b),ok:false}))]),answer:cut(me.b)};
+  return {n:v.n,label:'이어지는 말씀은?',sub:showRef?sref(v):'',body:`<p class="verse q-verse">${esc(me.a)} …</p>`,opts:shuffle([{label:cut(me.b),ok:true},...others(v,3).map(x=>({label:cut(halves(x).b),ok:false}))]),answer:cut(me.b)};
 }
 function startQuiz(){
+  const d=S.diff,df=DIFF[d];
   const pool=filtered().map(v=>({v,k:starCount(v.n)+Math.random()*1.6})).sort((a,b)=>a.k-b.k).map(o=>o.v);
   const chosen=[];for(let i=0;i<10;i++)chosen.push(pool[i%pool.length]);
   const kinds=shuffle(['ref','word','next','title','word','ref','next','word','title','next']);
-  G={type:'quiz',qs:shuffle(chosen).map((v,i)=>makeQ(v,kinds[i])),qi:0,score:0,combo:0,maxCombo:0,correct:0,missed:new Set(),answered:null,left:1,result:null};
+  G={type:'quiz',d,qt:df.qt,qs:shuffle(chosen).map((v,i)=>makeQ(v,kinds[i],df.ref)),qi:0,score:0,combo:0,maxCombo:0,correct:0,missed:new Set(),answered:null,left:1,result:null};
   go({name:'quiz'});startTimer();
 }
 function quizView(){
@@ -874,7 +1024,7 @@ function startTimer(){
   clearTimers();G.t0=performance.now();G.left=1;
   const id=setInterval(()=>{
     if(!G||G.type!=='quiz')return clearTimers();
-    G.left=Math.max(0,1-(performance.now()-G.t0)/QT);
+    G.left=Math.max(0,1-(performance.now()-G.t0)/G.qt);
     const el=document.getElementById('tbar');
     if(el){el.style.width=(G.left*100)+'%';el.classList.toggle('low',G.left<.25)}
     if(G.left<=0)answer(-1);
@@ -884,7 +1034,7 @@ function startTimer(){
 function answer(i){
   if(!G||G.type!=='quiz'||G.answered)return;
   clearTimers();
-  const q=G.qs[G.qi],ok=i>=0&&q.opts[i].ok,secs=G.left*QT/1000;let pts=0;
+  const q=G.qs[G.qi],ok=i>=0&&q.opts[i].ok,secs=G.left*G.qt/1000;let pts=0;
   if(ok){G.combo++;G.maxCombo=Math.max(G.maxCombo,G.combo);G.correct++;pts=Math.round((100+secs*5)*(G.combo>=3?1.5:1));G.score+=pts;sfx('ok')}
   else{G.combo=0;G.missed.add(q.n);sfx('bad');buzz()}
   G.answered={i,ok,pts};render();
@@ -896,7 +1046,7 @@ function nextQ(){
   G.qi++;G.answered=null;render();startTimer();
 }
 function finishQuiz(){
-  const lvB=lvl().L,xp=Math.max(5,Math.round(G.score/20));recordGame(xp);
+  const lvB=lvl().L,xp=Math.max(5,Math.round(G.score/20*DIFF[G.d].mult));recordGame(xp);
   const good=G.correct>=8;
   const miss=[...G.missed].map(byN);
   G.result={pass:good,title:G.correct===10?'만점이에요!':good?'잘했어요!':'좋은 연습이었어요',msg:`10문제 중 ${G.correct}문제를 맞혔어요.`,xp,levelUp:lvl().L>lvB,
@@ -914,7 +1064,7 @@ function back(){
 }
 function retry(){
   if(!G)return;
-  if(G.type==='blank')startBlank(G.n,G.L);
+  if(G.type==='blank')startBlank(G.n);
   else if(G.type==='order')startOrder(G.n);
   else if(G.type==='type')startType(G.n);
   else startQuiz();
@@ -934,7 +1084,12 @@ app.addEventListener('click',e=>{
     case 'hide':cycleHide(byN(view.n));render();break;
     case 'peek':ui.peek.has(i)?ui.peek.delete(i):ui.peek.add(i);render();break;
     case 'speak':speak(byN(view.n));break;
-    case 'blank':startBlank(n,+el.dataset.l);break;
+    case 'blank':startBlank(n);break;
+    case 'diff':S.diff=+el.dataset.d;save();render();break;
+    case 'nameSave':S.name=ui.nameIn.trim().replace(/[<>]/g,'').slice(0,10);ui.panel=null;save();render();if(S.name)loadBoard(true);break;
+    case 'nameClear':S.name='';ui.panel=null;save();render();break;
+    case 'boardRefresh':board.at=0;board.rows=null;render();loadBoard(true);break;
+    case 'toKeep':{const k=$('.keep');if(k)k.scrollIntoView({behavior:reduceMotion()?'auto':'smooth',block:'start'});break}
     case 'order':startOrder(n);break;
     case 'type':startType(n);break;
     case 'chip':onChip(i);break;
@@ -951,11 +1106,11 @@ app.addEventListener('click',e=>{
     case 'nextQ':nextQ();break;
     case 'reset':ui.confirmReset=true;render();break;
     case 'resetNo':ui.confirmReset=false;render();break;
-    case 'resetYes':S=Object.assign(blank(),{sound:S.sound,series:S.series});ui.confirmReset=false;save();render();
+    case 'resetYes':S=Object.assign(blank(),{sound:S.sound,series:S.series,name:S.name,diff:S.diff});ui.confirmReset=false;save();render();
       // merging would bring the old record back, so overwrite the server copy
       if(SYNC_URL&&syncCode){clearTimeout(sync.timer);syncFetch('PUT',S).catch(()=>{})}
       break;
-    case 'panel':ui.panel=el.dataset.p;ui.msg=null;render();{const f=$('#syncIn')||$('#bkIn');if(f)f.focus()}break;
+    case 'panel':ui.panel=el.dataset.p;ui.msg=null;if(ui.panel==='name')ui.nameIn=S.name;render();{const f=$('#syncIn')||$('#bkIn')||$('#nameIn');if(f)f.focus()}break;
     case 'panelClose':ui.panel=null;ui.msg=null;render();break;
     case 'bkMake':ui.bk=backupCode();ui.panel='backup';ui.msg=null;render();
       copyText(ui.bk).then(ok=>{ui.msg={k:ok?'good':'',t:ok?'백업 코드를 복사했어요.':'아래 코드를 길게 눌러 전체 선택 후 복사해 주세요.'};render();if(!ok){const t=$('#bkOut');if(t)t.select()}});break;
@@ -973,19 +1128,21 @@ app.addEventListener('click',e=>{
 });
 app.addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role="button"][data-act]')){e.preventDefault();e.target.click()}
+  if(e.key==='Enter'&&(e.target.id==='nameIn'||e.target.id==='syncIn')){e.preventDefault();const b=$(e.target.id==='nameIn'?'[data-act="nameSave"]':'[data-act="syncLink"]');if(b)b.click()}
 });
 app.addEventListener('input',e=>{
   const t=e.target;
   if(t.id==='typeBox'&&G)G.input=t.value;
   else if(t.id==='bkIn')ui.bkIn=t.value;
   else if(t.id==='syncIn')ui.syncIn=t.value;
+  else if(t.id==='nameIn')ui.nameIn=t.value;
 });
 // pick up progress from the other phone when coming back; push before the app goes to the background
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'||sync.timer)syncNow()});
 
 render();
 initCloud();
-syncNow();
+computeId().then(()=>{syncNow();loadBoard()});
 </script>
 
 <script>

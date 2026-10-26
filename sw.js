@@ -1,5 +1,5 @@
 // Bump CACHE when you want every phone to drop its old copy.
-const CACHE = 'amsong-v1';
+const CACHE = 'amsong-v2';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
