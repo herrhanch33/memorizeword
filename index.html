@@ -282,6 +282,13 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(
 .feedback{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 10px 10px 16px;border-radius:16px;font-family:var(--f-display);font-size:18px;flex-wrap:wrap}
 .feedback.good{background:var(--accent-soft);color:var(--accent-strong)}
 .feedback.bad{background:var(--bad-soft);color:var(--bad)}
+.feedback small{font-family:var(--f-body);font-size:13px;opacity:.85}
+.reveal{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:14px 18px 12px;display:grid;gap:8px;text-align:left}
+.rv-verse{font-size:clamp(17px,4.6vw,19px);line-height:1.9}
+.rv-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.rv-ref{font-family:var(--f-display);font-weight:400;font-size:17px;color:var(--accent-strong)}
+.sheet .reveal{background:var(--surface-2);border-color:transparent;padding:10px 14px 8px;gap:4px}
+.sheet .rv-verse{font-size:15px;line-height:1.7}
 
 /* result sheet */
 .backdrop{position:fixed;inset:0;background:var(--scrim);z-index:20;animation:fade .2s ease}
@@ -1176,6 +1183,14 @@ function gameTop(v,done,total){
     <div class="bar thin"><i style="width:${total?done/total*100:0}%"></i></div>`;
 }
 function btns(list){return list.map(([label,act,cls,extra])=>`<button class="btn ${cls||''}" data-act="${act}" ${extra||''}>${label}</button>`).join('')}
+// the whole verse with its heading and reference, shown after a quiz answer and on a game's result
+// sheet, so the answer is read in full whether it was guessed, known or missed
+function verseCard(v){
+  return `<section class="reveal">${headHtml(v)}
+    <p class="verse rv-verse">${v.p.map(([num,txt])=>`<sup class="vn">${num}</sup>${esc(txt)}`).join(' ')}</p>
+    <div class="rv-foot"><b class="rv-ref">${esc(ref(v))}</b>${hasVoice(v)?`<button class="btn small ghost" data-act="speak" data-n="${v.n}">${ICON.play} 들려주기</button>`:''}</div>
+  </section>`;
+}
 function resultSheet(){
   const r=G.result;
   const st=G.n?`<div class="r-stars" aria-label="이 구절의 별">${stars(G.n).map(on=>`<span class="star ${on?'on':''}"></span>`).join('')}</div>`:'';
@@ -1185,6 +1200,7 @@ function resultSheet(){
     <h2 id="rt">${r.title}</h2>
     <p>${r.msg}</p>
     ${st}
+    ${G.n?verseCard(byN(G.n)):''}
     ${r.extra||''}
     <div class="r-xp"><span>+${r.xp} XP</span>${r.newStar?'<span>새 별 획득</span>':''}</div>
     ${r.levelUp?`<div class="lvup-card">${avatar(lvl().L,62)}<div><b>레벨 업! ${esc(lvl().title)}</b><span>${esc(ARMOR[lvl().L-1].desc)}${ARMOR[lvl().L-1].ref?` (${ARMOR[lvl().L-1].ref})`:''}</span></div></div>`:''}
@@ -1401,7 +1417,9 @@ function quizView(){
   <div class="timer" aria-hidden="true"><i id="tbar" class="${G.left<.25?'low':''}" style="width:${G.left*100}%"></i></div>
   <section class="qcard"><div class="q-label">${q.label}</div>${q.sub||''}${q.body}</section>
   <div class="opts">${q.opts.map((o,i)=>`<button class="opt ${a?(o.ok?'right':(a.i===i?'wrong':'dim')):''}" data-act="ans" data-i="${i}" ${a?'disabled':''}>${esc(o.label)}</button>`).join('')}</div>
-  ${a?`<div class="feedback ${a.ok?'good':'bad'}" aria-live="polite"><span>${a.ok?`정답! +${a.pts}점`:(a.i<0?'시간이 다 됐어요':'아쉬워요')}</span>${a.ok?'':`<button class="btn primary small" data-act="nextQ">${G.qi+1<G.qs.length?'다음 문제':'결과 보기'}</button>`}</div>`:''}`;
+  ${a?`<div id="reveal" class="feedback ${a.ok?'good':'bad'}" aria-live="polite"><span>${a.ok?`정답! +${a.pts}점`:(a.i<0?'시간이 다 됐어요':'아쉬워요')}</span><small>${a.ok?'전체 구절을 한 번 읽고 넘어가요':'정답 구절을 읽어 보세요'}</small></div>
+  ${verseCard(byN(q.n))}
+  <button class="btn primary" data-act="nextQ">${G.qi+1<G.qs.length?'다음 문제':'결과 보기'}</button>`:''}`;
 }
 function startTimer(){
   clearTimers();G.t0=performance.now();G.left=1;
@@ -1420,8 +1438,10 @@ function answer(i){
   const q=G.qs[G.qi],ok=i>=0&&q.opts[i].ok,secs=G.left*G.qt/1000;let pts=0;
   if(ok){G.combo++;G.maxCombo=Math.max(G.maxCombo,G.combo);G.correct++;pts=Math.round((100+secs*5)*(G.combo>=3?1.5:1));G.score+=pts;sfx('ok')}
   else{G.combo=0;G.missed.add(q.n);sfx('bad');buzz()}
+  // right or wrong, the whole verse is shown and the player moves on with the 다음 문제 button
   G.answered={i,ok,pts};render();
-  if(ok){const id=setTimeout(nextQ,950);timers.push(()=>clearTimeout(id))}
+  // bring the verse and the button into view while keeping the answered options above them
+  const nb=$('[data-act="nextQ"]');if(nb)nb.scrollIntoView({behavior:reduceMotion()?'auto':'smooth',block:'nearest'});
 }
 function nextQ(){
   clearTimers();
@@ -1466,7 +1486,7 @@ app.addEventListener('click',e=>{
     case 'open':openVerse(n);break;
     case 'hide':cycleHide(byN(view.n));render();break;
     case 'peek':ui.peek.has(i)?ui.peek.delete(i):ui.peek.add(i);render();break;
-    case 'speak':speak(byN(view.n));break;
+    case 'speak':speak(byN(n));break;
     case 'blank':startBlank(n);break;
     case 'diff':S.diff=+el.dataset.d;save();render();break;
     case 'nameSave':S.name=ui.nameIn.trim().replace(/[<>]/g,'').slice(0,10);ui.panel=null;save();render();if(S.name)loadBoard(true);break;
