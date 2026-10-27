@@ -573,18 +573,19 @@ const seriesOf=id=>SERIES.find(s=>s.id===id);
 function toks(v){const out=[];v.p.forEach(([num,txt])=>txt.split(/\s+/).filter(Boolean).forEach((w,k)=>out.push({w,vn:k===0?num:null})));return out}
 // indices of the verse's key words among its tokens (a word listed twice, like 사랑하라, counts at both places)
 function keyIdx(v,t){const ks=new Set((KEYS[v.n]||[]).map(norm));return t.map((x,i)=>i).filter(i=>ks.has(norm(t[i].w)))}
-// verse numbers are hidden in a game at the harder difficulties (they give the reference away)
-const vnHtml=x=>x.vn&&(!G||!G.d||DIFF[G.d].vn)?`<sup class="vn">${x.vn}</sup>`:'';
+// the small verse numbers show when reading a verse but never while solving one: the number alone
+// gave the answer away (church feedback); the chapter and verse themselves stay visible at every level
+const vnHtml=x=>x.vn&&!G?`<sup class="vn">${x.vn}</sup>`:'';
 
 /* ---------- 난이도 ---------- */
 // ratio: share of words blanked · dist: decoy chips · chunk: max words per order piece · hint: typing first-letter hint
 // ref/vn: show reference / verse numbers during a game · qt: quiz seconds per question · mult: XP multiplier · pass: typing pass %
 const ND=4;
 const DIFF=[null,
-  {name:'쉬움',ratio:.3,dist:0,chunk:3,hint:'on',ref:true,vn:true,qt:45000,mult:1,pass:90,desc:'빈칸 적음 · 장절 보임 · 첫 글자 힌트 · 문제당 45초'},
-  {name:'보통',ratio:.55,dist:2,chunk:2,hint:'opt',ref:true,vn:true,qt:35000,mult:1.5,pass:90,desc:'빈칸 절반 · 헷갈리는 단어 섞임 · 힌트는 선택 · 문제당 35초'},
-  {name:'어려움',ratio:.8,dist:4,chunk:2,hint:'none',ref:false,vn:false,qt:25000,mult:2,pass:90,desc:'빈칸 많음 · 장절 숨김 · 힌트 없음 · 문제당 25초'},
-  {name:'오직말씀',ratio:1,dist:6,chunk:1,hint:'none',ref:false,vn:false,qt:20000,mult:3,pass:95,desc:'전부 빈칸 · 한 단어씩 · 95% 통과 · 문제당 20초'}];
+  {name:'쉬움',ratio:.3,dist:0,chunk:3,hint:'on',ref:true,vn:false,qt:45000,mult:1,pass:90,desc:'빈칸 적음 · 첫 글자 힌트 · 문제당 45초'},
+  {name:'보통',ratio:.55,dist:2,chunk:2,hint:'opt',ref:true,vn:false,qt:35000,mult:1.5,pass:90,desc:'빈칸 절반 · 헷갈리는 단어 섞임 · 힌트는 선택 · 문제당 35초'},
+  {name:'어려움',ratio:.8,dist:4,chunk:2,hint:'none',ref:true,vn:false,qt:25000,mult:2,pass:90,desc:'빈칸 많음 · 힌트 없음 · 문제당 25초'},
+  {name:'오직말씀',ratio:1,dist:6,chunk:1,hint:'none',ref:true,vn:false,qt:20000,mult:3,pass:95,desc:'전부 빈칸 · 한 단어씩 · 95% 통과 · 문제당 20초'}];
 const D=()=>DIFF[S.diff];
 
 const ICON={
@@ -1145,7 +1146,7 @@ function tourSlides(){
      p:'가려진 자리에 들어갈 단어를 아래 단어 중에서 <b>순서대로</b> 눌러요. 틀리면 하트가 하나 깨지니 천천히 생각해요. 순서 맞추기는 흩어진 조각을 차례로 잇고, 직접 써보기는 말씀을 통째로 써 봐요.'},
     {pic:`<div class="seg t-seg" aria-hidden="true">${[1,2,3,4].map(i=>`<button class="d${i}" aria-pressed="${i===2}" tabindex="-1">${DIFF[i].name}</button>`).join('')}</div>`,
      h:'난이도는 네 단계',
-     p:'<b>쉬움</b>과 <b>보통</b>은 장절이 보이고, <b>어려움</b>과 <b>오직말씀</b>은 장절을 숨겨서 말씀만으로 맞혀야 해요. 어려울수록 XP를 더 받아요 (최대 ×3). 난이도마다 따로 정복할 수 있으니 쉬움부터 차근차근!'},
+     p:'네 난이도 모두 장절은 보여요. 대신 문제를 풀 때는 구절 옆의 작은 절 번호를 가려서 번호만 보고 맞히지 못하게 해요. 어려울수록 빈칸이 많고 힌트가 줄며 XP를 더 받아요 (최대 ×3). 난이도마다 따로 정복할 수 있으니 쉬움부터 차근차근!'},
     {pic:`<div class="t-quiz"><div class="t-hearts">${ICON.heart}${ICON.heart}${ICON.heart.replace('class="heart"','class="heart off"')}</div><div class="t-timer"><i></i></div>
        <div class="t-chips"><span class="t-chip">${esc(v1.t)}</span><span class="t-chip pick">${esc(v2.t)}</span></div></div>`,
      h:'오늘의 도전',
@@ -1233,7 +1234,7 @@ function verseView(v){
 // only the chapter and verse are hidden at 어려움 and 오직말씀
 function gref(v){
   const df=DIFF[G.d];
-  return `<div class="gref"><small>${esc(head(v))}<span class="dchip">${df.name}</span></small><b>${esc(v.t)}</b><span>${df.ref?ref(v):'장·절은 비밀이에요'}</span></div>`;
+  return `<div class="gref"><small>${esc(head(v))}<span class="dchip">${df.name}</span></small><b>${esc(v.t)}</b><span>${ref(v)}</span></div>`;
 }
 function gameTop(v,done,total){
   return `<div class="gtop">${gref(v)}
@@ -1445,10 +1446,11 @@ function check(){
 /* ---------- 오늘의 도전 (퀴즈) ---------- */
 const others=(v,k)=>pick(VERSES.filter(x=>x.n!==v.n),k);
 function halves(v){const w=toks(v).map(x=>x.w),h=Math.ceil(w.length/2);return {a:w.slice(0,h).join(' '),b:w.slice(h).join(' ')}}
-// showRef: at the easier difficulties a question shows the reference, verse number and sheet number as context; harder ones hide them
-function makeQ(v,kind,showRef){
-  const sup=(num)=>showRef?`<sup class="vn">${num}</sup>`:'';
-  const sub=headHtml(v,'q-head')+(showRef?`<div class="q-sub">${sref(v)}</div>`:'');
+// every question shows the heading, title and chapter:verse as context, but never the small verse
+// numbers inside the text (they alone gave the answer away)
+function makeQ(v,kind){
+  const sup=()=>'';
+  const sub=headHtml(v,'q-head')+`<div class="q-sub">${sref(v)}</div>`;
   // no verse-number superscripts here: they would give the answer away
   if(kind==='ref')return {n:v.n,label:'이 말씀은 어디에 있을까요?',sub:headHtml(v,'q-head'),body:`<p class="verse q-verse">${v.p.map(([,txt])=>esc(txt)).join(' ')}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
   if(kind==='title')return {n:v.n,label:'이 제목의 암송 구절은?',body:`<p class="tiny">${esc(head(v))}</p><p class="q-title">${esc(v.t)}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
@@ -1469,7 +1471,7 @@ function startQuiz(){
   const pool=filtered().map(v=>({v,k:starCount(v.n)+Math.random()*1.6})).sort((a,b)=>a.k-b.k).map(o=>o.v);
   const chosen=[];for(let i=0;i<10;i++)chosen.push(pool[i%pool.length]);
   const kinds=shuffle(['ref','word','next','title','word','ref','next','word','title','next']);
-  G={type:'quiz',d,qt:df.qt,qs:shuffle(chosen).map((v,i)=>makeQ(v,kinds[i],df.ref)),qi:0,score:0,combo:0,maxCombo:0,correct:0,missed:new Set(),answered:null,left:1,result:null};
+  G={type:'quiz',d,qt:df.qt,qs:shuffle(chosen).map((v,i)=>makeQ(v,kinds[i])),qi:0,score:0,combo:0,maxCombo:0,correct:0,missed:new Set(),answered:null,left:1,result:null};
   go({name:'quiz'});startTimer();
 }
 function quizView(){
