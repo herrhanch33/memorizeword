@@ -504,6 +504,53 @@ const VERSES=[
   {n:41,s:'gospel',t:'몸의 부활신앙',b:'욥기',c:19,v:'26',p:[[26,'내 가죽이 벗김을 당한 뒤에도 내가 육체 밖에서 하나님을 보리라']]},
   {n:42,s:'gospel',t:'우리를 의롭게 만든 부활',b:'로마서',c:4,v:'25',p:[[25,'예수는 우리가 범죄한 것 때문에 내줌이 되고 또한 우리를 의롭다 하시기 위하여 살아나셨느니라']]}
 ];
+// the key words of each verse, written exactly as they appear in the text: 빈칸 채우기 blanks
+// them first and the quiz's 빈칸 question asks for one of them, so the answers are the words
+// that carry the meaning rather than a random 이는 or 그런즉 (feedback from the church pastor)
+const KEYS={
+  1:['보배를','질그릇에','능력은','하나님께'],
+  2:['빛이','비치라','얼굴에','영광을','마음에'],
+  3:['죽음을','짊어짐은','생명이','나타나게'],
+  4:['사망은','생명은','역사하고'],
+  5:['십자가에','박혔나니','그리스도께서','육체','사랑하사','버리신','믿음'],
+  6:['계명을','사랑하라','사랑한','제자인'],
+  7:['위의','땅의','죽었고','감추어졌음이라'],
+  8:['물로','성령으로','세례를'],
+  9:['성령이','권능을','예루살렘과','유대와','사마리아와','증인이'],
+  10:['이스라엘','십자가에','주와','그리스도가'],
+  11:['회개하여','이름으로','세례를','사함을','성령의','선물을'],
+  12:['가르침을','교제하고','떡을','기도하기를'],
+  13:['은과','금은','나사렛','이름으로','걸으라'],
+  14:['구원을','천하','이름을'],
+  15:['한마음으로','대주재여','천지와','바다와','만물을'],
+  16:['사람보다','하나님께','순종하는','마땅하니라'],
+  17:['발의','신을','벗으라','거룩한','땅이니라'],
+  18:['아나니아가','안수하여','사울아','길에서','보게','성령으로','충만하게'],
+  19:['외모를','경외하며','의를','받으시는','깨달았도다'],
+  20:['바나바가','사울을','다소에','안디옥에','년간','그리스도인이라'],
+  21:['종이','형통하리니','높이','존귀하게'],
+  22:['연한','마른','뿌리','풍채도','흠모할'],
+  23:['찔림은','허물','상함은','죄악','징계를','평화를','채찍에','나음을'],
+  24:['곤욕을','입을','도수장으로','어린','양과','잠잠한'],
+  25:['영혼의','수고한','만족하게','의로운','지식으로','의롭게','담당하리로다'],
+  26:['이름을','야곱이라','이스라엘이라','겨루어','이겼음이니라'],
+  27:['귀로','듣기만','눈으로','뵈옵나이다'],
+  28:['모세에게','스스로','자이니라','자손에게','보내셨다'],
+  29:['입술에','입에','악이','제하여졌고','죄가','사하여졌느니라'],
+  30:['인자가','잃어버린','찾아','구원하려'],
+  31:['물과','성령으로','나지','나라에'],
+  32:['거듭난','썩어질','씨로','썩지','말씀으로'],
+  33:['우상을','버리고','돌아와서','참되신','섬기는지와'],
+  34:['양과','길을','잃었더니','목자와','감독','돌아왔느니라'],
+  35:['죄인','죽으심으로','사랑을','확증하셨느니라'],
+  36:['피로써','믿음으로','화목제물로','참으시는','간과하심으로','의로우심을'],
+  37:['십자가에','죄의','몸이','노릇','벗어나','의롭다'],
+  38:['종으로','순종하든지','죄의','사망에','순종의','의에'],
+  39:['율법이','죄냐','율법으로','탐내지','탐심을'],
+  40:['무서워하는','종의','양자의','아빠','아버지라고','부르짖느니라'],
+  41:['가죽이','벗김을','육체','보리라'],
+  42:['범죄한','내줌이','의롭다','살아나셨느니라']
+};
 
 /* ---------- 도우미 ---------- */
 const $=s=>document.querySelector(s);
@@ -522,6 +569,8 @@ const fullText=v=>v.p.map(x=>x[1]).join(' ');
 const byN=n=>VERSES.find(v=>v.n===n);
 const seriesOf=id=>SERIES.find(s=>s.id===id);
 function toks(v){const out=[];v.p.forEach(([num,txt])=>txt.split(/\s+/).filter(Boolean).forEach((w,k)=>out.push({w,vn:k===0?num:null})));return out}
+// indices of the verse's key words among its tokens (a word listed twice, like 사랑하라, counts at both places)
+function keyIdx(v,t){const ks=new Set((KEYS[v.n]||[]).map(norm));return t.map((x,i)=>i).filter(i=>ks.has(norm(t[i].w)))}
 // verse numbers are hidden in a game at the harder difficulties (they give the reference away)
 const vnHtml=x=>x.vn&&(!G||!G.d||DIFF[G.d].vn)?`<sup class="vn">${x.vn}</sup>`:'';
 
@@ -1232,7 +1281,9 @@ function startBlank(n){
   const d=S.diff,df=DIFF[d],v=byN(n),t=toks(v);
   const cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=(d>=3?1:2));
   const k=Math.min(cand.length,Math.max(2,Math.round(t.length*df.ratio)));
-  const blanks=d>=4?t.map((x,i)=>i):pick(cand,k).sort((a,b)=>a-b);
+  // key words are blanked first; only when the level asks for more blanks than there are key words do other words join
+  const keys=pick(keyIdx(v,t).filter(i=>cand.includes(i)),k);
+  const blanks=d>=4?t.map((x,i)=>i):[...keys,...pick(cand.filter(i=>!keys.includes(i)),k-keys.length)].sort((a,b)=>a-b);
   const own=new Set(t.map(x=>norm(x.w)));
   const pool=[...new Set(VERSES.filter(x=>x.n!==n).flatMap(x=>toks(x).map(y=>norm(y.w))))].filter(w=>w.length>=2&&!own.has(w));
   const chips=shuffle([...blanks.map(i=>norm(t[i].w)),...pick(pool,df.dist)]).map(w=>({w,used:false}));
@@ -1393,7 +1444,8 @@ function makeQ(v,kind,showRef){
   if(kind==='ref')return {n:v.n,label:'이 말씀은 어디에 있을까요?',sub:headHtml(v,'q-head'),body:`<p class="verse q-verse">${v.p.map(([,txt])=>esc(txt)).join(' ')}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
   if(kind==='title')return {n:v.n,label:'이 제목의 암송 구절은?',body:`<p class="tiny">${esc(head(v))}</p><p class="q-title">${esc(v.t)}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
   if(kind==='word'){
-    const t=toks(v),cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=2),bi=cand[Math.floor(Math.random()*cand.length)],ans=norm(t[bi].w);
+    // the blank is one of the verse's key words (any word only when a verse has none listed)
+    const t=toks(v),cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=2),keys=keyIdx(v,t).filter(i=>cand.includes(i)),from=keys.length?keys:cand,bi=from[Math.floor(Math.random()*from.length)],ans=norm(t[bi].w);
     const own=new Set(t.map(x=>norm(x.w)));
     let dp=[...new Set(VERSES.flatMap(x=>toks(x).map(y=>norm(y.w))))].filter(w=>!own.has(w)&&w.length>=2);
     const near=dp.filter(w=>Math.abs(w.length-ans.length)<=1);if(near.length>=3)dp=near;
