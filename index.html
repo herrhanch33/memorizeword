@@ -385,7 +385,9 @@ body.pl-on .sheet{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
 /* ---- 생기 있는 게임 느낌: 전신갑주 아바타, 진행 링, 시리즈 색, 모드 아이콘 ---- */
 .hero{background:radial-gradient(circle at 88% 8%,color-mix(in srgb,var(--accent-ink) 22%,transparent),transparent 45%),var(--accent);gap:14px}
 .hero-top{grid-template-columns:104px minmax(0,1fr);gap:12px;align-items:center}
-.avatar-wrap{position:relative;display:grid;place-items:center;padding-bottom:10px}
+.avatar-wrap{display:grid;place-items:center;gap:8px}
+.av-box{position:relative;padding-bottom:10px}
+.sex-btn{background:color-mix(in srgb,var(--accent-ink) 18%,transparent);border:0;color:inherit;border-radius:999px;padding:4px 10px;font-family:var(--f-display);font-size:12px;cursor:pointer;white-space:nowrap}
 .avatar{display:block;filter:drop-shadow(0 6px 0 rgba(0,0,0,.18));animation:bob 3.2s ease-in-out infinite}
 .avatar.mini{display:inline-block;width:20px;height:25px;vertical-align:-7px;margin-right:5px;filter:none;animation:none}
 .lv-pill{position:absolute;left:50%;bottom:0;transform:translateX(-50%);background:var(--accent-ink);color:var(--accent);font-family:var(--f-display);font-size:14px;padding:2px 12px;border-radius:999px;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.15)}
@@ -610,7 +612,7 @@ const ICON={
 /* ---------- 진도 저장 ---------- */
 const KEY='malsseum-amsong-v1';
 const z4=()=>[0,0,0,0];
-function blank(){return {xp:0,streak:0,lastDay:null,today:{day:null,games:0},verses:{},name:'',diff:2,sound:true,series:'all',updatedAt:0}}
+function blank(){return {xp:0,streak:0,lastDay:null,today:{day:null,games:0},verses:{},name:'',sex:'m',diff:2,sound:true,series:'all',updatedAt:0}}
 // A verse record keeps b (blank cleared), o (order cleared) and t (best typing %) per difficulty, index = difficulty-1.
 // Older records had one blank level 1-3, one order flag and one typing score; those map onto 쉬움/보통/어려움.
 function migrateVerse(x){
@@ -621,7 +623,7 @@ function migrateVerse(x){
 }
 function migrateAll(vv){const out={};Object.keys(vv||{}).forEach(k=>{const m=migrateVerse(vv[k]);if(m)out[k]=m});return out}
 function load(){
-  try{const r=localStorage.getItem(KEY);if(r){const s=Object.assign(blank(),JSON.parse(r));s.verses=migrateAll(s.verses);s.diff=Math.min(ND,Math.max(1,+s.diff||2));s.name=String(s.name||'').slice(0,10);return s}}catch(e){}
+  try{const r=localStorage.getItem(KEY);if(r){const s=Object.assign(blank(),JSON.parse(r));s.verses=migrateAll(s.verses);s.diff=Math.min(ND,Math.max(1,+s.diff||2));s.name=String(s.name||'').slice(0,10);s.sex=s.sex==='f'?'f':'m';return s}}catch(e){}
   return blank();
 }
 let S=load();
@@ -647,7 +649,7 @@ function merge(a,b){
 // what the leaderboard shows about me; sent with each sync when a nickname is set
 function pubSummary(){
   const m=z4();VERSES.forEach(v=>{for(let d=1;d<=ND;d++)if(mastered(v.n,d))m[d-1]++});
-  return {name:S.name,xp:S.xp,lv:lvl().L,streak:curStreak(),m,at:Date.now()};
+  return {name:S.name,sex:S.sex,xp:S.xp,lv:lvl().L,streak:curStreak(),m,at:Date.now()};
 }
 
 let cloud=null,cloudBusy=false,cloudDirty=false,cloudTimer=null;
@@ -766,7 +768,7 @@ async function loadBoard(force){
 function boardRow(r,i){
   const title=ARMOR[Math.min(r.lv-1,ARMOR.length-1)].t;
   return `<li class="${r.id===myId?'me':''}"><span class="rk ${i<3?'top':''}">${i+1}</span>
-    <span class="nm">${avatar(r.lv,22,'mini')}${esc(r.name)}${r.id===myId?' (나)':''}<span class="sub">Lv.${r.lv} ${title} · ${r.streak}일 연속 · 정복 ${r.m.map((c,k)=>`${DIFF[k+1].name[0]}${c}`).join(' ')}</span></span>
+    <span class="nm">${avatar(r.lv,22,'mini',r.sex)}${esc(r.name)}${r.id===myId?' (나)':''}<span class="sub">Lv.${r.lv} ${title} · ${r.streak}일 연속 · 정복 ${r.m.map((c,k)=>`${DIFF[k+1].name[0]}${c}`).join(' ')}</span></span>
     <span class="xp">${r.xp.toLocaleString()} XP</span></li>`;
 }
 function boardView(){
@@ -863,14 +865,18 @@ const PIECE_ICON={
   helmet:'<svg viewBox="0 0 24 24"><path d="M5 14q0-9 7-9t7 9v1H5z" fill="currentColor" opacity=".5"/><rect x="3" y="14" width="18" height="4" rx="2" fill="currentColor"/></svg>',
   sword:'<svg viewBox="0 0 24 24"><path d="M12 2l3 3v10H9V5z" fill="currentColor" opacity=".5"/><rect x="6" y="15" width="12" height="3" rx="1" fill="currentColor"/><rect x="10.5" y="18" width="3" height="4" rx="1" fill="currentColor"/></svg>'
 };
-// The little warrior: pieces appear as the level rises (belt → breastplate → shoes → shield → helmet → sword → full armor glow)
-function avatar(L,size=104,cls=''){
-  const has=p=>L>=ARMOR.findIndex(a=>a.piece===p)+1,full=L>=8;
+// The little warrior: pieces appear as the level rises (belt → breastplate → shoes → shield → helmet → sword → full armor glow).
+// sex 'm' or 'f' (the player's choice, S.sex): the same armour on both; she has long hair, a skirt and a flower
+function avatar(L,size=104,cls='',sex){
+  const has=p=>L>=ARMOR.findIndex(a=>a.piece===p)+1,full=L>=8,f=(sex||S.sex)==='f';
   const skin='#F3C9A2',hair='#3B2A1F',tunic='#F4EFE3',pants='#4A6FA5',silver='#D6DBE3',silverD='#8E97A4',gold='#F2C14E',goldD='#B8862B',ink='#2B2B2B';
   return `<svg class="avatar ${cls}" viewBox="0 0 120 150" width="${size}" height="${Math.round(size*1.25)}" aria-hidden="true">
     ${full?`<circle cx="60" cy="82" r="58" fill="${gold}" opacity=".28"><animate attributeName="r" values="55;61;55" dur="3s" repeatCount="indefinite"/></circle>
       <g fill="${gold}"><path d="M14 40l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M104 26l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M102 122l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z"/></g>`:''}
-    <rect x="43" y="108" width="14" height="34" rx="7" fill="${pants}"/><rect x="63" y="108" width="14" height="34" rx="7" fill="${pants}"/>
+    ${f?`<path d="M36 44q-6 36 4 62h40q10-26 4-62z" fill="${hair}"/>
+      <rect x="45" y="110" width="12" height="32" rx="6" fill="${skin}"/><rect x="63" y="110" width="12" height="32" rx="6" fill="${skin}"/>
+      <path d="M36 104h48l6 20H30z" fill="${pants}"/>`
+      :`<rect x="43" y="108" width="14" height="34" rx="7" fill="${pants}"/><rect x="63" y="108" width="14" height="34" rx="7" fill="${pants}"/>`}
     ${has('shoes')?`<path d="M38 134h20v10q0 5-5 5H40q-4 0-4-4z" fill="${goldD}"/><path d="M62 134h20v10q0 5-5 5H66q-4 0-4-4z" fill="${goldD}"/><rect x="38" y="134" width="20" height="4" fill="${gold}"/><rect x="62" y="134" width="20" height="4" fill="${gold}"/>`
       :`<rect x="41" y="138" width="18" height="10" rx="5" fill="#8A6A4F"/><rect x="61" y="138" width="18" height="10" rx="5" fill="#8A6A4F"/>`}
     ${has('sword')?`<path d="M93 34l5 4v62h-10V38z" fill="${silver}" stroke="${silverD}" stroke-width="1.5"/>${full?`<path d="M90 40h4v40h-4z" fill="#fff" opacity=".7"/>`:''}<rect x="84" y="100" width="20" height="6" rx="2" fill="${gold}"/><rect x="90" y="106" width="8" height="16" rx="3" fill="#6B4A2B"/>`:''}
@@ -880,11 +886,14 @@ function avatar(L,size=104,cls=''){
     ${has('belt')?`<rect x="34" y="100" width="52" height="10" fill="${goldD}"/><rect x="53" y="98" width="14" height="14" rx="3" fill="${gold}" stroke="${goldD}" stroke-width="2"/>`:''}
     ${has('shield')?`<path d="M8 84h32v22q0 14-16 20-16-6-16-20z" fill="#3B6FD6" stroke="#223F8A" stroke-width="2.5"/><path d="M22 92h4v22h-4zM14 100h20v4H14z" fill="${gold}"/>`:''}
     <circle cx="60" cy="42" r="23" fill="${skin}"/>
-    <path d="M37 40q4-22 23-22t23 22q-8-8-23-7-15-1-23 7z" fill="${hair}"/>
+    ${f?`<path d="M37 40q4-22 23-22t23 22q-5-6-13-7-4 5-10 1-7-1-23 6z" fill="${hair}"/><path d="M38 42q-4 12-1 26M82 42q4 12 1 26" stroke="${hair}" stroke-width="7" stroke-linecap="round" fill="none"/>
+      <path d="M46 39l3-2.5M74 39l-3-2.5" stroke="${ink}" stroke-width="1.8" stroke-linecap="round"/>`
+      :`<path d="M37 40q4-22 23-22t23 22q-8-8-23-7-15-1-23 7z" fill="${hair}"/>`}
     <circle cx="51" cy="44" r="2.6" fill="${ink}"/><circle cx="69" cy="44" r="2.6" fill="${ink}"/>
     <path d="M52 52q8 7 16 0" stroke="${ink}" stroke-width="2.2" stroke-linecap="round" fill="none"/>
     <circle cx="45" cy="50" r="3" fill="#F08A8A" opacity=".45"/><circle cx="75" cy="50" r="3" fill="#F08A8A" opacity=".45"/>
-    ${has('helmet')?`<path d="M35 42q0-26 25-26t25 26v2H35z" fill="${silver}" stroke="${silverD}" stroke-width="2"/><rect x="31" y="40" width="58" height="7" rx="3.5" fill="${silverD}"/><path d="M56 16q4-10 8 0 2 6-4 6-6 0-4-6z" fill="#D9534F"/>`:''}
+    ${has('helmet')?`<path d="M35 42q0-26 25-26t25 26v2H35z" fill="${silver}" stroke="${silverD}" stroke-width="2"/><rect x="31" y="40" width="58" height="7" rx="3.5" fill="${silverD}"/><path d="M56 16q4-10 8 0 2 6-4 6-6 0-4-6z" fill="#D9534F"/>`
+      :f?`<g fill="#F2A0B0"><circle cx="79" cy="27" r="3.4"/><circle cx="85" cy="24" r="3.4"/><circle cx="85" cy="31" r="3.4"/></g><circle cx="83" cy="27.5" r="2.2" fill="${gold}"/>`:''}
   </svg>`;
 }
 function armorRow(L){
@@ -1041,7 +1050,7 @@ function homeView(){
   return `
   <section class="hero" aria-label="나의 기록">
     <div class="hero-top">
-      <div class="avatar-wrap">${avatar(l.L)}<span class="lv-pill">Lv.${l.L}</span></div>
+      <div class="avatar-wrap"><div class="av-box">${avatar(l.L)}<span class="lv-pill">Lv.${l.L}</span></div><button class="sex-btn" data-act="sex" aria-label="캐릭터 성별 바꾸기">${S.sex==='f'?'♂ 남자 캐릭터':'♀ 여자 캐릭터'}</button></div>
       <div class="lv-info">
         <div class="lv-name">${SYNC_URL&&!cloud?(S.name&&syncCode?`<span>${esc(S.name)}</span>`:''):S.name?`<span>${esc(S.name)}</span><button data-act="panel" data-p="name" aria-label="닉네임 바꾸기">✎</button>`:`<button data-act="panel" data-p="name">닉네임 정하기</button>`}</div>
         <div class="lv-title">${l.title}</div>
@@ -1565,7 +1574,8 @@ app.addEventListener('click',e=>{
     case 'nextQ':nextQ();break;
     case 'reset':ui.confirmReset=true;render();break;
     case 'resetNo':ui.confirmReset=false;render();break;
-    case 'resetYes':S=Object.assign(blank(),{sound:S.sound,series:S.series,name:S.name,diff:S.diff});ui.confirmReset=false;save();render();
+    case 'sex':S.sex=S.sex==='f'?'m':'f';save();render();break;
+    case 'resetYes':S=Object.assign(blank(),{sound:S.sound,series:S.series,name:S.name,sex:S.sex,diff:S.diff});ui.confirmReset=false;save();render();
       // merging would bring the old record back, so overwrite the server copy
       if(SYNC_URL&&syncCode){clearTimeout(sync.timer);syncFetch('PUT',S).catch(()=>{})}
       break;
