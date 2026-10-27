@@ -307,6 +307,32 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(
 
 /* 사용법 (튜토리얼): 첫 방문에 자동으로 열리고, 상단 "사용법" 버튼으로 다시 볼 수 있어요 */
 @media (max-width:400px){.top .logo{display:none}}  /* room for the ? button next to the title */
+
+/* 직접 써보기: 장·절 칸 */
+.refrow{display:grid;gap:4px}
+.refin{min-height:44px;border-radius:12px;border:1.5px solid var(--line);padding:0 12px;font:inherit;font-size:16px;background:var(--surface);color:var(--ink);width:100%}
+.refin:focus{outline:3px solid var(--accent)}
+.refres.ok{color:var(--accent-strong)} .refres.no{color:var(--bad)} .refres b{font-weight:400;color:var(--ink)}
+
+/* 연속 듣기 */
+.listen{width:100%;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:12px 14px;cursor:pointer;box-shadow:0 3px 0 var(--line)}
+.listen:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.listen .micon{--mc:var(--accent)}
+.listen b{font-family:var(--f-display);font-weight:400;font-size:18px;display:block;line-height:1.2}
+.listen small{font-size:13px;color:var(--muted);display:block}
+.listen>svg{width:28px;height:28px;color:var(--accent)}
+.player{position:fixed;left:0;right:0;bottom:0;z-index:12;max-width:560px;margin:0 auto;display:flex;align-items:center;gap:2px;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);border-radius:18px 18px 0 0;box-shadow:0 -4px 16px rgba(0,0,0,.2)}
+.pl-title{flex:1;min-width:0;border:0;background:transparent;color:inherit;text-align:left;padding:4px 8px;cursor:pointer;display:grid;gap:1px}
+.pl-title b{font-family:var(--f-display);font-weight:400;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-title span{font-size:12px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player .icon-btn{color:inherit;width:38px;height:38px}
+.player .icon-btn svg{width:22px;height:22px}
+.player .icon-btn.on{background:color-mix(in srgb,var(--bg) 22%,transparent)}
+.player .pl-main{background:var(--bg);color:var(--ink);border-radius:50%;width:42px;height:42px}
+.player .pl-main svg{width:24px;height:24px}
+body.pl-on main{padding-bottom:110px}
+body.pl-on .tray{bottom:66px}
+body.pl-on .sheet{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
 .tour{position:fixed;left:0;right:0;bottom:0;z-index:31;max-width:560px;margin:0 auto;background:var(--surface);border-radius:26px 26px 0 0;padding:14px 18px calc(18px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;animation:up .35s cubic-bezier(.2,.9,.3,1.15);max-height:92%;overflow:auto;touch-action:pan-y;outline:none}
 .tour.still{animation:none}
 .tour-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
@@ -497,10 +523,10 @@ const vnHtml=x=>x.vn&&(!G||!G.d||DIFF[G.d].vn)?`<sup class="vn">${x.vn}</sup>`:'
 // ref/vn: show reference / verse numbers during a game · qt: quiz seconds per question · mult: XP multiplier · pass: typing pass %
 const ND=4;
 const DIFF=[null,
-  {name:'쉬움',ratio:.3,dist:0,chunk:3,hint:'on',ref:true,vn:true,qt:25000,mult:1,pass:90,desc:'빈칸 적음 · 장절 보임 · 첫 글자 힌트'},
-  {name:'보통',ratio:.55,dist:2,chunk:2,hint:'opt',ref:true,vn:true,qt:20000,mult:1.5,pass:90,desc:'빈칸 절반 · 헷갈리는 단어 섞임 · 힌트는 선택'},
-  {name:'어려움',ratio:.8,dist:4,chunk:2,hint:'none',ref:false,vn:false,qt:12000,mult:2,pass:90,desc:'빈칸 많음 · 장절 숨김 · 힌트 없음 · 문제당 12초'},
-  {name:'오직말씀',ratio:1,dist:6,chunk:1,hint:'none',ref:false,vn:false,qt:8000,mult:3,pass:95,desc:'전부 빈칸 · 한 단어씩 · 95% 통과 · 문제당 8초'}];
+  {name:'쉬움',ratio:.3,dist:0,chunk:3,hint:'on',ref:true,vn:true,qt:45000,mult:1,pass:90,desc:'빈칸 적음 · 장절 보임 · 첫 글자 힌트 · 문제당 45초'},
+  {name:'보통',ratio:.55,dist:2,chunk:2,hint:'opt',ref:true,vn:true,qt:35000,mult:1.5,pass:90,desc:'빈칸 절반 · 헷갈리는 단어 섞임 · 힌트는 선택 · 문제당 35초'},
+  {name:'어려움',ratio:.8,dist:4,chunk:2,hint:'none',ref:false,vn:false,qt:25000,mult:2,pass:90,desc:'빈칸 많음 · 장절 숨김 · 힌트 없음 · 문제당 25초'},
+  {name:'오직말씀',ratio:1,dist:6,chunk:1,hint:'none',ref:false,vn:false,qt:20000,mult:3,pass:95,desc:'전부 빈칸 · 한 단어씩 · 95% 통과 · 문제당 20초'}];
 const D=()=>DIFF[S.diff];
 
 const ICON={
@@ -516,7 +542,13 @@ const ICON={
   blank:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4a2.5 2.5 0 1 1 5 0h4v4a2.5 2.5 0 1 1 0 5v3H4z"/></svg>',
   order:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h4l8 10h4M4 17h4l2-2.5M14 9.5L16 7h4"/><path d="M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>',
   type:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4.5-1L20 7.5l-3.5-3.5L5 15.5z"/><path d="M14 6.5l3.5 3.5"/></svg>',
-  help:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.5a2.8 2.8 0 1 1 3.9 2.6c-.9.5-1.2 1-1.2 1.9"/><path d="M12 17.2h.01"/></svg>'
+  help:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.5a2.8 2.8 0 1 1 3.9 2.6c-.9.5-1.2 1-1.2 1.9"/><path d="M12 17.2h.01"/></svg>',
+  pause:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4.5" height="14" rx="1"/><rect x="13.5" y="5" width="4.5" height="14" rx="1"/></svg>',
+  prev:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h2.5v14H7zM18 5.5v13L10 12z"/></svg>',
+  next:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.5 5H17v14h-2.5zM6 5.5v13l8-6.5z"/></svg>',
+  loop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3l3 3-3 3"/><path d="M20 6H8a4 4 0 0 0-4 4v1"/><path d="M7 21l-3-3 3-3"/><path d="M4 18h12a4 4 0 0 0 4-4v-1"/></svg>',
+  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  headset:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4.5" height="7" rx="2"/><rect x="16.5" y="13" width="4.5" height="7" rx="2"/></svg>'
 };
 
 /* ---------- 진도 저장 ---------- */
@@ -817,7 +849,7 @@ function buzz(){try{navigator.vibrate&&navigator.vibrate(60)}catch(e){}}
 // Read-aloud: a real recording (audio/<n>.mp3, listed in audio/manifest.json) when there is one, else the phone's best Korean voice
 const canSpeak='speechSynthesis' in window;
 let RECORDED=new Set(),player=null;
-fetch('audio/manifest.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]).then(a=>{RECORDED=new Set(Array.isArray(a)?a.map(Number):[]);if(view.name==='verse')render()}).catch(()=>{});
+fetch('audio/manifest.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]).then(a=>{RECORDED=new Set(Array.isArray(a)?a.map(Number):[]);if(view.name==='verse'||view.name==='home')render()}).catch(()=>{});
 const hasVoice=v=>RECORDED.has(v.n)||canSpeak;
 function koVoice(){
   const vs=speechSynthesis.getVoices().filter(x=>/^ko/i.test(x.lang));
@@ -826,13 +858,59 @@ function koVoice(){
   return vs.sort((a,b)=>score(b)-score(a))[0]||null;
 }
 function speak(v){
-  stopSpeech();
+  stopSpeech();if(PL.on)plStop();
   if(RECORDED.has(v.n)){player=new Audio(`audio/${v.n}.mp3`);player.play().catch(()=>speakTts(v));return}
   speakTts(v);
 }
 function speakTts(v){try{const u=new SpeechSynthesisUtterance(ref(v)+'. '+fullText(v));u.lang='ko-KR';u.rate=.92;const vo=koVoice();if(vo)u.voice=vo;speechSynthesis.speak(u)}catch(e){}}
 function stopSpeech(){try{if(player){player.pause();player=null}if(canSpeak)speechSynthesis.cancel()}catch(e){}}
 if(canSpeak)speechSynthesis.onvoiceschanged=()=>{};
+
+/* ---------- 연속 듣기: 녹음된 구절을 차례로 틀어 주는 작은 플레이어 ---------- */
+// One <audio> element outside #app, so it survives re-renders and keeps playing with the screen off;
+// the lock-screen controls come from the Media Session API where the phone has it.
+const PL={on:false,list:[],i:0,loop:false,playing:false};
+const plAudio=document.createElement('audio');plAudio.preload='auto';document.body.appendChild(plAudio);
+plAudio.addEventListener('ended',()=>plStep(1,true));
+plAudio.addEventListener('play',()=>{PL.playing=true;plUi()});
+plAudio.addEventListener('pause',()=>{PL.playing=false;plUi()});
+plAudio.addEventListener('error',()=>{if(PL.on)plStep(1,true)});
+const plCur=()=>PL.list[PL.i];
+function plStart(list,i){
+  const l=list.filter(v=>RECORDED.has(v.n));if(!l.length)return;
+  stopSpeech();PL.on=true;PL.list=l;PL.i=Math.max(0,l.indexOf(list[i]));
+  document.body.classList.add('pl-on');plLoad();render();
+}
+function plLoad(){
+  const v=plCur();plAudio.src=`audio/${v.n}.mp3`;plAudio.play().catch(()=>{});
+  if('mediaSession' in navigator){try{
+    navigator.mediaSession.metadata=new MediaMetadata({title:`${v.n}. ${v.t}`,artist:ref(v),album:'주평예수교회 말씀암송'});
+    navigator.mediaSession.setActionHandler('play',()=>plAudio.play());navigator.mediaSession.setActionHandler('pause',()=>plAudio.pause());
+    navigator.mediaSession.setActionHandler('previoustrack',()=>plStep(-1));navigator.mediaSession.setActionHandler('nexttrack',()=>plStep(1));
+  }catch(e){}}
+  plUi();
+}
+// auto=true when a track just ended: stop at the end of the list unless 반복 is on
+function plStep(d,auto){
+  if(!PL.on)return;let i=PL.i+d;
+  if(i>=PL.list.length){if(PL.loop||!auto)i=0;else return plStop()}
+  if(i<0)i=PL.list.length-1;
+  PL.i=i;plLoad();
+}
+function plToggle(){if(plAudio.paused)plAudio.play().catch(()=>{});else plAudio.pause()}
+function plStop(){PL.on=false;plAudio.pause();plAudio.removeAttribute('src');document.body.classList.remove('pl-on');render()}
+function playerBar(){
+  if(!PL.on)return '';const v=plCur();
+  return `<div class="player" role="region" aria-label="연속 듣기">
+    <button class="pl-title" data-act="open" data-n="${v.n}"><b>${v.n}. ${esc(v.t)}</b><span>${ref(v)} · ${PL.i+1}/${PL.list.length}</span></button>
+    <button class="icon-btn" data-act="plPrev" aria-label="이전 구절">${ICON.prev}</button>
+    <button class="icon-btn pl-main" data-act="plToggle" aria-label="${PL.playing?'일시정지':'재생'}">${PL.playing?ICON.pause:ICON.play}</button>
+    <button class="icon-btn" data-act="plNext" aria-label="다음 구절">${ICON.next}</button>
+    <button class="icon-btn ${PL.loop?'on':''}" data-act="plLoop" aria-label="반복 ${PL.loop?'끄기':'켜기'}" aria-pressed="${PL.loop}">${ICON.loop}</button>
+    <button class="icon-btn" data-act="plClose" aria-label="듣기 끝내기">${ICON.close}</button>
+  </div>`;
+}
+function plUi(){const b=$('.player');if(b)b.outerHTML=playerBar()}
 
 const fx=$('#fx');
 const reduceMotion=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -878,7 +956,7 @@ function render(){
     case 'type':title='직접 써보기';back=true;body=typeView();break;
     case 'quiz':title='오늘의 도전';back=true;body=quizView();break;
   }
-  app.innerHTML=header(title,back)+`<main class="gut">${body}</main>`+(G&&G.result?resultSheet():'')+(ui.tour!=null?tourView():'');
+  app.innerHTML=header(title,back)+`<main class="gut">${body}</main>`+playerBar()+(G&&G.result?resultSheet():'')+(ui.tour!=null?tourView():'');
   // the tutorial sheet slides up once when opened, then stays put while paging; keep keyboard focus on it
   if(ui.tour!=null){ui.tourFresh=false;const t=$('.tour');if(t&&!t.contains(document.activeElement))t.focus({preventScroll:true})}
 }
@@ -928,6 +1006,7 @@ function homeView(){
     <p class="tiny">${df.desc} · XP ×${df.mult}</p>
   </section>
   <button class="cta" data-act="quiz"><span><span class="cta-main">오늘의 도전</span><span class="cta-sub">${sel?esc(sel.short):'전체 구절'}에서 10문제 · 문제당 ${df.qt/1000}초</span></span>${ICON.go}</button>
+  ${RECORDED.size?`<button class="listen" data-act="listen"><span class="micon">${ICON.headset}</span><span><b>연속 듣기</b><small>${sel?esc(sel.short):'전체'} ${list.filter(v=>RECORDED.has(v.n)).length}구절을 차례로 들려줘요 · 화면을 꺼도 이어져요</small></span>${ICON.play}</button>`:''}
   ${boardView()}
   <div class="tabs" role="tablist" aria-label="시리즈">${tabs}</div>
   <p class="tiny">구절을 눌러 빈칸 채우기, 순서 맞추기, 직접 써보기를 통과하면 별 3개로 그 난이도를 정복해요. 네 난이도를 모두 정복해 보세요. <button class="link" data-act="tourOpen">사용법 보기</button></p>
@@ -989,7 +1068,7 @@ function tourSlides(){
     {pic:`<div class="t-rows"><div class="t-row" style="--sc:var(--c${seriesOf(v1.s).c})">${ring(v1.n)}<span><b>${esc(v1.t)}</b><small>${ref(v1)}</small></span>${pips(v1.n)}</div>
        <div class="t-row" style="--sc:var(--c${seriesOf(v2.s).c})">${ring(v2.n)}<span><b>${esc(v2.t)}</b><small>${ref(v2)}</small></span>${pips(v2.n)}</div></div>`,
      h:'먼저 구절을 골라요',
-     p:'홈 아래쪽 목록에서 구절을 누르면 말씀이 보여요. <b>가리기</b> 버튼으로 단어를 조금씩 숨기며 읽고, <b>들려주기</b>로 낭독을 들을 수 있어요. 위의 탭으로 시리즈를 고를 수 있어요.'},
+     p:'홈 아래쪽 목록에서 구절을 누르면 말씀이 보여요. <b>가리기</b> 버튼으로 단어를 조금씩 숨기며 읽고, <b>들려주기</b>로 낭독을 들을 수 있어요. 홈의 <b>연속 듣기</b>를 누르면 이동하면서 전체 구절을 쭉 들을 수 있어요.'},
     {pic:`<div class="t-modes">
        <div class="t-mode m1"><span class="micon">${ICON.blank}</span><span>빈칸 채우기</span><span class="star on"></span></div>
        <div class="t-mode m2"><span class="micon">${ICON.order}</span><span>순서 맞추기</span><span class="star on"></span></div>
@@ -1057,12 +1136,14 @@ function verseView(v){
     <div class="vc-tools">
       <button class="btn small" data-act="hide">${HIDE_NEXT[ui.hide]}</button>
       ${hasVoice(v)?`<button class="btn small ghost" data-act="speak">${ICON.play} ${RECORDED.has(v.n)?'들려주기':'읽어주기'}</button>`:''}
+      ${RECORDED.has(v.n)?`<button class="btn small ghost" data-act="listenHere">${ICON.headset} 여기부터 쭉 듣기</button>`:''}
     </div>
     ${ui.hide?'<p class="tiny">가려진 단어를 누르면 살짝 보여요.</p>':''}
   </article>
   <section class="modes" aria-label="암송 연습">
-    <h3 class="sec"><span>암송 연습 · ${df.name}</span><button class="link" data-act="home">난이도 바꾸기</button></h3>
-    <div class="mast" aria-label="정복한 난이도">${[1,2,3,4].map(i=>`<span class="${mastered(v.n,i)?'on':''}">${DIFF[i].name}${mastered(v.n,i)?' ✓':''}</span>`).join('')}</div>
+    <h3 class="sec"><span>암송 연습 · ${df.name}</span><span class="range">XP ×${df.mult}</span></h3>
+    <div class="seg" aria-label="난이도">${[1,2,3,4].map(i=>`<button class="d${i}" aria-pressed="${d===i}" data-act="diff" data-d="${i}">${DIFF[i].name}${mastered(v.n,i)?' ✓':''}</button>`).join('')}</div>
+    <p class="tiny">${df.desc.replace(/ · 문제당.*$/,'')}${mastered(v.n,d)?` · 이 난이도는 정복했어요${d<ND?', 다음 난이도에 도전해 보세요':''}`:''}</p>
     <div class="mode m1 ${st[0]?'done':''}">
       <div class="mode-head"><span class="micon">${ICON.blank}</span><div><b>빈칸 채우기</b><span class="d">${d>=4?'모든 단어를 말씀 순서대로 눌러요':'빈칸에 들어갈 단어를 순서대로 눌러요'}${df.dist?' · 헷갈리는 단어 섞임':''}</span></div><span class="star ${st[0]?'on':''}"></span></div>
       <button class="btn ${!st[0]?'primary':''}" data-act="blank">${st[0]?'다시 하기':'시작하기'}</button>
@@ -1114,7 +1195,11 @@ function wrapResult(n,starIdx,before,lvBefore,base){
   const after=stars(n);
   base.newStar=starIdx>=0&&!before[starIdx]&&after[starIdx];
   base.levelUp=lvl().L>lvBefore;
-  if(base.pass&&!before.every(Boolean)&&after.every(Boolean)){base.title=`${DIFF[S.diff].name} 정복!`;base.msg+=` ${DIFF[S.diff].name} 난이도의 별 3개를 모두 모았어요.${S.diff<ND?' 다음 난이도에도 도전해 보세요.':''}`}
+  if(base.pass&&!before.every(Boolean)&&after.every(Boolean)){
+    base.title=`${DIFF[S.diff].name} 정복!`;base.msg+=` ${DIFF[S.diff].name} 난이도의 별 3개를 모두 모았어요.${S.diff<ND?' 같은 구절을 한 단계 어렵게 다시 외워 볼까요?':''}`;
+    // the same verse, one level harder, becomes the main button
+    if(S.diff<ND)base.actions=btns([[`${DIFF[S.diff+1].name} 난이도로 다시 도전`,'nextDiff','primary',`data-n="${n}"`]])+base.actions.replace('btn primary','btn');
+  }
   return base;
 }
 // the heart that was just lost breaks on the next render, then stays grey
@@ -1244,26 +1329,34 @@ function typeView(){
   ${df.hint==='none'?'':`<div class="hintbox ${G.hint?'':'off'}" aria-label="첫 글자 힌트">${G.hint?hint:'힌트를 껐어요. 힌트 없이 통과하면 보너스 XP를 받아요.'}</div>`}
   <label class="lbl" for="typeBox">기억나는 대로 구절을 써 보세요. 띄어쓰기와 문장부호는 채점하지 않아요.</label>
   <textarea id="typeBox" rows="6" lang="ko" maxlength="600" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="여기에 구절을 써 보세요">${esc(G.input)}</textarea>
+  <div class="refrow"><label class="lbl" for="refBox">몇 장 몇 절인지도 써 보세요 (맞히면 보너스 XP)</label>
+    <input id="refBox" class="refin" lang="ko" maxlength="20" autocomplete="off" inputmode="numeric" value="${esc(G.refIn||'')}" placeholder="예: 4장 7절 / 4:7"></div>
   <div class="row">${df.hint==='opt'?`<button class="btn ghost" data-act="toggleHint">힌트 ${G.hint?'끄기':'켜기'}</button>`:''}<button class="btn primary" data-act="check">채점하기</button></div>
   ${r?`<section class="gradebox" id="grade" aria-live="polite">
     <div class="pct ${r.score>=pass?'ok':'no'}">${r.score}%</div>
     <p class="tiny">${r.score>=pass?`통과 기준 ${pass}%를 넘었어요.`:`${pass}% 이상이면 통과예요.`} 빠진 글자 ${r.missed}개 · 더 쓴 글자 ${r.extra}개</p>
     <p class="verse" style="font-size:18px">${gradeHtml(r)}</p>
     <p class="tiny">밑줄 친 부분이 빠졌거나 틀린 곳이에요.</p>
+    <p class="tiny refres ${r.refOk?'ok':r.refOk===false?'no':''}">장·절: ${r.refOk?'맞았어요 ✓':r.refOk===false?'아쉬워요':'안 썼어요'} · 정답은 <b>${ref(v)}</b></p>
     <div class="row"><button class="btn" data-act="clearType">처음부터 다시 쓰기</button></div>
   </section>`:''}`;
 }
+// "4장 7절", "4:7", "4 7", "34-35절" all count: only the numbers are compared
+function refOk(v,input){
+  const nums=(input||'').match(/\d+/g);if(!nums)return null;
+  return nums.join(',')===[v.c,...String(v.v).split('-')].map(Number).join(',');
+}
 function check(){
-  const box=$('#typeBox');G.input=box?box.value:G.input;
+  const box=$('#typeBox'),rb=$('#refBox');G.input=box?box.value:G.input;if(rb)G.refIn=rb.value;
   if(!G.input.trim()){flash('#typeBox','shake');return}
   const n=G.n,d=G.d,df=DIFF[d],v=byN(n),x=vs(n),before=stars(n),lvB=lvl().L;
-  G.res=grade(v,G.input);
+  G.res=grade(v,G.input);G.res.refOk=refOk(v,G.refIn);
   if(G.res.score>(x.t[d-1]||0))x.t[d-1]=G.res.score;x.last=Date.now();
   if(G.res.score>=df.pass&&!G.passed){
     G.passed=true;G.recorded=true;
-    const xp=Math.round(40*df.mult)+(df.hint==='opt'&&!G.hint?15:0);recordGame(xp);
+    const xp=Math.round(40*df.mult)+(df.hint==='opt'&&!G.hint?15:0)+(G.res.refOk?Math.round(10*df.mult):0);recordGame(xp);
     const idx=VERSES.indexOf(v),next=VERSES[idx+1];
-    G.result=wrapResult(n,2,before,lvB,{pass:true,title:G.res.score===100?'한 글자도 틀리지 않았어요!':'통과!',msg:`정확도 ${G.res.score}%${G.hint?'':' · 힌트 없이 성공'}.`,xp,
+    G.result=wrapResult(n,2,before,lvB,{pass:true,title:G.res.score===100?'한 글자도 틀리지 않았어요!':'통과!',msg:`정확도 ${G.res.score}%${G.hint?'':' · 힌트 없이 성공'}${G.res.refOk?' · 장·절도 정답':G.res.refOk===false?` · 장·절은 ${v.c}장 ${v.v}절이에요`:''}.`,xp,
       actions:btns([...(next?[[`다음 구절 · ${next.n}번`,'open','primary',`data-n="${next.n}"`]]:[]),['결과 자세히 보기','closeSheet'],['구절로 돌아가기','toVerse','ghost']])});
     render();celebrate();sfx('win');
   }else{
@@ -1280,7 +1373,8 @@ function halves(v){const w=toks(v).map(x=>x.w),h=Math.ceil(w.length/2);return {a
 function makeQ(v,kind,showRef){
   const sup=(num)=>showRef?`<sup class="vn">${num}</sup>`:'';
   const sub=headHtml(v,'q-head')+(showRef?`<div class="q-sub">${sref(v)}</div>`:'');
-  if(kind==='ref')return {n:v.n,label:'이 말씀은 어디에 있을까요?',sub:headHtml(v,'q-head'),body:`<p class="verse q-verse">${v.p.map(([num,txt])=>sup(num)+esc(txt)).join(' ')}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
+  // no verse-number superscripts here: they would give the answer away
+  if(kind==='ref')return {n:v.n,label:'이 말씀은 어디에 있을까요?',sub:headHtml(v,'q-head'),body:`<p class="verse q-verse">${v.p.map(([,txt])=>esc(txt)).join(' ')}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
   if(kind==='title')return {n:v.n,label:'이 제목의 암송 구절은?',body:`<p class="tiny">${esc(head(v))}</p><p class="q-title">${esc(v.t)}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
   if(kind==='word'){
     const t=toks(v),cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=2),bi=cand[Math.floor(Math.random()*cand.length)],ans=norm(t[bi].w);
@@ -1413,6 +1507,14 @@ app.addEventListener('click',e=>{
       catch(err){ui.msg={k:'bad',t:'백업 코드가 올바르지 않아요. 코드 전체를 빠짐없이 붙여 넣었는지 확인해 주세요.'};sfx('bad')}
       render();break;
     case 'syncNow':sync.at=0;render();syncNow();break;
+    case 'nextDiff':S.diff=Math.min(ND,S.diff+1);save();startBlank(n);break;
+    case 'listen':plStart(filtered(),0);break;
+    case 'listenHere':plStart(VERSES,VERSES.indexOf(byN(view.n)));break;
+    case 'plToggle':plToggle();break;
+    case 'plPrev':plStep(-1);break;
+    case 'plNext':plStep(1);break;
+    case 'plLoop':PL.loop=!PL.loop;plUi();break;
+    case 'plClose':plStop();break;
     case 'tourOpen':ui.tour=0;ui.tourFresh=true;render();break;
     case 'tourNext':ui.tour++;render();break;
     case 'tourPrev':ui.tour=Math.max(0,ui.tour-1);render();break;
@@ -1437,11 +1539,13 @@ document.addEventListener('keydown',e=>{
 });
 app.addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role="button"][data-act]')){e.preventDefault();e.target.click()}
+  if(e.key==='Enter'&&e.target.id==='refBox'){e.preventDefault();check()}
   if(e.key==='Enter'&&/^(nameIn|acctName|pin|pin2)$/.test(e.target.id)){e.preventDefault();const b=$(e.target.id==='nameIn'?'[data-act="nameSave"]':e.target.id==='pin2'?'[data-act="signup"]':'[data-act="save"],[data-act="signup"],[data-act="login"]');if(b)b.click()}
 });
 app.addEventListener('input',e=>{
   const t=e.target;
   if(t.id==='typeBox'&&G)G.input=t.value;
+  else if(t.id==='refBox'&&G)G.refIn=t.value;
   else if(t.id==='bkIn')ui.bkIn=t.value;
   else if(t.id==='nameIn')ui.nameIn=t.value;
   else if(t.id==='acctName')ui.acctName=t.value;
