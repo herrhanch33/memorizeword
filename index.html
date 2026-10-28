@@ -325,6 +325,10 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(
 .refrow{display:grid;gap:4px}
 .refin{min-height:44px;border-radius:12px;border:1.5px solid var(--line);padding:0 12px;font:inherit;font-size:16px;background:var(--surface);color:var(--ink);width:100%}
 .refin:focus{outline:3px solid var(--accent)}
+.refnums{display:flex;align-items:center;gap:6px}
+.refnums .refin{width:64px;flex:0 0 64px;text-align:center;padding:0 6px}
+.refnums span{font-family:var(--f-display);font-size:16px}
+.refnums .refto{color:var(--muted);margin-left:4px}
 .refres.ok{color:var(--accent-strong)} .refres.no{color:var(--bad)} .refres b{font-weight:400;color:var(--ink)}
 
 /* 연속 듣기 */
@@ -662,7 +666,7 @@ function merge(a,b){
 // what the leaderboard shows about me; sent with each sync when a nickname is set
 function pubSummary(){
   const m=z4();VERSES.forEach(v=>{for(let d=1;d<=ND;d++)if(mastered(v.n,d))m[d-1]++});
-  return {name:S.name,sex:S.sex,xp:S.xp,lv:lvl().L,streak:curStreak(),m,at:Date.now()};
+  return {name:S.name,sex:S.sex==='f'?'f':'m',xp:S.xp,lv:lvl().L,streak:curStreak(),m,at:Date.now()};
 }
 
 let cloud=null,cloudBusy=false,cloudDirty=false,cloudTimer=null;
@@ -772,7 +776,7 @@ async function loadBoard(force){
     const r=await fetch(SYNC_URL.replace(/\/+$/,'')+'/v1/board',{cache:'no-store'});
     if(!r.ok)throw 0;
     const j=await r.json();
-    board.rows=(Array.isArray(j.rows)?j.rows:[]).slice(0,50).map(x=>({id:String(x.id||''),name:String(x.name||'').slice(0,10),xp:+x.xp||0,lv:+x.lv||1,streak:+x.streak||0,m:z4().map((_,i)=>+(x.m||[])[i]||0)}));
+    board.rows=(Array.isArray(j.rows)?j.rows:[]).slice(0,50).map(x=>({id:String(x.id||''),name:String(x.name||'').slice(0,10),sex:x.sex==='f'?'f':'m',xp:+x.xp||0,lv:+x.lv||1,streak:+x.streak||0,m:z4().map((_,i)=>+(x.m||[])[i]||0)}));
     board.err='';board.at=Date.now();
   }catch(e){board.err='순위표를 불러오지 못했어요'}
   board.busy=false;
@@ -1055,6 +1059,38 @@ function namePanel(){
     <input id="nameIn" class="name-in" value="${esc(ui.nameIn)}" maxlength="10" autocomplete="nickname" placeholder="예: 한씨" aria-label="닉네임">
     <div class="row"><button class="btn small primary" data-act="nameSave">저장</button>${S.name?`<button class="btn small ghost" data-act="nameClear">이름 지우기</button>`:''}<button class="btn small ghost" data-act="panelClose">취소</button></div></div>`;
 }
+// a saved account's nickname is its login name on the sync server, so changing it goes through the
+// server (with the PIN); the progress, XP and leaderboard place stay with the account
+function renamePanel(){
+  const m=ui.msgAt==='rename'&&ui.msg;
+  return `<div class="keep-block"><b>닉네임 바꾸기</b>
+    <p class="tiny">지금 닉네임: <b>${esc(S.name)}</b>. 진도와 순위는 그대로 이어지고, 다음부터는 새 닉네임과 같은 비밀번호로 로그인해요. 2~10자.</p>
+    <input id="renName" class="name-in" value="${esc(ui.renName||'')}" maxlength="10" autocomplete="off" placeholder="새 닉네임" aria-label="새 닉네임">
+    <input id="renPin" class="name-in" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="${esc(ui.renPin||'')}" autocomplete="current-password" placeholder="지금 비밀번호" aria-label="지금 비밀번호">
+    ${m?`<p class="note ${m.k}" role="status">${esc(m.t)}</p>`:''}
+    <div class="row"><button class="btn small primary" data-act="renameSave" ${ui.syncBusy?'disabled':''}>${ui.syncBusy?'바꾸는 중…':'바꾸기'}</button><button class="btn small ghost" data-act="panelClose">취소</button></div></div>`;
+}
+async function renameAcct(){
+  const nn=(ui.renName||'').trim().replace(/[<>]/g,''),pin=ui.renPin||'';
+  const say=(k,t)=>{ui.msgAt='rename';ui.msg={k,t};ui.syncBusy=false;render()};
+  if(nn.length<2||nn.length>10)return say('bad','새 닉네임은 2~10자로 정해 주세요.');
+  if(nn===S.name)return say('bad','지금 닉네임과 같아요.');
+  if(!PIN_RE.test(pin))return say('bad','지금 비밀번호(숫자 4~6자리)를 넣어 주세요.');
+  ui.syncBusy=true;ui.msg=null;render();
+  try{
+    const {status,j}=await acctPost('/v1/rename',{name:S.name,pin,new:nn});
+    if(status===409)return say('bad','그 닉네임은 이미 다른 사람이 쓰고 있어요.');
+    if(status===401)return say('bad','비밀번호가 맞지 않아요.');
+    if(status===429)return say('bad','여러 번 틀렸어요. 10분 뒤에 다시 해 보세요.');
+    if(status===400)return say('bad',j&&j.error==='name'?'닉네임에 쓸 수 없는 글자가 있어요.':'비밀번호는 숫자 4~6자리예요.');
+    if(status!==200||!j||!j.name)throw 0;
+    S.name=String(j.name).slice(0,10);if(j.code&&j.code!==syncCode){syncCode=String(j.code);try{localStorage.setItem(SYNC_KEY,syncCode)}catch(e){}}
+    save();ui.panel=null;ui.renName='';ui.renPin='';
+    await syncNow();loadBoard(true);
+    ui.msgAt='sync';ui.msg={k:'good',t:`닉네임을 ${S.name}(으)로 바꿨어요. 다음부터 이 닉네임으로 로그인해요.`};
+  }catch(e){ui.msgAt='rename';ui.msg={k:'bad',t:'서버에 연결할 수 없어요. 인터넷 연결을 확인해 주세요.'}}
+  ui.syncBusy=false;render();
+}
 function homeView(){
   const l=lvl(),list=filtered(),d=S.diff,df=DIFF[d],m=list.filter(v=>mastered(v.n,d)).length,g=todayGames();
   const sel=S.series==='all'?null:seriesOf(S.series);
@@ -1065,7 +1101,7 @@ function homeView(){
     <div class="hero-top">
       <div class="avatar-wrap"><div class="av-box">${avatar(l.L)}<span class="lv-pill">Lv.${l.L}</span></div><button class="sex-btn" data-act="sex" aria-label="캐릭터 성별 바꾸기">${S.sex==='f'?'♂ 남자 캐릭터':'♀ 여자 캐릭터'}</button></div>
       <div class="lv-info">
-        <div class="lv-name">${SYNC_URL&&!cloud?(S.name&&syncCode?`<span>${esc(S.name)}</span>`:''):S.name?`<span>${esc(S.name)}</span><button data-act="panel" data-p="name" aria-label="닉네임 바꾸기">✎</button>`:`<button data-act="panel" data-p="name">닉네임 정하기</button>`}</div>
+        <div class="lv-name">${SYNC_URL&&!cloud?(S.name&&syncCode?`<span>${esc(S.name)}</span><button data-act="panel" data-p="rename" aria-label="닉네임 바꾸기">✎</button>`:''):S.name?`<span>${esc(S.name)}</span><button data-act="panel" data-p="name" aria-label="닉네임 바꾸기">✎</button>`:`<button data-act="panel" data-p="name">닉네임 정하기</button>`}</div>
         <div class="lv-title">${l.title}</div>
         <div class="bar"><i style="width:${l.need?l.into/l.need*100:100}%"></i></div>
         <p class="tiny">${l.next?`다음 갑주 <b>${l.next.t}</b>까지 <span style="white-space:nowrap">${l.need-l.into} XP</span>`:'전신갑주 완성! 계속 XP를 모아 순위를 올려요'}</p></div>
@@ -1079,6 +1115,7 @@ function homeView(){
     </div>
   </section>
   ${ui.panel==='name'?namePanel():''}
+  ${ui.panel==='rename'?renamePanel():''}
   <section class="diffbox" aria-label="난이도">
     <div class="seg">${[1,2,3,4].map(i=>`<button class="d${i}" aria-pressed="${d===i}" data-act="diff" data-d="${i}">${DIFF[i].name}</button>`).join('')}</div>
     <p class="tiny">${df.desc} · XP ×${df.mult}</p>
@@ -1420,8 +1457,14 @@ function typeView(){
   ${df.hint==='none'?'':`<div class="hintbox ${G.hint?'':'off'}" aria-label="첫 글자 힌트">${G.hint?hint:'힌트를 껐어요. 힌트 없이 통과하면 보너스 XP를 받아요.'}</div>`}
   <label class="lbl" for="typeBox">기억나는 대로 구절을 써 보세요. 띄어쓰기와 문장부호는 채점하지 않아요.</label>
   <textarea id="typeBox" rows="6" lang="ko" maxlength="600" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="여기에 구절을 써 보세요">${esc(G.input)}</textarea>
-  <div class="refrow"><label class="lbl" for="refBox">몇 장 몇 절인지도 써 보세요 (맞히면 보너스 XP)</label>
-    <input id="refBox" class="refin" lang="ko" maxlength="20" autocomplete="off" inputmode="numeric" value="${esc(G.refIn||'')}" placeholder="예: 4장 7절 / 4:7"></div>
+  <div class="refrow"><span class="lbl" id="refLbl">몇 장 몇 절인지도 써 보세요 (맞히면 보너스 XP)</span>
+    <!-- three number boxes, because a phone's number pad has no ":" or space -->
+    <div class="refnums" role="group" aria-labelledby="refLbl">
+      <input id="refC" class="refin" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="${esc(G.refC||'')}" aria-label="장"><span>장</span>
+      <input id="refV" class="refin" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="${esc(G.refV||'')}" aria-label="절"><span>절</span>
+      <span class="refto">~</span><input id="refV2" class="refin" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="${esc(G.refV2||'')}" placeholder="끝" aria-label="끝 절 (여러 절일 때만)"><span>절</span>
+    </div>
+    <p class="tiny">여러 절이면(예: 34~35절) 끝 절도 써요. 한 절이면 끝 칸은 비워 두세요.</p></div>
   <div class="row">${df.hint==='opt'?`<button class="btn ghost" data-act="toggleHint">힌트 ${G.hint?'끄기':'켜기'}</button>`:''}<button class="btn primary" data-act="check">채점하기</button></div>
   ${r?`<section class="gradebox" id="grade" aria-live="polite">
     <div class="pct ${r.score>=pass?'ok':'no'}">${r.score}%</div>
@@ -1438,7 +1481,9 @@ function refOk(v,input){
   return nums.join(',')===[v.c,...String(v.v).split('-')].map(Number).join(',');
 }
 function check(){
-  const box=$('#typeBox'),rb=$('#refBox');G.input=box?box.value:G.input;if(rb)G.refIn=rb.value;
+  const box=$('#typeBox');G.input=box?box.value:G.input;
+  for(const k of ['refC','refV','refV2']){const el=$('#'+k);if(el)G[k]=el.value.replace(/\D/g,'')}
+  G.refIn=[G.refC,G.refV,G.refV2].filter(Boolean).join(' ');
   if(!G.input.trim()){flash('#typeBox','shake');return}
   const n=G.n,d=G.d,df=DIFF[d],v=byN(n),x=vs(n),before=stars(n),lvB=lvl().L;
   G.res=grade(v,G.input);G.res.refOk=refOk(v,G.refIn);
@@ -1615,7 +1660,8 @@ app.addEventListener('click',e=>{
       // merging would bring the old record back, so overwrite the server copy
       if(SYNC_URL&&syncCode){clearTimeout(sync.timer);syncFetch('PUT',S).catch(()=>{})}
       break;
-    case 'panel':ui.panel=el.dataset.p;ui.msg=null;if(ui.panel==='name')ui.nameIn=S.name;if(ui.panel==='signup'||ui.panel==='login'){ui.acctName=ui.acctName||S.name;ui.pin='';ui.pin2=''}render();{const f=$('#bkIn')||$('#nameIn')||$('#acctName');if(f)f.focus()}break;
+    case 'panel':ui.panel=el.dataset.p;ui.msg=null;if(ui.panel==='name')ui.nameIn=S.name;if(ui.panel==='rename'){ui.renName='';ui.renPin=''}if(ui.panel==='signup'||ui.panel==='login'){ui.acctName=ui.acctName||S.name;ui.pin='';ui.pin2=''}render();{const f=$('#bkIn')||$('#nameIn')||$('#renName')||$('#acctName');if(f)f.focus()}break;
+    case 'renameSave':renameAcct();break;
     case 'panelClose':ui.panel=null;ui.msg=null;render();break;
     case 'bkMake':ui.bk=backupCode();ui.panel='backup';ui.msg=null;render();
       copyText(ui.bk).then(ok=>{ui.msg={k:ok?'good':'',t:ok?'백업 코드를 복사했어요.':'아래 코드를 길게 눌러 전체 선택 후 복사해 주세요.'};render();if(!ok){const t=$('#bkOut');if(t)t.select()}});break;
@@ -1657,13 +1703,18 @@ document.addEventListener('keydown',e=>{
 });
 app.addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role="button"][data-act]')){e.preventDefault();e.target.click()}
-  if(e.key==='Enter'&&e.target.id==='refBox'){e.preventDefault();check()}
+  if(e.key==='Enter'&&/^refV?2?$|^refC$/.test(e.target.id)){e.preventDefault();check()}
+  if(e.key==='Enter'&&/^(renName|renPin)$/.test(e.target.id)){e.preventDefault();const b=$('[data-act="renameSave"]');if(b)b.click()}
   if(e.key==='Enter'&&/^(nameIn|acctName|pin|pin2)$/.test(e.target.id)){e.preventDefault();const b=$(e.target.id==='nameIn'?'[data-act="nameSave"]':e.target.id==='pin2'?'[data-act="signup"]':'[data-act="save"],[data-act="signup"],[data-act="login"]');if(b)b.click()}
 });
 app.addEventListener('input',e=>{
   const t=e.target;
   if(t.id==='typeBox'&&G)G.input=t.value;
-  else if(t.id==='refBox'&&G)G.refIn=t.value;
+  else if(/^ref(C|V|V2)$/.test(t.id)&&G){t.value=t.value.replace(/\D/g,'');G[t.id]=t.value;
+    // after the chapter, hop to the verse box once two digits are in (most chapters here are 1–2 digits)
+    if(t.id==='refC'&&t.value.length>=2){const nx=$('#refV');if(nx&&!nx.value)nx.focus()}}
+  else if(t.id==='renName')ui.renName=t.value;
+  else if(t.id==='renPin')ui.renPin=t.value.replace(/\D/g,'');
   else if(t.id==='bkIn')ui.bkIn=t.value;
   else if(t.id==='nameIn')ui.nameIn=t.value;
   else if(t.id==='acctName')ui.acctName=t.value;
