@@ -582,13 +582,15 @@ const vnHtml=x=>x.vn&&!G?`<sup class="vn">${x.vn}</sup>`:'';
 
 /* ---------- 난이도 ---------- */
 // ratio: share of words blanked · dist: decoy chips · chunk: max words per order piece · hint: typing first-letter hint
-// ref/vn: show reference / verse numbers during a game · qt: quiz seconds per question · mult: XP multiplier · pass: typing pass %
+// ref/vn: show reference / verse numbers during a game · qt: quiz ms per question (generous: this is for memorising, not speed)
+// qb: most speed-bonus points a quick right answer earns (kept from the old shorter timers, so scores and XP don't inflate)
+// mult: XP multiplier · pass: typing pass %
 const ND=4;
 const DIFF=[null,
-  {name:'쉬움',ratio:.3,dist:0,chunk:3,hint:'on',ref:true,vn:false,qt:45000,mult:1,pass:90,desc:'빈칸 적음 · 첫 글자 힌트 · 문제당 45초'},
-  {name:'보통',ratio:.55,dist:2,chunk:2,hint:'opt',ref:true,vn:false,qt:35000,mult:1.5,pass:90,desc:'빈칸 절반 · 헷갈리는 단어 섞임 · 힌트는 선택 · 문제당 35초'},
-  {name:'어려움',ratio:.8,dist:4,chunk:2,hint:'none',ref:true,vn:false,qt:25000,mult:2,pass:90,desc:'빈칸 많음 · 힌트 없음 · 문제당 25초'},
-  {name:'오직말씀',ratio:1,dist:6,chunk:1,hint:'none',ref:true,vn:false,qt:20000,mult:3,pass:95,desc:'전부 빈칸 · 한 단어씩 · 95% 통과 · 문제당 20초'}];
+  {name:'쉬움',ratio:.3,dist:0,chunk:3,hint:'on',ref:true,vn:false,qt:90000,qb:225,mult:1,pass:90,desc:'빈칸 적음 · 첫 글자 힌트 · 문제당 90초'},
+  {name:'보통',ratio:.55,dist:2,chunk:2,hint:'opt',ref:true,vn:false,qt:75000,qb:175,mult:1.5,pass:90,desc:'빈칸 절반 · 헷갈리는 단어 섞임 · 힌트는 선택 · 문제당 75초'},
+  {name:'어려움',ratio:.8,dist:4,chunk:2,hint:'none',ref:true,vn:false,qt:60000,qb:125,mult:2,pass:90,desc:'빈칸 많음 · 힌트 없음 · 문제당 60초'},
+  {name:'오직말씀',ratio:1,dist:6,chunk:1,hint:'none',ref:true,vn:false,qt:45000,qb:100,mult:3,pass:95,desc:'전부 빈칸 · 한 단어씩 · 95% 통과 · 문제당 45초'}];
 const D=()=>DIFF[S.diff];
 
 const ICON={
@@ -1510,8 +1512,8 @@ function startTimer(){
 function answer(i){
   if(!G||G.type!=='quiz'||G.answered)return;
   clearTimers();
-  const q=G.qs[G.qi],ok=i>=0&&q.opts[i].ok,secs=G.left*G.qt/1000;let pts=0;
-  if(ok){G.combo++;G.maxCombo=Math.max(G.maxCombo,G.combo);G.correct++;pts=Math.round((100+secs*5)*(G.combo>=3?1.5:1));G.score+=pts;sfx('ok')}
+  const q=G.qs[G.qi],ok=i>=0&&q.opts[i].ok;let pts=0;
+  if(ok){G.combo++;G.maxCombo=Math.max(G.maxCombo,G.combo);G.correct++;pts=Math.round((100+G.left*DIFF[G.d].qb)*(G.combo>=3?1.5:1));G.score+=pts;sfx('ok')}
   else{G.combo=0;G.missed.add(q.n);sfx('bad');buzz()}
   // right or wrong, the whole verse is shown and the player moves on with the 다음 문제 button
   G.answered={i,ok,pts};render();
