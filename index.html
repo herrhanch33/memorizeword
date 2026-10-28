@@ -261,6 +261,9 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(
 
 /* quiz */
 .qtop{display:flex;gap:10px;align-items:center;font-family:var(--f-display)}
+.qdesc{margin:-4px 0 0}
+.qask{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--gold-soft);color:var(--gold-ink);border-radius:14px;padding:8px 10px;font-size:14px}
+.qask span{flex:1 1 100%}
 .qcount{background:var(--ink);color:var(--bg);padding:3px 12px;border-radius:99px;font-variant-numeric:tabular-nums}
 .qscore{margin-left:auto;font-size:20px;font-variant-numeric:tabular-nums}
 .combo{color:var(--gold-ink);background:var(--gold-soft);padding:3px 10px;border-radius:99px;animation:pop .3s ease}
@@ -1472,11 +1475,20 @@ function startQuiz(){
   const chosen=[];for(let i=0;i<10;i++)chosen.push(pool[i%pool.length]);
   const kinds=shuffle(['ref','word','next','title','word','ref','next','word','title','next']);
   G={type:'quiz',d,qt:df.qt,qs:shuffle(chosen).map((v,i)=>makeQ(v,kinds[i])),qi:0,score:0,combo:0,maxCombo:0,correct:0,missed:new Set(),answered:null,left:1,result:null};
+  ui.qdiffAsk=null;
   go({name:'quiz'});startTimer();
+}
+// the quiz's own difficulty switch: before the first answer it restarts at once, later it asks first
+// (switching starts the 10 questions over)
+function qdiffView(){
+  const ask=ui.qdiffAsk;
+  return `<div class="seg qseg" aria-label="난이도">${[1,2,3,4].map(i=>`<button class="d${i}" aria-pressed="${G.d===i}" data-act="qdiff" data-d="${i}">${DIFF[i].name}</button>`).join('')}</div>
+  ${ask?`<div class="qask"><span><b>${DIFF[ask].name}</b>으로 바꾸면 처음부터 다시 해요</span><button class="btn small primary" data-act="qdiffYes">바꾸기</button><button class="btn small ghost" data-act="qdiffNo">취소</button></div>`
+    :`<p class="tiny qdesc">${DIFF[G.d].desc} · XP ×${DIFF[G.d].mult}</p>`}`;
 }
 function quizView(){
   const q=G.qs[G.qi],a=G.answered;
-  return `<div class="qtop"><span class="qcount">${G.qi+1} / ${G.qs.length}</span>${G.combo>=2?`<span class="combo">${G.combo}연속!${G.combo>=3?' ×1.5':''}</span>`:''}<span class="qscore">${G.score.toLocaleString()}점</span></div>
+  return `${qdiffView()}<div class="qtop"><span class="qcount">${G.qi+1} / ${G.qs.length}</span>${G.combo>=2?`<span class="combo">${G.combo}연속!${G.combo>=3?' ×1.5':''}</span>`:''}<span class="qscore">${G.score.toLocaleString()}점</span></div>
   <div class="timer" aria-hidden="true"><i id="tbar" class="${G.left<.25?'low':''}" style="width:${G.left*100}%"></i></div>
   <section class="qcard"><div class="q-label">${q.label}</div>${q.sub||''}${q.body}</section>
   <div class="opts">${q.opts.map((o,i)=>`<button class="opt ${a?(o.ok?'right':(a.i===i?'wrong':'dim')):''}" data-act="ans" data-i="${i}" ${a?'disabled':''}>${esc(o.label)}</button>`).join('')}</div>
@@ -1518,7 +1530,10 @@ function finishQuiz(){
   G.result={pass:good,title:G.correct===10?'만점이에요!':good?'잘했어요!':'좋은 연습이었어요',msg:`10문제 중 ${G.correct}문제를 맞혔어요.`,xp,levelUp:lvl().L>lvB,
     extra:`<div class="r-stats"><div><b>${G.score.toLocaleString()}</b><span>점수</span></div><div><b>${G.correct}/10</b><span>정답</span></div><div><b>${G.maxCombo}</b><span>최고 연속</span></div></div>
     ${miss.length?`<p>다시 볼 구절</p><div class="r-list">${miss.map(v=>`<button class="btn small" data-act="open" data-n="${v.n}">${v.n}. ${esc(v.t)}</button>`).join('')}</div>`:''}`,
-    actions:btns([['한 번 더 도전','quiz','primary'],['처음 화면으로','home','ghost']])};
+    actions:btns([...(good&&G.d<ND?[[`${DIFF[G.d+1].name} 난이도로 도전`,'quizAt','primary',`data-d="${G.d+1}"`]]:[]),
+      [`${DIFF[G.d].name}으로 한 번 더`,'quizAt',good&&G.d<ND?'':'primary',`data-d="${G.d}"`],
+      ...(G.d>1?[[`${DIFF[G.d-1].name} 난이도로`,'quizAt','',`data-d="${G.d-1}"`]]:[]),
+      ['처음 화면으로','home','ghost']])};
   render();if(good){celebrate();sfx('win')}
 }
 
@@ -1571,6 +1586,11 @@ app.addEventListener('click',e=>{
     case 'retry':retry();break;
     case 'toVerse':openVerse(G?G.n:view.n);break;
     case 'quiz':startQuiz();break;
+    case 'qdiff':{const nd=+el.dataset.d;if(!G||G.type!=='quiz'||nd===G.d){ui.qdiffAsk=null;render();break}
+      if(G.qi===0&&!G.answered){S.diff=nd;save();startQuiz()}else{ui.qdiffAsk=nd;render()}break}
+    case 'qdiffYes':S.diff=ui.qdiffAsk||S.diff;save();startQuiz();break;
+    case 'qdiffNo':ui.qdiffAsk=null;render();break;
+    case 'quizAt':S.diff=+el.dataset.d;save();startQuiz();break;
     case 'home':G=null;go({name:'home'});break;
     case 'ans':answer(i);break;
     case 'nextQ':nextQ();break;
