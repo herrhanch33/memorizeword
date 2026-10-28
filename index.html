@@ -574,6 +574,10 @@ const fullText=v=>v.p.map(x=>x[1]).join(' ');
 const byN=n=>VERSES.find(v=>v.n===n);
 const seriesOf=id=>SERIES.find(s=>s.id===id);
 function toks(v){const out=[];v.p.forEach(([num,txt])=>txt.split(/\s+/).filter(Boolean).forEach((w,k)=>out.push({w,vn:k===0?num:null})));return out}
+// words that read badly when shown on their own, out of their verse (행 10:34 "외모를 보지 아니하시고"):
+// they are never a quiz choice, a word chip or a one-word order piece; in the verse text they stay as written
+const AWKWARD=/보지|자지/;
+const awk=w=>AWKWARD.test(norm(w));
 // indices of the verse's key words among its tokens (a word listed twice, like 사랑하라, counts at both places)
 function keyIdx(v,t){const ks=new Set((KEYS[v.n]||[]).map(norm));return t.map((x,i)=>i).filter(i=>ks.has(norm(t[i].w)))}
 // the small verse numbers show when reading a verse but never while solving one: the number alone
@@ -1294,13 +1298,14 @@ function failResult(xp){
 /* ---------- 빈칸 채우기 ---------- */
 function startBlank(n){
   const d=S.diff,df=DIFF[d],v=byN(n),t=toks(v);
-  const cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=(d>=3?1:2));
+  const cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=(d>=3?1:2)&&!awk(t[i].w));
   const k=Math.min(cand.length,Math.max(2,Math.round(t.length*df.ratio)));
   // key words are blanked first; only when the level asks for more blanks than there are key words do other words join
   const keys=pick(keyIdx(v,t).filter(i=>cand.includes(i)),k);
-  const blanks=d>=4?t.map((x,i)=>i):[...keys,...pick(cand.filter(i=>!keys.includes(i)),k-keys.length)].sort((a,b)=>a-b);
+  // 오직말씀 blanks every word except an awkward one, which stays printed in its place
+  const blanks=d>=4?t.map((x,i)=>i).filter(i=>!awk(t[i].w)):[...keys,...pick(cand.filter(i=>!keys.includes(i)),k-keys.length)].sort((a,b)=>a-b);
   const own=new Set(t.map(x=>norm(x.w)));
-  const pool=[...new Set(VERSES.filter(x=>x.n!==n).flatMap(x=>toks(x).map(y=>norm(y.w))))].filter(w=>w.length>=2&&!own.has(w));
+  const pool=[...new Set(VERSES.filter(x=>x.n!==n).flatMap(x=>toks(x).map(y=>norm(y.w))))].filter(w=>w.length>=2&&!own.has(w)&&!awk(w));
   const chips=shuffle([...blanks.map(i=>norm(t[i].w)),...pick(pool,df.dist)]).map(w=>({w,used:false}));
   const maxH=d>=4?5:3;  // a whole verse one word at a time deserves a couple more hearts
   G={type:'blank',n,d,t,blanks,cur:0,chips,hearts:maxH,maxH,mistakes:0,result:null};
@@ -1343,7 +1348,8 @@ function finishBlank(){
 function startOrder(n){
   const d=S.diff,t=toks(byN(n)),size=Math.min(DIFF[d].chunk,t.length<=10?1:t.length<=22?2:3),chunks=[];
   let cur=null;
-  t.forEach(x=>{if(!cur||x.vn||cur.ws.length>=size){cur={ws:[],vn:x.vn};chunks.push(cur)}cur.ws.push(x.w)});
+  // an awkward word always takes the next word into its piece, so it never stands alone
+  t.forEach(x=>{if(!cur||x.vn||(cur.ws.length>=size&&!awk(cur.ws[cur.ws.length-1]))){cur={ws:[],vn:x.vn};chunks.push(cur)}cur.ws.push(x.w)});
   chunks.forEach((c,i)=>{c.id=i;c.text=c.ws.join(' ');c.key=norm(c.text)});
   let order=shuffle(chunks.map(c=>c.id));
   if(order.length>2&&order.every((id,i)=>id===i))order=shuffle(order);
@@ -1461,9 +1467,9 @@ function makeQ(v,kind){
   if(kind==='title')return {n:v.n,label:'이 제목의 암송 구절은?',body:`<p class="tiny">${esc(head(v))}</p><p class="q-title">${esc(v.t)}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
   if(kind==='word'){
     // the blank is one of the verse's key words (any word only when a verse has none listed)
-    const t=toks(v),cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=2),keys=keyIdx(v,t).filter(i=>cand.includes(i)),from=keys.length?keys:cand,bi=from[Math.floor(Math.random()*from.length)],ans=norm(t[bi].w);
+    const t=toks(v),cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=2&&!awk(t[i].w)),keys=keyIdx(v,t).filter(i=>cand.includes(i)),from=keys.length?keys:cand,bi=from[Math.floor(Math.random()*from.length)],ans=norm(t[bi].w);
     const own=new Set(t.map(x=>norm(x.w)));
-    let dp=[...new Set(VERSES.flatMap(x=>toks(x).map(y=>norm(y.w))))].filter(w=>!own.has(w)&&w.length>=2);
+    let dp=[...new Set(VERSES.flatMap(x=>toks(x).map(y=>norm(y.w))))].filter(w=>!own.has(w)&&w.length>=2&&!awk(w));
     const near=dp.filter(w=>Math.abs(w.length-ans.length)<=1);if(near.length>=3)dp=near;
     const body=t.map((x,i)=>(x.vn?sup(x.vn):'')+(i===bi?`<span class="slot cur" style="--len:${ans.length}"></span>`:esc(x.w))).join(' ');
     return {n:v.n,label:'빈칸에 들어갈 말은?',sub,body:`<p class="verse q-verse">${body}</p>`,opts:shuffle([{label:ans,ok:true},...pick(dp,3).map(w=>({label:w,ok:false}))]),answer:ans};
