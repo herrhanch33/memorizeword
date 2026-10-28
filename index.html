@@ -275,6 +275,9 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(
 .q-sub{font-size:14px;color:var(--accent-strong)}
 .q-title{font-family:var(--f-display);font-size:26px;line-height:1.3;color:var(--accent-strong);margin:4px 0;word-break:keep-all}
 .q-verse{font-size:clamp(18px,4.8vw,20px)}
+.q-hint{margin:2px 0 0;display:grid;gap:2px;background:var(--surface-2);border-radius:12px;padding:8px 12px}
+.q-hint small{font-size:12px;color:var(--muted)}
+.q-hint .verse{font-size:clamp(17px,4.6vw,19px);line-height:1.6}
 .opts{display:grid;gap:10px}
 .opt{text-align:left;padding:13px 16px;border-radius:16px;background:var(--surface);border:2px solid var(--line);box-shadow:0 3px 0 var(--line);font-family:var(--f-verse);font-size:17px;line-height:1.5;cursor:pointer;min-height:54px;color:var(--ink);word-break:keep-all}
 .opt:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
@@ -1464,15 +1467,18 @@ function makeQ(v,kind){
   const sub=headHtml(v,'q-head')+`<div class="q-sub">${sref(v)}</div>`;
   // no verse-number superscripts here: they would give the answer away
   if(kind==='ref')return {n:v.n,label:'이 말씀은 어디에 있을까요?',sub:headHtml(v,'q-head'),body:`<p class="verse q-verse">${v.p.map(([,txt])=>esc(txt)).join(' ')}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
-  if(kind==='title')return {n:v.n,label:'이 제목의 암송 구절은?',body:`<p class="tiny">${esc(head(v))}</p><p class="q-title">${esc(v.t)}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
+  // the title alone was too hard to place, so the first few words of the verse come along as a hint
+  if(kind==='title'){const w=toks(v).map(x=>x.w),k=Math.min(w.length-1,Math.max(3,Math.round(w.length/4)));
+    return {n:v.n,label:'이 제목의 암송 구절은?',body:`<p class="tiny">${esc(head(v))}</p><p class="q-title">${esc(v.t)}</p><p class="q-hint"><small>말씀 첫머리</small><span class="verse">${esc(w.slice(0,k).join(' '))} …</span></p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)}}
   if(kind==='word'){
     // the blank is one of the verse's key words (any word only when a verse has none listed)
     const t=toks(v),cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=2&&!awk(t[i].w)),keys=keyIdx(v,t).filter(i=>cand.includes(i)),from=keys.length?keys:cand,bi=from[Math.floor(Math.random()*from.length)],ans=norm(t[bi].w);
     const own=new Set(t.map(x=>norm(x.w)));
     let dp=[...new Set(VERSES.flatMap(x=>toks(x).map(y=>norm(y.w))))].filter(w=>!own.has(w)&&w.length>=2&&!awk(w));
     const near=dp.filter(w=>Math.abs(w.length-ans.length)<=1);if(near.length>=3)dp=near;
-    const body=t.map((x,i)=>(x.vn?sup(x.vn):'')+(i===bi?`<span class="slot cur" style="--len:${ans.length}"></span>`:esc(x.w))).join(' ');
-    return {n:v.n,label:'빈칸에 들어갈 말은?',sub,body:`<p class="verse q-verse">${body}</p>`,opts:shuffle([{label:ans,ok:true},...pick(dp,3).map(w=>({label:w,ok:false}))]),answer:ans};
+    const verse=slot=>`<p class="verse q-verse">${t.map((x,i)=>(x.vn?sup(x.vn):'')+(i===bi?slot:esc(x.w))).join(' ')}</p>`;
+    // once answered, right or wrong, the blank shows the word that belongs there
+    return {n:v.n,label:'빈칸에 들어갈 말은?',sub,body:verse(`<span class="slot cur" style="--len:${ans.length}"></span>`),done:verse(`<span class="slot filled just">${esc(t[bi].w)}</span>`),opts:shuffle([{label:ans,ok:true},...pick(dp,3).map(w=>({label:w,ok:false}))]),answer:ans};
   }
   const me=halves(v);
   return {n:v.n,label:'이어지는 말씀은?',sub,body:`<p class="verse q-verse">${esc(me.a)} …</p>`,opts:shuffle([{label:me.b,ok:true},...others(v,3).map(x=>({label:halves(x).b,ok:false}))]),answer:me.b};
@@ -1498,7 +1504,7 @@ function quizView(){
   const q=G.qs[G.qi],a=G.answered;
   return `${qdiffView()}<div class="qtop"><span class="qcount">${G.qi+1} / ${G.qs.length}</span>${G.combo>=2?`<span class="combo">${G.combo}연속!${G.combo>=3?' ×1.5':''}</span>`:''}<span class="qscore">${G.score.toLocaleString()}점</span></div>
   <div class="timer" aria-hidden="true"><i id="tbar" class="${G.left<.25?'low':''}" style="width:${G.left*100}%"></i></div>
-  <section class="qcard"><div class="q-label">${q.label}</div>${q.sub||''}${q.body}</section>
+  <section class="qcard"><div class="q-label">${q.label}</div>${q.sub||''}${a&&q.done?q.done:q.body}</section>
   <div class="opts">${q.opts.map((o,i)=>`<button class="opt ${a?(o.ok?'right':(a.i===i?'wrong':'dim')):''}" data-act="ans" data-i="${i}" ${a?'disabled':''}>${esc(o.label)}</button>`).join('')}</div>
   ${a?`<div id="reveal" class="feedback ${a.ok?'good':'bad'}" aria-live="polite"><span>${a.ok?`정답! +${a.pts}점`:(a.i<0?'시간이 다 됐어요':'아쉬워요')}</span><small>${a.ok?'전체 구절을 한 번 읽고 넘어가요':'정답 구절을 읽어 보세요'}</small></div>
   ${verseCard(byN(q.n))}
