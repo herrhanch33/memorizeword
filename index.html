@@ -421,6 +421,15 @@ body.pl-on .sheet{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
 .hero.lit .piece.on{color:var(--glow)}
 .hero.lit .piece.on svg{filter:drop-shadow(0 0 calc(4px + var(--tier) * 4px) var(--glow)) brightness(calc(1 + var(--tier) * .1))}
 .hero.lit .lv-title{text-shadow:0 0 calc(var(--tier) * 6px) var(--glow)}
+/* the scene behind the hero card */
+.hero{position:relative;overflow:hidden}
+.hero>*{position:relative;z-index:1}
+.hero>.scene{position:absolute;inset:0;z-index:0;width:100%;height:100%;color:var(--accent-ink);pointer-events:none}
+.scene .tw{animation:twinkle 2.6s ease-in-out infinite}
+.scene .dove{animation:dove 6s ease-in-out infinite}
+@keyframes twinkle{50%{opacity:.25}}
+@keyframes dove{50%{transform:translate(136px,64px)}}
+@media (prefers-reduced-motion:reduce){.scene .tw,.scene .dove{animation:none}}
 /* keepsakes strip */
 .garden{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:12px 14px;display:grid;gap:8px}
 .g-items{display:grid;grid-template-columns:repeat(6,1fr);gap:6px 4px}
@@ -436,6 +445,8 @@ body.pl-on .sheet{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
 main{position:relative;z-index:1}
 .deco{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .deco .tint{position:absolute;inset:0;background:radial-gradient(ellipse at 50% -10%,var(--tint),transparent 55%)}
+.deco .st{position:absolute;width:var(--s);height:var(--s);border-radius:50%;background:var(--ink);opacity:.22}
+.deco .st.tw{animation:twinkle 3s ease-in-out infinite}
 .deco .fv{position:absolute;bottom:-40px;font-family:var(--f-verse);font-size:15px;color:var(--ink);opacity:.14;white-space:nowrap;animation:floatup var(--dur) linear infinite}
 @keyframes floatup{to{transform:translateY(calc(-100vh - 80px))}}
 @media (prefers-reduced-motion:reduce){.deco .fv{animation:none;bottom:auto;top:30%}}
@@ -948,10 +959,40 @@ function gardenView(L,th){
 // titles drifting slowly upward (more each level). The timing is tied to the clock so a re-render
 // doesn't make them jump.
 function decoView(L,th){
-  if(!th)return '';
-  const n=Math.min(6,L-8),now=Date.now()/1000,pool=shuffle(VERSES.filter(v=>mastered(v.n)).length>=n?VERSES.filter(v=>mastered(v.n)):VERSES).slice(0,n);
-  return `<div class="deco" aria-hidden="true" style="--tint:color-mix(in srgb,${th.bg} 20%,transparent)"><div class="tint"></div>
+  if(L<6&&!th)return '';
+  // faint stars in the page background from level 6 (more each level), drifting verse titles from level 9
+  const rnd=i=>{const x=Math.sin(i*91.3+17.7)*24631.1;return x-Math.floor(x)};
+  const stars=L>=6?Array.from({length:Math.min(48,L*3)},(_,i)=>`<i class="st ${i%4?'':'tw'}" style="left:${(rnd(i)*100).toFixed(1)}%;top:${(rnd(i+40)*100).toFixed(1)}%;--s:${(2+rnd(i+80)*2).toFixed(1)}px;animation-delay:${(rnd(i+9)*3).toFixed(1)}s"></i>`).join(''):'';
+  const n=th?Math.min(6,L-8):0,now=Date.now()/1000,pool=n?shuffle(VERSES.filter(v=>mastered(v.n)).length>=n?VERSES.filter(v=>mastered(v.n)):VERSES).slice(0,n):[];
+  return `<div class="deco" aria-hidden="true" ${th?`style="--tint:color-mix(in srgb,${th.bg} 20%,transparent)"`:''}>${th?'<div class="tint"></div>':''}${stars}
     ${pool.map((v,i)=>{const dur=50+i*9,left=8+((i*37)%80);return `<span class="fv" style="left:${left}%;--dur:${dur}s;animation-delay:${-((now+i*13)%dur).toFixed(1)}s">${esc(v.t.length>14?v.t.slice(0,14)+'…':v.t)}</span>`}).join('')}</div>`;
+}
+// The scene behind the hero card: a night sky over hills that fills in as the level rises —
+// stars (more each level), a cross on the hill (2), a dove (3), a lamp (4), an olive tree that keeps
+// growing (5), the star of Bethlehem (6), the river of life with fish (7), the dawn (8), a vine (10),
+// the lampstand (12), a rainbow (14), the dove's olive branch (16), the temple (18), a crown of light (20).
+function sceneView(L){
+  const rnd=i=>{const x=Math.sin(i*127.1+311.7)*43758.5;return x-Math.floor(x)};
+  const stars=Array.from({length:Math.min(34,4+L*2)},(_,i)=>{const x=rnd(i)*400,y=rnd(i+50)*140,r=.9+rnd(i+90)*1.3;
+    return `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(1)}" opacity="${(.35+rnd(i+130)*.45).toFixed(2)}" class="${i%3?'':'tw'}" style="animation-delay:${(rnd(i+7)*3).toFixed(1)}s"/>`}).join('');
+  const tree=L>=5?(()=>{const g=Math.min(1,.45+(L-5)*.08);return `<g transform="translate(66 ${196-30*g}) scale(${g})"><rect x="-3" y="0" width="6" height="34" rx="2" opacity=".55"/><circle cx="0" cy="-6" r="20" opacity=".35"/><circle cx="-14" cy="4" r="13" opacity=".35"/><circle cx="14" cy="4" r="13" opacity=".35"/></g>`})():'';
+  return `<svg class="scene" viewBox="0 0 400 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true" fill="currentColor">
+    ${L>=8?`<g opacity=".18"><path d="M330 200 L150 20 L170 14z"/><path d="M330 200 L240 0 L262 0z"/><path d="M330 200 L360 0 L386 0z"/><path d="M330 200 L400 60 L400 90z"/></g><circle cx="330" cy="200" r="46" opacity=".16"/>`:''}
+    ${L>=14?`<g fill="none" stroke="currentColor" opacity=".3" stroke-width="5"><path d="M20 190a110 110 0 0 1 220 0"/><path d="M34 190a96 96 0 0 1 192 0" opacity=".7"/><path d="M48 190a82 82 0 0 1 164 0" opacity=".45"/></g>`:''}
+    <g>${stars}</g>
+    ${L>=6?`<g transform="translate(372 26) scale(.8)" opacity=".9" class="tw"><path d="M0-16L4-4 16 0 4 4 0 16-4 4-16 0-4-4z"/><path d="M0-30V30M-30 0H30" stroke="currentColor" stroke-width="1.2" opacity=".35"/></g>`:''}
+    ${L>=20?`<g transform="translate(118 22) scale(.65)" opacity=".8"><path d="M-26 10h52l3-24-13 10-11-16-11 16-13-10z"/><rect x="-26" y="10" width="52" height="6" rx="2"/></g><circle cx="118" cy="22" r="28" opacity=".1"/>`:''}
+    ${L>=3?`<g transform="translate(${L>=16?150:130} 70)" class="dove" opacity=".85"><path d="M-14 4c6-8 14-9 20-5l9-7-3 9c3 2 5 5 5 9H1c-6 0-11-2-15-6z"/>${L>=16?`<path d="M10 11q10-2 18-12" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16 7q-3-2-3-6 4 0 4 5zM22 3q-3-2-3-6 4 0 4 5z"/>`:''}</g>`:''}
+    <path d="M0 260V206q60-26 120-12t90-6q70-24 120 2 40 20 70 6V260z" opacity=".16"/>
+    <path d="M0 260V226q90-30 170-8t110-4q60-16 120 10V260z" opacity=".2"/>
+    ${L>=7?`<g opacity=".32"><path d="M0 244q50-10 100 0t100 0 100 0 100 0V260H0z" fill="currentColor" opacity=".5"/>${[40,150,270].slice(0,Math.min(3,L-6)).map((x,i)=>`<g transform="translate(${x} ${248+(i%2)*4})"><path d="M0 0q6-5 12 0-6 5-12 0z"/><path d="M12 0l4-3M12 0l4 3" stroke="currentColor" stroke-width="1.2"/></g>`).join('')}</g>`:''}
+    ${tree}
+    ${L>=2?`<g transform="translate(330 ${L>=18?150:160})"><rect x="-2.5" y="-34" width="5" height="46" rx="1.5" opacity=".8"/><rect x="-12" y="-22" width="24" height="5" rx="1.5" opacity=".8"/></g>`:''}
+    ${L>=18?`<g transform="translate(200 192)" opacity=".7"><path d="M-44 0h88M-40 0V-26h80V0M-44-26l44-22 44 22z"/><g fill="none" stroke="currentColor" stroke-width="3"><path d="M-28 0v-24M-10 0v-24M10 0v-24M28 0v-24"/></g></g>`:''}
+    ${L>=4?`<g transform="translate(248 ${L>=18?186:190})" opacity=".85"><path d="M-9 0h18q0 6-9 6T-9 0z"/><path d="M0-4q-3-5 0-9 3 4 0 9z" class="tw"/></g>`:''}
+    ${L>=12?`<g transform="translate(112 196)" opacity=".8"><path d="M0 2v12M-18 0q0 10 18 10T18 0M-12-2q0 8 12 8T12-2M-6-4q0 6 6 6T6-4M-10 14h20" fill="none" stroke="currentColor" stroke-width="2"/>${[-18,-12,-6,0,6,12,18].map((x,i)=>`<path d="M${x} ${i===3?-6:i%2?-4:-2}q-2-4 0-7 2 3 0 7z" class="tw" style="animation-delay:${i*.3}s"/>`).join('')}</g>`:''}
+    ${L>=10?`<g transform="translate(20 206)" opacity=".7"><path d="M0 0q20-18 40-2t40-2" fill="none" stroke="currentColor" stroke-width="2"/>${[14,36,58].map(x=>`<g transform="translate(${x} 2)"><circle cx="0" cy="0" r="2.2"/><circle cx="-2.5" cy="3.5" r="2.2"/><circle cx="2.5" cy="3.5" r="2.2"/><circle cx="0" cy="7" r="2.2"/></g>`).join('')}</g>`:''}
+  </svg>`;
 }
 function heroTheme(L){
   if(L<9)return null;
@@ -1195,6 +1236,7 @@ function homeView(){
   const tabs=[{id:'all',short:'전체'},...SERIES].map(s=>`<button class="tab" role="tab" aria-selected="${S.series===s.id}" data-act="series" data-id="${s.id}" ${s.c?`style="--sc:var(--c${s.c})"`:''}>${esc(s.short)}</button>`).join('');
   return `${decoView(l.L,th)}
   <section class="hero ${th?'lit':''}" aria-label="나의 기록" ${th?`style="--accent:${th.bg};--accent-deep:${th.deep};--accent-ink:${th.ink};--glow:${th.glow};--glow-r:${th.glowR}px;--glow-a:${th.glowA};--tier:${th.tier}"`:''}>
+    ${sceneView(l.L)}
     <div class="hero-top">
       <div class="avatar-wrap"><div class="av-box">${avatar(l.L)}<span class="lv-pill">Lv.${l.L}</span></div><button class="sex-btn" data-act="sex" aria-label="캐릭터 성별 바꾸기">${S.sex==='f'?'♂ 남자 캐릭터':'♀ 여자 캐릭터'}</button></div>
       <div class="lv-info">
