@@ -1382,8 +1382,11 @@ function verseView(v){
 // While solving, the reference is blanked by level: 쉬움 shows it all, 보통 hides the verse, 어려움 the
 // chapter and verse, 오직말씀 the book too. A hint button per hidden part reveals just that part.
 const REF_HIDE=[null,[],['v'],['c','v'],['b','c','v']];
+// 직접 써보기 hides the book from 보통 on: the book is picked from a list up to 보통 and typed from 어려움
+const REF_HIDE_TYPE=[null,[],['b','v'],['b','c','v'],['b','c','v']];
+const refHideSet=(type,d)=>(type==='type'?REF_HIDE_TYPE:REF_HIDE)[d];
 const REF_LABEL={b:'책',c:'장',v:'절'};
-const refHidden=p=>!!G&&REF_HIDE[G.d].includes(p)&&!(G.refShow&&G.refShow.has(p))&&!G.res;
+const refHidden=p=>!!G&&refHideSet(G.type,G.d).includes(p)&&!(G.refShow&&G.refShow.has(p))&&!G.res;
 const refText=v=>`${refHidden('b')?'□□':v.b} ${refHidden('c')?'?':v.c}장 ${refHidden('v')?'?':v.v}절`;
 function gref(v){
   const df=DIFF[G.d],hid=['b','c','v'].filter(refHidden);
@@ -1538,6 +1541,13 @@ function finishOrder(){
 /* ---------- 직접 써보기 ---------- */
 function startType(n){G={type:'type',n,d:S.diff,hint:DIFF[S.diff].hint==='on',input:'',res:null,passed:false,recorded:false,result:null,refShow:new Set(),refB:'',refC:'',refV:'',refV2:''};go({name:'type',n})}
 const BOOKS=[...new Set(VERSES.map(v=>v.b))];
+// a typed book name counts with or without spaces, and by its usual short form (고후, 롬, 벧전 …)
+const BOOK_ABBR={고린도후서:'고후',갈라디아서:'갈',요한복음:'요',골로새서:'골',사도행전:'행',이사야:'사',창세기:'창',욥기:'욥',출애굽기:'출',누가복음:'눅',베드로전서:'벧전',데살로니가전서:'살전',로마서:'롬'};
+function normBook(s){
+  const k=String(s||'').replace(/[\s.]/g,'');
+  if(!k)return '';
+  return BOOKS.find(b=>b===k||BOOK_ABBR[b]===k||b.replace(/서$|기$|음$|야$|전$/,'')===k.replace(/서$|기$|음$|야$|전$/,''))||k;
+}
 function grade(v,input){
   const orig=fullText(v),oc=[],pos=[];
   [...orig].forEach((ch,i)=>{if(!SKIP.test(ch)){oc.push(ch);pos.push(i)}});
@@ -1568,10 +1578,11 @@ function typeView(){
   ${df.hint==='none'?'':`<div class="hintbox ${G.hint?'':'off'}" aria-label="첫 글자 힌트">${G.hint?hint:'힌트를 껐어요. 힌트 없이 통과하면 보너스 XP를 받아요.'}</div>`}
   <label class="lbl" for="typeBox">기억나는 대로 구절을 써 보세요. 띄어쓰기와 문장부호는 채점하지 않아요.</label>
   <textarea id="typeBox" rows="6" lang="ko" maxlength="600" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="여기에 구절을 써 보세요">${esc(G.input)}</textarea>
-  <div class="refrow"><span class="lbl" id="refLbl">어느 책 몇 장 몇 절인지도 써 보세요. ${REF_HIDE[G.d].length?'위에서 가려진 부분을 힌트 없이 맞히면 보너스 XP':'이 난이도에서는 위에 다 보여서 보너스는 없어요'}</span>
-    <!-- a book list and three number boxes, because a phone's number pad has no ":" or space -->
+  <div class="refrow"><span class="lbl" id="refLbl">어느 책 몇 장 몇 절인지도 써 보세요. ${refHideSet('type',G.d).length?'위에서 가려진 부분을 힌트 없이 맞히면 보너스 XP':'이 난이도에서는 위에 다 보여서 보너스는 없어요'}</span>
+    <!-- the book: a list up to 보통, typed from 어려움; three number boxes, because a phone's number pad has no ":" or space -->
     <div class="refnums" role="group" aria-labelledby="refLbl">
-      <select id="refB" class="refin refbook" aria-label="책"><option value="">책 고르기</option>${BOOKS.map(b=>`<option ${G.refB===b?'selected':''}>${esc(b)}</option>`).join('')}</select>
+      ${G.d<=2?`<select id="refB" class="refin refbook" aria-label="책"><option value="">책 고르기</option>${BOOKS.map(b=>`<option ${G.refB===b?'selected':''}>${esc(b)}</option>`).join('')}</select>`
+        :`<input id="refB" class="refin refbook" lang="ko" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false" value="${esc(G.refB||'')}" placeholder="책 이름 (예: 로마서, 롬)" aria-label="책 이름">`}
     </div>
     <div class="refnums" role="group" aria-labelledby="refLbl">
       <input id="refC" class="refin" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="${esc(G.refC||'')}" aria-label="장"><span>장</span>
@@ -1592,8 +1603,8 @@ function typeView(){
 // Book, chapter and verse are scored one by one. A part earns its bonus only when this level hid it
 // and no hint was used for it (책 3 · 장 3 · 절 4, +5 when all three are right with no hint), × the level's XP multiplier.
 function refScore(v,d,df){
-  const ok={b:G.refB===v.b,c:G.refC!==''&&+G.refC===v.c,v:G.refV!==''&&[G.refV,G.refV2].filter(Boolean).map(Number).join('-')===String(v.v)};
-  const hidden=REF_HIDE[d],earned=p=>hidden.includes(p)&&!G.refShow.has(p)&&ok[p];
+  const ok={b:normBook(G.refB)===v.b,c:G.refC!==''&&+G.refC===v.c,v:G.refV!==''&&[G.refV,G.refV2].filter(Boolean).map(Number).join('-')===String(v.v)};
+  const hidden=refHideSet('type',d),earned=p=>hidden.includes(p)&&!G.refShow.has(p)&&ok[p];
   let bonus=({b:3,c:3,v:4}),sum=['b','c','v'].filter(earned).reduce((a,p)=>a+bonus[p],0);
   const all=ok.b&&ok.c&&ok.v;
   if(all&&hidden.length&&hidden.every(p=>!G.refShow.has(p)))sum+=5;
@@ -1823,7 +1834,7 @@ document.addEventListener('keydown',e=>{
 });
 app.addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role="button"][data-act]')){e.preventDefault();e.target.click()}
-  if(e.key==='Enter'&&/^refV?2?$|^refC$/.test(e.target.id)){e.preventDefault();check()}
+  if(e.key==='Enter'&&/^ref(B|C|V|V2)$/.test(e.target.id)){e.preventDefault();check()}
   if(e.key==='Enter'&&/^(renName|renPin)$/.test(e.target.id)){e.preventDefault();const b=$('[data-act="renameSave"]');if(b)b.click()}
   if(e.key==='Enter'&&/^(nameIn|acctName|pin|pin2)$/.test(e.target.id)){e.preventDefault();const b=$(e.target.id==='nameIn'?'[data-act="nameSave"]':e.target.id==='pin2'?'[data-act="signup"]':'[data-act="save"],[data-act="signup"],[data-act="login"]');if(b)b.click()}
 });
