@@ -331,6 +331,10 @@ textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(
 .refnums .refin{width:64px;flex:0 0 64px;text-align:center;padding:0 6px}
 .refnums span{font-family:var(--f-display);font-size:16px}
 .refnums .refto{color:var(--muted);margin-left:4px}
+.refnums .refbook{width:auto;flex:1 1 auto;max-width:220px;text-align:left}
+.refline{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.refhints{display:inline-flex;gap:4px}
+.hintchip{border:1.5px dashed var(--accent);background:transparent;color:var(--accent-strong);border-radius:999px;padding:1px 9px;font-family:var(--f-display);font-size:12px;cursor:pointer;line-height:1.5}
 .refres.ok{color:var(--accent-strong)} .refres.no{color:var(--bad)} .refres b{font-weight:400;color:var(--ink)}
 
 /* 연속 듣기 */
@@ -417,6 +421,24 @@ body.pl-on .sheet{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
 .hero.lit .piece.on{color:var(--glow)}
 .hero.lit .piece.on svg{filter:drop-shadow(0 0 calc(4px + var(--tier) * 4px) var(--glow)) brightness(calc(1 + var(--tier) * .1))}
 .hero.lit .lv-title{text-shadow:0 0 calc(var(--tier) * 6px) var(--glow)}
+/* keepsakes strip */
+.garden{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:12px 14px;display:grid;gap:8px}
+.g-items{display:grid;grid-template-columns:repeat(6,1fr);gap:6px 4px}
+.g-item{display:grid;justify-items:center;gap:1px;font-size:10.5px;line-height:1.2;color:var(--accent-strong);text-align:center;word-break:keep-all}
+.g-item svg{width:32px;height:32px}
+.g-item.on svg{filter:drop-shadow(0 0 5px color-mix(in srgb,var(--accent) 45%,transparent))}
+.g-item.off{color:var(--muted);opacity:.45}
+.g-item.off svg{stroke-dasharray:3 3}
+.garden.lit .g-item.on{color:var(--gink)}
+.garden.lit .g-item.on svg{filter:drop-shadow(0 0 6px var(--gcol))}
+.garden .tiny b{font-weight:400;color:var(--accent-strong)}
+/* page background from level 9: tint + drifting verse titles */
+main{position:relative;z-index:1}
+.deco{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.deco .tint{position:absolute;inset:0;background:radial-gradient(ellipse at 50% -10%,var(--tint),transparent 55%)}
+.deco .fv{position:absolute;bottom:-40px;font-family:var(--f-verse);font-size:15px;color:var(--ink);opacity:.14;white-space:nowrap;animation:floatup var(--dur) linear infinite}
+@keyframes floatup{to{transform:translateY(calc(-100vh - 80px))}}
+@media (prefers-reduced-motion:reduce){.deco .fv{animation:none;bottom:auto;top:30%}}
 @keyframes heroglow{50%{box-shadow:0 6px 0 var(--accent-deep),0 0 calc(var(--glow-r) * 1.6) color-mix(in srgb,var(--glow) calc(var(--glow-a) * 100%),transparent)}}
 @media (prefers-reduced-motion:reduce){.hero.lit{animation:none}}
 
@@ -899,6 +921,38 @@ const THEMES=[
   {name:'홍색',bg:'#B5383F',deep:'#80262B',ink:'#FFFFFF',glow:'#FF9CA3'},
   {name:'금색',bg:'#C8962A',deep:'#8F6A1B',ink:'#2A1E05',glow:'#FFE08A'},
   {name:'백색',bg:'#F3EFE6',deep:'#CFC6B3',ink:'#2B2B2B',glow:'#FFFFFF'}];
+// Biblical keepsakes gathered as the level rises, shown in a strip under the hero card (locked ones
+// faintly, with the level that earns them). Only objects from Scripture, nothing else.
+const ORN=[
+  {L:2,name:'십자가',ref:'고전 1:18',svg:'<path d="M24 6v36M12 18h24"/>'},
+  {L:3,name:'비둘기',ref:'마 3:16',svg:'<path d="M9 28c6-8 14-9 20-5l9-7-3 9c3 2 5 5 5 9H24c-6 0-11-2-15-6z"/><path d="M24 34v7M20 41h8"/>'},
+  {L:4,name:'등불',ref:'시 119:105',svg:'<path d="M8 30h24q0 8-12 8T8 30z"/><path d="M32 30q6-2 8-8"/><path d="M20 20q-4-6 0-11 4 5 0 11z"/>'},
+  {L:5,name:'두루마리',ref:'겔 3:1',svg:'<path d="M12 10h22a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H12"/><path d="M12 10a4 4 0 0 0-4 4v24a4 4 0 0 0 4 4"/><path d="M18 20h14M18 28h14"/>'},
+  {L:6,name:'별',ref:'마 2:10',svg:'<path d="M24 6l4 12h12l-10 7 4 12-10-7-10 7 4-12-10-7h12z"/>'},
+  {L:7,name:'물고기',ref:'요 21:6',svg:'<path d="M6 24q14-14 28 0-14 14-28 0z"/><path d="M34 24l8-8M34 24l8 8"/>'},
+  {L:8,name:'면류관',ref:'딤후 4:8',svg:'<path d="M8 34h32l2-18-10 8-8-12-8 12-10-8z"/><path d="M8 34v4h32v-4"/>'},
+  {L:10,name:'떡과 잔',ref:'고전 11:24',svg:'<path d="M14 12h20l-2 12q-2 6-8 6t-8-6z"/><path d="M24 30v8M16 38h16"/><circle cx="38" cy="36" r="5"/>'},
+  {L:12,name:'등잔대',ref:'출 25:31',svg:'<path d="M24 10v28M12 16q0 14 12 14t12-14M16 14q0 10 8 10t8-10M14 42h20"/>'},
+  {L:14,name:'무지개',ref:'창 9:13',svg:'<path d="M6 36a18 18 0 0 1 36 0M12 36a12 12 0 0 1 24 0M18 36a6 6 0 0 1 12 0"/>'},
+  {L:16,name:'감람나무 가지',ref:'창 8:11',svg:'<path d="M10 38q14-2 26-26"/><path d="M18 30q-6-2-8-8 6 0 8 8zM24 24q-6-2-8-8 6 0 8 8zM30 18q-6-2-8-8 6 0 8 8z"/>'},
+  {L:18,name:'성전',ref:'시 122:1',svg:'<path d="M8 40h32M10 40V22h28v18M12 22l12-10 12 10M18 40V28M30 40V28M24 40V28"/>'}];
+const ornSvg=o=>`<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${o.svg}</svg>`;
+function gardenView(L,th){
+  const next=ORN.find(o=>o.L>L),have=ORN.filter(o=>o.L<=L).length;
+  if(!have)return '';
+  return `<section class="garden ${th?'lit':''}" aria-label="모은 상징" ${th?`style="--gcol:${th.glow};--gink:${th.bg}"`:''}>
+    <div class="g-items">${ORN.map(o=>`<span class="g-item ${o.L<=L?'on':'off'}" title="${esc(o.name)} · ${esc(o.ref)}${o.L>L?` · Lv.${o.L}에 받아요`:''}">${ornSvg(o)}<small>${o.L<=L?esc(o.name):`Lv.${o.L}`}</small></span>`).join('')}</div>
+    <p class="tiny">${next?`다음 상징: 레벨 ${next.L}에서 <b>${esc(next.name)}</b> (${esc(next.ref)})`:'성경의 상징을 모두 모았어요'}</p></section>`;
+}
+// Behind the home page: from level 9 a soft tint in the card's colour at the top, and a few verse
+// titles drifting slowly upward (more each level). The timing is tied to the clock so a re-render
+// doesn't make them jump.
+function decoView(L,th){
+  if(!th)return '';
+  const n=Math.min(6,L-8),now=Date.now()/1000,pool=shuffle(VERSES.filter(v=>mastered(v.n)).length>=n?VERSES.filter(v=>mastered(v.n)):VERSES).slice(0,n);
+  return `<div class="deco" aria-hidden="true" style="--tint:color-mix(in srgb,${th.bg} 20%,transparent)"><div class="tint"></div>
+    ${pool.map((v,i)=>{const dur=50+i*9,left=8+((i*37)%80);return `<span class="fv" style="left:${left}%;--dur:${dur}s;animation-delay:${-((now+i*13)%dur).toFixed(1)}s">${esc(v.t.length>14?v.t.slice(0,14)+'…':v.t)}</span>`}).join('')}</div>`;
+}
 function heroTheme(L){
   if(L<9)return null;
   const k=L-9,th=THEMES[k%THEMES.length],tier=Math.min(3,Math.floor(k/THEMES.length)+1);
@@ -1139,7 +1193,7 @@ function homeView(){
   const sel=S.series==='all'?null:seriesOf(S.series);
   const groups=sel?[sel]:SERIES;
   const tabs=[{id:'all',short:'전체'},...SERIES].map(s=>`<button class="tab" role="tab" aria-selected="${S.series===s.id}" data-act="series" data-id="${s.id}" ${s.c?`style="--sc:var(--c${s.c})"`:''}>${esc(s.short)}</button>`).join('');
-  return `
+  return `${decoView(l.L,th)}
   <section class="hero ${th?'lit':''}" aria-label="나의 기록" ${th?`style="--accent:${th.bg};--accent-deep:${th.deep};--accent-ink:${th.ink};--glow:${th.glow};--glow-r:${th.glowR}px;--glow-a:${th.glowA};--tier:${th.tier}"`:''}>
     <div class="hero-top">
       <div class="avatar-wrap"><div class="av-box">${avatar(l.L)}<span class="lv-pill">Lv.${l.L}</span></div><button class="sex-btn" data-act="sex" aria-label="캐릭터 성별 바꾸기">${S.sex==='f'?'♂ 남자 캐릭터':'♀ 여자 캐릭터'}</button></div>
@@ -1159,6 +1213,7 @@ function homeView(){
   </section>
   ${ui.panel==='name'?namePanel():''}
   ${ui.panel==='rename'?renamePanel():''}
+  ${gardenView(l.L,th)}
   <section class="diffbox" aria-label="난이도">
     <div class="seg">${[1,2,3,4].map(i=>`<button class="d${i}" aria-pressed="${d===i}" data-act="diff" data-d="${i}">${DIFF[i].name}</button>`).join('')}</div>
     <p class="tiny">${df.desc} · XP ×${df.mult}</p>
@@ -1324,11 +1379,16 @@ function verseView(v){
 /* ---------- 공통 게임 UI ---------- */
 // the handout heading and title stay visible at every level (they are memorised with the verse);
 // only the chapter and verse are hidden at 어려움 and 오직말씀
-function gref(v,hideRef){
-  const df=DIFF[G.d];
-  // 직접 써보기 asks for the chapter and verse, so there they stay hidden until the hint (chapter only) or grading
-  const r=!hideRef?ref(v):G.res?ref(v):G.refHint?`${v.b} ${v.c}장 ?절`:'장·절은 아래에 직접 써 보세요';
-  return `<div class="gref"><small>${esc(head(v))}<span class="dchip">${df.name}</span></small><b>${esc(v.t)}</b><span>${esc(r)}</span></div>`;
+// While solving, the reference is blanked by level: 쉬움 shows it all, 보통 hides the verse, 어려움 the
+// chapter and verse, 오직말씀 the book too. A hint button per hidden part reveals just that part.
+const REF_HIDE=[null,[],['v'],['c','v'],['b','c','v']];
+const REF_LABEL={b:'책',c:'장',v:'절'};
+const refHidden=p=>!!G&&REF_HIDE[G.d].includes(p)&&!(G.refShow&&G.refShow.has(p))&&!G.res;
+const refText=v=>`${refHidden('b')?'□□':v.b} ${refHidden('c')?'?':v.c}장 ${refHidden('v')?'?':v.v}절`;
+function gref(v){
+  const df=DIFF[G.d],hid=['b','c','v'].filter(refHidden);
+  return `<div class="gref"><small>${esc(head(v))}<span class="dchip">${df.name}</span></small><b>${esc(v.t)}</b>
+    <span class="refline">${esc(refText(v))}${hid.length?`<span class="refhints">${hid.map(p=>`<button class="hintchip" data-act="refShow" data-p="${p}">${REF_LABEL[p]} 힌트</button>`).join('')}</span>`:''}</span></div>`;
 }
 // hearts grow with the verse: 3 for a short one, one more per ten words (갈 2:20's 45 words → 7),
 // two extra at 오직말씀 where every word is a blank
@@ -1398,7 +1458,7 @@ function startBlank(n){
   const pool=[...new Set(VERSES.filter(x=>x.n!==n).flatMap(x=>toks(x).map(y=>norm(y.w))))].filter(w=>w.length>=2&&!own.has(w)&&!awk(w));
   const chips=shuffle([...blanks.map(i=>norm(t[i].w)),...pick(pool,df.dist)]).map(w=>({w,used:false}));
   const maxH=heartsFor(t.length,d);
-  G={type:'blank',n,d,t,blanks,cur:0,chips,hearts:maxH,maxH,mistakes:0,result:null};
+  G={type:'blank',n,d,t,blanks,cur:0,chips,hearts:maxH,maxH,mistakes:0,result:null,refShow:new Set()};
   go({name:'blank',n});
 }
 function blankView(){
@@ -1444,7 +1504,7 @@ function startOrder(n){
   let order=shuffle(chunks.map(c=>c.id));
   if(order.length>2&&order.every((id,i)=>id===i))order=shuffle(order);
   const maxH=heartsFor(t.length,d);
-  G={type:'order',n,d,chunks,order,used:new Set(),placed:0,hearts:maxH,maxH,mistakes:0,result:null};
+  G={type:'order',n,d,chunks,order,used:new Set(),placed:0,hearts:maxH,maxH,mistakes:0,result:null,refShow:new Set()};
   go({name:'order',n});
 }
 function orderView(){
@@ -1476,7 +1536,8 @@ function finishOrder(){
 }
 
 /* ---------- 직접 써보기 ---------- */
-function startType(n){G={type:'type',n,d:S.diff,hint:DIFF[S.diff].hint==='on',input:'',res:null,passed:false,recorded:false,result:null};go({name:'type',n})}
+function startType(n){G={type:'type',n,d:S.diff,hint:DIFF[S.diff].hint==='on',input:'',res:null,passed:false,recorded:false,result:null,refShow:new Set(),refB:'',refC:'',refV:'',refV2:''};go({name:'type',n})}
+const BOOKS=[...new Set(VERSES.map(v=>v.b))];
 function grade(v,input){
   const orig=fullText(v),oc=[],pos=[];
   [...orig].forEach((ch,i)=>{if(!SKIP.test(ch)){oc.push(ch);pos.push(i)}});
@@ -1503,12 +1564,15 @@ function gradeHtml(r){
 function typeView(){
   const v=byN(G.n),t=toks(v),r=G.res,df=DIFF[G.d],pass=df.pass;
   const hint=t.map(x=>vnHtml(x)+`<span class="ini">${esc([...norm(x.w)||x.w][0])}</span>`).join(' ');
-  return `<div class="gtop">${gref(v,true)}</div>
+  return `<div class="gtop">${gref(v)}</div>
   ${df.hint==='none'?'':`<div class="hintbox ${G.hint?'':'off'}" aria-label="첫 글자 힌트">${G.hint?hint:'힌트를 껐어요. 힌트 없이 통과하면 보너스 XP를 받아요.'}</div>`}
   <label class="lbl" for="typeBox">기억나는 대로 구절을 써 보세요. 띄어쓰기와 문장부호는 채점하지 않아요.</label>
   <textarea id="typeBox" rows="6" lang="ko" maxlength="600" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="여기에 구절을 써 보세요">${esc(G.input)}</textarea>
-  <div class="refrow"><span class="lbl" id="refLbl">몇 장 몇 절인지도 써 보세요 (맞히면 보너스 XP${G.refHint?' 절반':''}) ${r||G.refHint?'':`<button class="link" data-act="refHint">장 힌트 보기</button>`}</span>
-    <!-- three number boxes, because a phone's number pad has no ":" or space -->
+  <div class="refrow"><span class="lbl" id="refLbl">어느 책 몇 장 몇 절인지도 써 보세요. ${REF_HIDE[G.d].length?'위에서 가려진 부분을 힌트 없이 맞히면 보너스 XP':'이 난이도에서는 위에 다 보여서 보너스는 없어요'}</span>
+    <!-- a book list and three number boxes, because a phone's number pad has no ":" or space -->
+    <div class="refnums" role="group" aria-labelledby="refLbl">
+      <select id="refB" class="refin refbook" aria-label="책"><option value="">책 고르기</option>${BOOKS.map(b=>`<option ${G.refB===b?'selected':''}>${esc(b)}</option>`).join('')}</select>
+    </div>
     <div class="refnums" role="group" aria-labelledby="refLbl">
       <input id="refC" class="refin" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="${esc(G.refC||'')}" aria-label="장"><span>장</span>
       <input id="refV" class="refin" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="${esc(G.refV||'')}" aria-label="절"><span>절</span>
@@ -1521,28 +1585,33 @@ function typeView(){
     <p class="tiny">${r.score>=pass?`통과 기준 ${pass}%를 넘었어요.`:`${pass}% 이상이면 통과예요.`} 빠진 글자 ${r.missed}개 · 더 쓴 글자 ${r.extra}개</p>
     <p class="verse" style="font-size:18px">${gradeHtml(r)}</p>
     <p class="tiny">밑줄 친 부분이 빠졌거나 틀린 곳이에요.</p>
-    <p class="tiny refres ${r.refOk?'ok':r.refOk===false?'no':''}">장·절: ${r.refOk?'맞았어요 ✓':r.refOk===false?'아쉬워요':'안 썼어요'} · 정답은 <b>${ref(v)}</b></p>
+    <p class="tiny refres ${r.ref.all?'ok':'no'}">${['b','c','v'].map(p=>`${REF_LABEL[p]} ${r.ref.ok[p]?'✓':'✗'}`).join(' · ')} · 정답은 <b>${ref(v)}</b>${r.ref.bonus?` · 보너스 +${r.ref.bonus} XP`:r.ref.all&&r.ref.hidden.length?' · 힌트를 써서 보너스는 없어요':''}</p>
     <div class="row"><button class="btn" data-act="clearType">처음부터 다시 쓰기</button></div>
   </section>`:''}`;
 }
-// "4장 7절", "4:7", "4 7", "34-35절" all count: only the numbers are compared
-function refOk(v,input){
-  const nums=(input||'').match(/\d+/g);if(!nums)return null;
-  return nums.join(',')===[v.c,...String(v.v).split('-')].map(Number).join(',');
+// Book, chapter and verse are scored one by one. A part earns its bonus only when this level hid it
+// and no hint was used for it (책 3 · 장 3 · 절 4, +5 when all three are right with no hint), × the level's XP multiplier.
+function refScore(v,d,df){
+  const ok={b:G.refB===v.b,c:G.refC!==''&&+G.refC===v.c,v:G.refV!==''&&[G.refV,G.refV2].filter(Boolean).map(Number).join('-')===String(v.v)};
+  const hidden=REF_HIDE[d],earned=p=>hidden.includes(p)&&!G.refShow.has(p)&&ok[p];
+  let bonus=({b:3,c:3,v:4}),sum=['b','c','v'].filter(earned).reduce((a,p)=>a+bonus[p],0);
+  const all=ok.b&&ok.c&&ok.v;
+  if(all&&hidden.length&&hidden.every(p=>!G.refShow.has(p)))sum+=5;
+  return {ok,all,hidden,bonus:Math.round(sum*df.mult)};
 }
 function check(){
   const box=$('#typeBox');G.input=box?box.value:G.input;
   for(const k of ['refC','refV','refV2']){const el=$('#'+k);if(el)G[k]=el.value.replace(/\D/g,'')}
-  G.refIn=[G.refC,G.refV,G.refV2].filter(Boolean).join(' ');
+  {const el=$('#refB');if(el)G.refB=el.value}
   if(!G.input.trim()){flash('#typeBox','shake');return}
   const n=G.n,d=G.d,df=DIFF[d],v=byN(n),x=vs(n),before=stars(n),lvB=lvl().L;
-  G.res=grade(v,G.input);G.res.refOk=refOk(v,G.refIn);
+  G.res=grade(v,G.input);G.res.ref=refScore(v,d,df);
   if(G.res.score>(x.t[d-1]||0))x.t[d-1]=G.res.score;x.last=Date.now();
   if(G.res.score>=df.pass&&!G.passed){
     G.passed=true;G.recorded=true;
-    const xp=Math.round(40*df.mult)+(df.hint==='opt'&&!G.hint?15:0)+(G.res.refOk?Math.round((G.refHint?5:10)*df.mult):0);recordGame(xp);
+    const rs=G.res.ref,xp=Math.round(40*df.mult)+(df.hint==='opt'&&!G.hint?15:0)+rs.bonus;recordGame(xp);
     const idx=VERSES.indexOf(v),next=VERSES[idx+1];
-    G.result=wrapResult(n,2,before,lvB,{pass:true,title:G.res.score===100?'한 글자도 틀리지 않았어요!':'통과!',msg:`정확도 ${G.res.score}%${G.hint?'':' · 힌트 없이 성공'}${G.res.refOk?' · 장·절도 정답':G.res.refOk===false?` · 장·절은 ${v.c}장 ${v.v}절이에요`:''}.`,xp,
+    G.result=wrapResult(n,2,before,lvB,{pass:true,title:G.res.score===100?'한 글자도 틀리지 않았어요!':'통과!',msg:`정확도 ${G.res.score}%${G.hint?'':' · 힌트 없이 성공'}${rs.all?` · 책·장·절도 정답${rs.bonus?` (+${rs.bonus} XP)`:''}`:` · 정답은 ${ref(v)}`}.`,xp,
       actions:btns([...(next?[[`다음 구절 · ${next.n}번`,'open','primary',`data-n="${next.n}"`]]:[]),['결과 자세히 보기','closeSheet'],['구절로 돌아가기','toVerse','ghost']])});
     render();celebrate();sfx('win');
   }else{
@@ -1689,7 +1758,7 @@ app.addEventListener('click',e=>{
     case 'chip':onChip(i);break;
     case 'piece':onPiece(i);break;
     case 'toggleHint':{const b=$('#typeBox');if(b)G.input=b.value;G.hint=!G.hint;render();break}
-    case 'refHint':{const b=$('#typeBox');if(b)G.input=b.value;G.refHint=true;render();break}
+    case 'refShow':{const b=$('#typeBox');if(b)G.input=b.value;for(const k of ['refC','refV','refV2','refB']){const f=$('#'+k);if(f)G[k]=f.value}G.refShow.add(el.dataset.p);render();break}
     case 'check':check();break;
     case 'clearType':G.input='';G.res=null;render();{const b=$('#typeBox');if(b)b.focus()}break;
     case 'closeSheet':G.result=null;render();{const g=$('#grade');if(g)g.scrollIntoView({block:'start'})}break;
@@ -1764,6 +1833,7 @@ app.addEventListener('input',e=>{
   else if(/^ref(C|V|V2)$/.test(t.id)&&G){t.value=t.value.replace(/\D/g,'');G[t.id]=t.value;
     // after the chapter, hop to the verse box once two digits are in (most chapters here are 1–2 digits)
     if(t.id==='refC'&&t.value.length>=2){const nx=$('#refV');if(nx&&!nx.value)nx.focus()}}
+  else if(t.id==='refB'&&G)G.refB=t.value;
   else if(t.id==='renName')ui.renName=t.value;
   else if(t.id==='renPin')ui.renPin=t.value.replace(/\D/g,'');
   else if(t.id==='bkIn')ui.bkIn=t.value;
