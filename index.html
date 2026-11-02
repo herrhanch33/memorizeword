@@ -447,9 +447,11 @@ main{position:relative;z-index:1}
 .deco .tint{position:absolute;inset:0;background:radial-gradient(ellipse at 50% -10%,var(--tint),transparent 55%)}
 .deco .st{position:absolute;width:var(--s);height:var(--s);border-radius:50%;background:var(--ink);opacity:.22}
 .deco .st.tw{animation:twinkle 3s ease-in-out infinite}
-.deco .fv{position:absolute;bottom:-40px;font-family:var(--f-verse);font-size:15px;color:var(--ink);opacity:.14;white-space:nowrap;animation:floatup var(--dur) linear infinite}
+/* each title keeps its own lane: all drift at one speed, evenly spaced, alternating left and right, so they never meet */
+.deco .fv{position:absolute;bottom:-40px;max-width:44vw;overflow:hidden;text-overflow:ellipsis;font-family:var(--f-verse);font-size:15px;color:var(--ink);opacity:.14;white-space:nowrap;animation:floatup var(--dur) linear infinite}
+.deco .fv.r{left:auto;right:5%;text-align:right}
 @keyframes floatup{to{transform:translateY(calc(-100vh - 80px))}}
-@media (prefers-reduced-motion:reduce){.deco .fv{animation:none;bottom:auto;top:30%}}
+@media (prefers-reduced-motion:reduce){.deco .fv{animation:none;bottom:auto;top:var(--top)}}
 @keyframes heroglow{50%{box-shadow:0 6px 0 var(--accent-deep),0 0 calc(var(--glow-r) * 1.6) color-mix(in srgb,var(--glow) calc(var(--glow-a) * 100%),transparent)}}
 @media (prefers-reduced-motion:reduce){.hero.lit{animation:none}}
 
@@ -498,6 +500,69 @@ main{position:relative;z-index:1}
 @keyframes fade{from{opacity:0}}
 @keyframes up{from{transform:translateY(100%)}}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* 오늘의 도전: range button under the yellow button, written answers */
+.ctabox{display:grid;gap:8px}
+.cta-set{justify-self:center;background:none;border:1.5px dashed var(--gold-deep);color:var(--gold-ink);border-radius:999px;padding:6px 16px;font-family:var(--f-display);font-size:14px;cursor:pointer}
+.qtag{font-weight:400;font-size:13px;background:var(--ink);color:var(--bg);border-radius:999px;padding:1px 8px;vertical-align:middle}
+.qtype{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:12px;gap:8px}
+.qtype .btn{width:100%}
+.qans{background:var(--surface-2);border-radius:12px;padding:8px 12px;color:var(--ink)}
+.qmark{color:var(--muted);letter-spacing:.02em}
+/* 도전 고르기 */
+.qset{display:grid;gap:10px}
+.qquick{display:flex;flex-wrap:wrap;gap:6px}
+.qquick .btn{flex:0 1 auto}
+.qgroup{display:grid;gap:6px}
+.qghead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;background:none;border:0;border-bottom:2px solid var(--sc);padding:6px 2px;font-family:var(--f-display);font-size:15px;text-align:left;cursor:pointer;color:var(--ink)}
+.qghead small{font-family:var(--f-body);font-size:12px;color:var(--sc);white-space:nowrap}
+.qghead .sheet-no{color:var(--sc)}
+.qgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.qv{display:grid;grid-template-columns:28px minmax(0,1fr);gap:6px;align-items:center;text-align:left;min-height:46px;padding:6px 8px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;color:var(--muted)}
+.qv b{font-family:var(--f-display);font-weight:400;font-size:16px;text-align:center}
+.qv span{font-size:13px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
+.qv[aria-pressed="true"]{border-color:var(--sc);background:color-mix(in srgb,var(--sc) 14%,var(--surface));color:var(--ink)}
+.qv[aria-pressed="true"] b{color:var(--sc)}
+.seg.seg3{grid-template-columns:repeat(3,1fr)}
+.qgo{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:grid;gap:6px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(6px);border-radius:18px;padding:8px}
+.qgo .btn:disabled{opacity:.5;cursor:default}
+/* 내 기록 */
+.rec-btn{background:color-mix(in srgb,var(--accent-ink) 16%,transparent);color:inherit;border:0;border-radius:12px;min-height:40px;padding:6px 12px;font-family:var(--f-display);font-size:15px;cursor:pointer}
+.rec-sum{display:grid;gap:8px}
+.r-stats.four{grid-template-columns:repeat(4,1fr)}
+.r-stats div{text-align:center}
+.r-stats b em{font-style:normal;font-size:13px;opacity:.7}
+.r-stats.four b{font-size:20px}
+.r-stats.four span{font-size:12px}
+.cal,.weak,.vgrid,.lgbox{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:10px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;text-align:center}
+.cal-grid span{font-size:12px;color:var(--muted)}
+.cal-d{height:22px;border-radius:6px;background:var(--surface-2);display:block}
+.cal-d.c1{background:color-mix(in srgb,var(--accent) 45%,var(--surface-2))}
+.cal-d.c3{background:var(--accent)}
+.cal-d.now{outline:2px solid var(--gold-deep);outline-offset:1px}
+.vg-s{display:grid;gap:4px}
+.vg-s .sheet-no{color:var(--sc);font-size:13px;margin-top:4px}
+.vg-row{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:8px;align-items:center;background:none;border:0;border-bottom:1px solid var(--line);padding:6px 0;text-align:left;cursor:pointer;color:var(--ink)}
+.vg-row b{font-family:var(--f-display);font-weight:400;color:var(--sc);text-align:center}
+.vg-row>span:not(.vg-c){font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vg-c{display:flex;gap:3px}
+.vg-c i{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-style:normal;font-size:11px;background:var(--surface-2);color:var(--muted)}
+.vg-c i.s1{background:color-mix(in srgb,var(--gold) 30%,var(--surface-2))}
+.vg-c i.s2{background:color-mix(in srgb,var(--gold) 60%,var(--surface-2));color:var(--gold-on)}
+.vg-c i.s3{background:var(--gold);color:var(--gold-on)}
+.lg-day{font-family:var(--f-display);font-weight:400;font-size:15px;margin:6px 0 0;color:var(--muted)}
+.lgs{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.lg{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;padding:8px 10px;border-radius:12px;background:var(--surface-2);border-left:4px solid var(--accent)}
+.lg.no{border-left-color:var(--bad)}
+.lg-time{font-size:12px;color:var(--muted);padding-top:2px;font-variant-numeric:tabular-nums}
+.lg-main{display:grid;gap:1px;min-width:0}
+.lg-main b{font-family:var(--f-display);font-weight:400;font-size:15px}
+.lg-main .link{text-align:left;padding:0;font-size:13px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lg-main small{font-size:13px;color:var(--muted)}
+.lg-miss{font-size:12px;color:var(--bad)}
+.lg-miss .link{display:inline;color:var(--bad);font-size:12px}
+.lg-xp{font-family:var(--f-display);color:var(--gold-ink);font-size:14px;white-space:nowrap}
 </style>
 
 <div id="app"></div>
@@ -671,7 +736,20 @@ const ICON={
 /* ---------- 진도 저장 ---------- */
 const KEY='malsseum-amsong-v1';
 const z4=()=>[0,0,0,0];
-function blank(){return {xp:0,streak:0,lastDay:null,today:{day:null,games:0},verses:{},name:'',sex:'m',diff:2,sound:true,series:'all',updatedAt:0}}
+// log: the games played, newest first (내 기록) · qset: the verses 오늘의 도전 asks about (null = the series tab)
+// qmode: what it asks — 'verse' 말씀, 'name' 제목·시리즈, 'mix' both
+function blank(){return {xp:0,streak:0,lastDay:null,today:{day:null,games:0},verses:{},log:[],name:'',sex:'m',diff:2,sound:true,series:'all',qset:null,qmode:'mix',updatedAt:0}}
+const LOG_MAX=200;
+// a log entry: t time · k b/o/w/q (빈칸·순서·써보기·도전) · n verse (0 for 도전) · d difficulty · p passed 0/1
+// s mistakes (b/o), accuracy % (w) or right answers (q) · x XP · m verses missed in a 도전 · z the 도전's range
+function cleanLog(a){
+  const num=x=>Math.max(0,Math.floor(+x||0));
+  return (Array.isArray(a)?a:[]).filter(e=>e&&typeof e==='object'&&'bowq'.includes(e.k)&&e.k.length===1).map(e=>{
+    const o={t:num(e.t),k:e.k,n:Math.min(42,num(e.n)),d:Math.min(ND,Math.max(1,num(e.d)||1)),p:e.p?1:0,s:Math.min(100,num(e.s)),x:Math.min(9999,num(e.x))};
+    if(e.k==='q'){o.m=(Array.isArray(e.m)?e.m:[]).map(num).filter(n=>n>=1&&n<=42).slice(0,10);o.z=String(e.z||'').replace(/[<>]/g,'').slice(0,40)}
+    return o}).filter(e=>e.t);
+}
+function mergeLog(a,b){const seen=new Set();return [...(a||[]),...(b||[])].sort((x,y)=>y.t-x.t).filter(e=>{const id=e.t+e.k+e.n;if(seen.has(id))return false;seen.add(id);return true}).slice(0,LOG_MAX)}
 // A verse record keeps b (blank cleared), o (order cleared) and t (best typing %) per difficulty, index = difficulty-1.
 // Older records had one blank level 1-3, one order flag and one typing score; those map onto 쉬움/보통/어려움.
 function migrateVerse(x){
@@ -682,7 +760,8 @@ function migrateVerse(x){
 }
 function migrateAll(vv){const out={};Object.keys(vv||{}).forEach(k=>{const m=migrateVerse(vv[k]);if(m)out[k]=m});return out}
 function load(){
-  try{const r=localStorage.getItem(KEY);if(r){const s=Object.assign(blank(),JSON.parse(r));s.verses=migrateAll(s.verses);s.diff=Math.min(ND,Math.max(1,+s.diff||2));s.name=String(s.name||'').slice(0,10);s.sex=s.sex==='f'?'f':'m';return s}}catch(e){}
+  try{const r=localStorage.getItem(KEY);if(r){const s=Object.assign(blank(),JSON.parse(r));s.verses=migrateAll(s.verses);s.diff=Math.min(ND,Math.max(1,+s.diff||2));s.name=String(s.name||'').slice(0,10);s.sex=s.sex==='f'?'f':'m';
+    s.log=cleanLog(s.log);s.qset=Array.isArray(s.qset)?[...new Set(s.qset.map(Number).filter(n=>n>=1&&n<=42))].sort((a,b)=>a-b):null;if(s.qset&&!s.qset.length)s.qset=null;s.qmode=['verse','name','mix'].includes(s.qmode)?s.qmode:'mix';return s}}catch(e){}
   return blank();
 }
 let S=load();
@@ -702,6 +781,7 @@ function merge(a,b){
     const x=migrateVerse((a.verses||{})[k])||{b:z4(),o:z4(),t:z4()},y=migrateVerse((b.verses||{})[k])||{b:z4(),o:z4(),t:z4()};
     m.verses[k]={b:mx(x.b,y.b),o:mx(x.o,y.o),t:mx(x.t,y.t),last:Math.max(x.last||0,y.last||0)};
   });
+  m.log=mergeLog(a.log,b.log);
   m.updatedAt=Math.max(a.updatedAt||0,b.updatedAt||0);
   return m;
 }
@@ -744,7 +824,7 @@ function clean(d){
   const num=x=>Math.max(0,Math.floor(+x||0)),day=x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)?x:null;
   const arr=(a,cap)=>z4().map((_,i)=>Array.isArray(a)?Math.min(cap,num(a[i])):0);
   const o={xp:num(d.xp),streak:num(d.streak),lastDay:day(d.lastDay),today:{day:day(d.today&&d.today.day),games:num(d.today&&d.today.games)},
-    name:String(d.name||'').replace(/[<>]/g,'').trim().slice(0,10),verses:{},updatedAt:num(d.updatedAt)};
+    name:String(d.name||'').replace(/[<>]/g,'').trim().slice(0,10),verses:{},log:cleanLog(d.log).slice(0,LOG_MAX),updatedAt:num(d.updatedAt)};
   const vv=d.verses&&typeof d.verses==='object'?d.verses:{};
   VERSES.forEach(v=>{const x=migrateVerse(vv[v.n]);if(x)o.verses[v.n]={b:arr(x.b,1),o:arr(x.o,1),t:arr(x.t,100),last:num(x.last)}});
   return o;
@@ -888,11 +968,14 @@ function dayStr(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).
 function yesterday(){const d=new Date();d.setDate(d.getDate()-1);return dayStr(d)}
 const curStreak=()=>(S.lastDay===dayStr()||S.lastDay===yesterday())?S.streak:0;
 const todayGames=()=>S.today&&S.today.day===dayStr()?S.today.games:0;
-function recordGame(xp){
+// e: what to write in 내 기록 ({k,n,d,p,s} plus m and z for 오늘의 도전)
+function recordGame(xp,e){
   const t=dayStr();
   if(S.lastDay!==t){S.streak=S.lastDay===yesterday()?S.streak+1:1;S.lastDay=t}
   if(!S.today||S.today.day!==t)S.today={day:t,games:0};
-  S.today.games++;S.xp+=xp;save();
+  S.today.games++;S.xp+=xp;
+  if(e)S.log=[...cleanLog([{...e,t:Date.now(),x:xp}]),...(S.log||[])].slice(0,LOG_MAX);
+  save();
 }
 const vs=n=>S.verses[n]||(S.verses[n]={b:z4(),o:z4(),t:z4(),last:0});
 function stars(n,d=S.diff){const x=S.verses[n];if(!x)return [false,false,false];const i=d-1;return [!!x.b[i],!!x.o[i],(x.t[i]||0)>=DIFF[d].pass]}
@@ -963,9 +1046,14 @@ function decoView(L,th){
   // faint stars in the page background from level 6 (more each level), drifting verse titles from level 9
   const rnd=i=>{const x=Math.sin(i*91.3+17.7)*24631.1;return x-Math.floor(x)};
   const stars=L>=6?Array.from({length:Math.min(48,L*3)},(_,i)=>`<i class="st ${i%4?'':'tw'}" style="left:${(rnd(i)*100).toFixed(1)}%;top:${(rnd(i+40)*100).toFixed(1)}%;--s:${(2+rnd(i+80)*2).toFixed(1)}px;animation-delay:${(rnd(i+9)*3).toFixed(1)}s"></i>`).join(''):'';
-  const n=th?Math.min(6,L-8):0,now=Date.now()/1000,pool=n?shuffle(VERSES.filter(v=>mastered(v.n)).length>=n?VERSES.filter(v=>mastered(v.n)):VERSES).slice(0,n):[];
+  // The titles are the same all day (re-renders used to swap them), all drift at one speed and are
+  // spaced evenly in time, alternating left and right lanes, so two never cross. With reduced motion
+  // they stand still, each at its own height (they all used to sit on one line at 30%).
+  const n=th?Math.min(6,L-8):0,now=Date.now()/1000,dur=72,seed=dayStr();
+  const own=VERSES.filter(v=>mastered(v.n)),src=own.length>=n?own:VERSES;
+  const pool=n?src.map(v=>({v,k:rnd(v.n*7+[...seed].reduce((a,c)=>a+c.charCodeAt(0),0))})).sort((a,b)=>a.k-b.k).slice(0,n).map(o=>o.v):[];
   return `<div class="deco" aria-hidden="true" ${th?`style="--tint:color-mix(in srgb,${th.bg} 20%,transparent)"`:''}>${th?'<div class="tint"></div>':''}${stars}
-    ${pool.map((v,i)=>{const dur=50+i*9,left=8+((i*37)%80);return `<span class="fv" style="left:${left}%;--dur:${dur}s;animation-delay:${-((now+i*13)%dur).toFixed(1)}s">${esc(v.t.length>14?v.t.slice(0,14)+'…':v.t)}</span>`}).join('')}</div>`;
+    ${pool.map((v,i)=>`<span class="fv ${i%2?'r':''}" style="${i%2?'':'left:5%;'}--dur:${dur}s;--top:${(10+i*80/n).toFixed(0)}%;animation-delay:${-((now+i*dur/n)%dur).toFixed(1)}s">${esc(v.t.length>14?v.t.slice(0,14)+'…':v.t)}</span>`).join('')}</div>`;
 }
 // The scene behind the hero card: a night sky over hills that fills in as the level rises —
 // stars (more each level), a cross on the hill (2), a dove (3), a lamp (4), an olive tree that keeps
@@ -1175,6 +1263,8 @@ function render(){
     case 'order':title='순서 맞추기';back=true;body=orderView();break;
     case 'type':title='직접 써보기';back=true;body=typeView();break;
     case 'quiz':title='오늘의 도전';back=true;body=quizView();break;
+    case 'qset':title='오늘의 도전 고르기';back=true;body=qsetView();break;
+    case 'records':title='내 기록';back=true;body=recordsView();break;
   }
   app.innerHTML=header(title,back)+`<main class="gut">${body}</main>`+playerBar()+(G&&G.result?resultSheet():'')+(ui.tour!=null?tourView():'');
   // the tutorial sheet slides up once when opened, then stays put while paging; keep keyboard focus on it
@@ -1252,6 +1342,7 @@ function homeView(){
       <div class="stat"><b>${Math.min(g,3)}<em>/3</em></b><span>오늘의 목표</span></div>
       <div class="stat"><b>${m}<em>/${list.length}</em></b><span>${df.name} 정복</span></div>
     </div>
+    <button class="rec-btn" data-act="records">내 기록 보기 · 한 게임과 구절별 별${(S.log||[]).length?` (${S.log.length})`:''}</button>
   </section>
   ${ui.panel==='name'?namePanel():''}
   ${ui.panel==='rename'?renamePanel():''}
@@ -1260,7 +1351,8 @@ function homeView(){
     <div class="seg">${[1,2,3,4].map(i=>`<button class="d${i}" aria-pressed="${d===i}" data-act="diff" data-d="${i}">${DIFF[i].name}</button>`).join('')}</div>
     <p class="tiny">${df.desc} · XP ×${df.mult}</p>
   </section>
-  <button class="cta" data-act="quiz"><span><span class="cta-main">오늘의 도전</span><span class="cta-sub">${sel?esc(sel.short):'전체 구절'}에서 10문제 · 문제당 ${df.qt/1000}초</span></span>${ICON.go}</button>
+  <div class="ctabox"><button class="cta" data-act="quiz"><span><span class="cta-main">오늘의 도전</span><span class="cta-sub">${esc(scopeText())}에서 10문제 · ${QMODE[S.qmode].name} · ${df.name} · 문제당 ${df.qt/1000}초</span></span>${ICON.go}</button>
+    <button class="cta-set" data-act="qsetOpen">범위 · 문제 종류 고르기</button></div>
   ${RECORDED.size?`<button class="listen" data-act="listen"><span class="micon">${ICON.headset}</span><span><b>연속 듣기</b><small>${sel?esc(sel.short):'전체'} ${list.filter(v=>RECORDED.has(v.n)).length}구절을 차례로 들려줘요 · 화면을 꺼도 이어져요</small></span>${ICON.play}</button>`:''}
   ${boardView()}
   <div class="tabs" role="tablist" aria-label="시리즈">${tabs}</div>
@@ -1339,7 +1431,7 @@ function tourSlides(){
     {pic:`<div class="t-quiz"><div class="t-hearts">${ICON.heart}${ICON.heart}${ICON.heart.replace('class="heart"','class="heart off"')}</div><div class="t-timer"><i></i></div>
        <div class="t-chips"><span class="t-chip">${esc(v1.t)}</span><span class="t-chip pick">${esc(v2.t)}</span></div></div>`,
      h:'오늘의 도전',
-     p:'노란 버튼을 누르면 <b>10문제</b> 퀴즈가 시작돼요. 시간 안에 맞는 말씀이나 장절을 골라요. 하루에 게임 3번이면 <b>오늘의 목표</b> 달성, 매일 하면 <b>연속</b> 기록이 쌓여요.'},
+     p:'노란 버튼을 누르면 <b>10문제</b> 퀴즈가 시작돼요. 말씀, 주소, <b>제목</b>, <b>시리즈</b>를 맞혀요. 아래 <b>범위 · 문제 종류 고르기</b>에서 지금 외우는 구절만 골라 둘 수 있어요. 어려움부터는 직접 쓰는 문제도 나와요. 하루에 게임 3번이면 <b>오늘의 목표</b> 달성, 내가 한 것은 <b>내 기록</b>에서 볼 수 있어요.'},
     {pic:`<div class="t-avatars">${avatar(1,56)}<span class="arrow">→</span>${avatar(4,64)}<span class="arrow">→</span>${avatar(8,76)}</div>`,
      h:'XP를 모아 전신갑주를 입어요',
      p:'연습과 도전으로 XP를 얻으면 레벨이 오르고, 에베소서 6장의 <b>전신갑주</b>가 한 벌씩 입혀져요. 진리의 허리띠부터 성령의 검까지 다 갖추면 <b>말씀의 용사</b>!'}];
@@ -1408,7 +1500,7 @@ function verseView(v){
       <button class="btn ${st[0]&&!st[1]?'primary':''}" data-act="order">${st[1]?'다시 하기':'시작하기'}</button>
     </div>
     <div class="mode m3 ${st[2]?'done':''}">
-      <div class="mode-head"><span class="micon">${ICON.type}</span><div><b>직접 써보기</b><span class="d">${df.hint==='on'?'첫 글자 힌트를 보고':df.hint==='opt'?'힌트는 선택,':'힌트 없이'} 구절을 써요 · ${df.pass}% 이상 통과${best?` · 최고 ${best}%`:''}</span></div><span class="star ${st[2]?'on':''}"></span></div>
+      <div class="mode-head"><span class="micon">${ICON.type}</span><div><b>직접 써보기</b><span class="d">${df.hint==='on'?'첫 글자 힌트를 보고':df.hint==='opt'?'힌트는 선택,':'힌트 없이'} 구절을 써요${d>=4?' · 시리즈와 제목도':d>=3?' · 제목도 써요':''} · ${df.pass}% 이상 통과${best?` · 최고 ${best}%`:''}</span></div><span class="star ${st[2]?'on':''}"></span></div>
       <button class="btn ${st[1]&&!st[2]?'primary':''}" data-act="type">${st[2]?'다시 하기':'시작하기'}</button>
     </div>
   </section>
@@ -1424,15 +1516,27 @@ function verseView(v){
 // While solving, the reference is blanked by level: 쉬움 shows it all, 보통 hides the verse, 어려움 the
 // chapter and verse, 오직말씀 the book too. A hint button per hidden part reveals just that part.
 const REF_HIDE=[null,[],['v'],['c','v'],['b','c','v']];
-// 직접 써보기 hides the book from 보통 on: the book is picked from a list up to 보통 and typed from 어려움
-const REF_HIDE_TYPE=[null,[],['b','v'],['b','c','v'],['b','c','v']];
+// 직접 써보기 hides the book from 보통 on: the book is picked from a list up to 보통 and typed from 어려움.
+// The handout title (t) is written from 어려움 and the series (s) picked from 오직말씀, so they are
+// memorised along with the verse; the verse number on the handout is then the only cue.
+const REF_HIDE_TYPE=[null,[],['b','v'],['t','b','c','v'],['s','t','b','c','v']];
 const refHideSet=(type,d)=>(type==='type'?REF_HIDE_TYPE:REF_HIDE)[d];
-const REF_LABEL={b:'책',c:'장',v:'절'};
+const REF_LABEL={s:'시리즈',t:'제목',b:'책',c:'장',v:'절'};
 const refHidden=p=>!!G&&refHideSet(G.type,G.d).includes(p)&&!(G.refShow&&G.refShow.has(p))&&!G.res;
 const refText=v=>`${refHidden('b')?'□□':v.b} ${refHidden('c')?'?':v.c}장 ${refHidden('v')?'?':v.v}절`;
+const seriesLabel=s=>`${s.sheet} ${s.name}`;
+// a typed title counts when it is close enough: spaces, punctuation and the (2)-style numbers are ignored
+function similar(a,b){
+  a=[...norm(a)];b=[...norm(b)];if(!a.length||!b.length)return 0;
+  let prev=new Array(b.length+1).fill(0);
+  for(let i=1;i<=a.length;i++){const cur=[0];for(let j=1;j<=b.length;j++)cur[j]=a[i-1]===b[j-1]?prev[j-1]+1:Math.max(prev[j],cur[j-1]);prev=cur}
+  return 2*prev[b.length]/(a.length+b.length);
+}
+const titleOk=(input,v)=>similar(input,v.t)>=.85;
 function gref(v){
-  const df=DIFF[G.d],hid=['b','c','v'].filter(refHidden);
-  return `<div class="gref"><small>${esc(head(v))}<span class="dchip">${df.name}</span></small><b>${esc(v.t)}</b>
+  const df=DIFF[G.d],hid=['s','t','b','c','v'].filter(refHidden);
+  const hd=refHidden('s')?`${v.n}번 구절 · 시리즈 ?`:head(v);
+  return `<div class="gref"><small>${esc(hd)}<span class="dchip">${df.name}</span></small><b>${refHidden('t')?'<span class="qmark">제목은?</span>':esc(v.t)}</b>
     <span class="refline">${esc(refText(v))}${hid.length?`<span class="refhints">${hid.map(p=>`<button class="hintchip" data-act="refShow" data-p="${p}">${REF_LABEL[p]} 힌트</button>`).join('')}</span>`:''}</span></div>`;
 }
 // hearts grow with the verse: 3 for a short one, one more per ten words (갈 2:20's 45 words → 7),
@@ -1484,7 +1588,7 @@ function wrapResult(n,starIdx,before,lvBefore,base){
 // the heart that was just lost breaks on the next render, then stays grey
 function loseHeart(){G.justLost=true;const g=G;setTimeout(()=>{if(G===g)G.justLost=false},700)}
 function failResult(xp){
-  const lvB=lvl().L;recordGame(xp);
+  const lvB=lvl().L;recordGame(xp,{k:G.type==='order'?'o':'b',n:G.n,d:G.d,p:0,s:G.mistakes});
   G.result={pass:false,title:'아쉬워요',msg:'기회를 모두 썼어요. 구절을 한 번 더 읽고 다시 도전해 봐요.',xp,levelUp:lvl().L>lvB,
     actions:btns([['다시 하기','retry','primary'],['구절 다시 읽기','toVerse','ghost']])};
   render();
@@ -1533,7 +1637,7 @@ function onChip(i){
 }
 function finishBlank(){
   const n=G.n,d=G.d,x=vs(n),before=stars(n),lvB=lvl().L,perfect=G.mistakes===0,xp=Math.round(20*DIFF[d].mult)+(perfect?10:0);
-  x.b[d-1]=1;x.last=Date.now();recordGame(xp);
+  x.b[d-1]=1;x.last=Date.now();recordGame(xp,{k:'b',n,d,p:1,s:G.mistakes});
   G.result=wrapResult(n,0,before,lvB,{pass:true,title:perfect?'완벽해요!':'통과!',msg:`빈칸 채우기(${DIFF[d].name})를 마쳤어요${perfect?' · 실수 없이 성공':''}.`,xp,
     actions:btns([['순서 맞추기 도전','order','primary',`data-n="${n}"`],['다시 하기','retry'],...nextBtn(n),['구절로 돌아가기','toVerse','ghost']])});
   render();celebrate();sfx('win');
@@ -1574,14 +1678,14 @@ function onPiece(id){
 }
 function finishOrder(){
   const n=G.n,d=G.d,x=vs(n),before=stars(n),lvB=lvl().L,perfect=G.mistakes===0,xp=Math.round(25*DIFF[d].mult)+(perfect?10:0);
-  x.o[d-1]=1;x.last=Date.now();recordGame(xp);
+  x.o[d-1]=1;x.last=Date.now();recordGame(xp,{k:'o',n,d,p:1,s:G.mistakes});
   G.result=wrapResult(n,1,before,lvB,{pass:true,title:perfect?'완벽해요!':'통과!',msg:`말씀 조각을 모두 맞췄어요${perfect?' · 실수 없이 성공':''}.`,xp,
     actions:btns([['직접 써보기 도전','type','primary',`data-n="${n}"`],['다시 하기','retry'],...nextBtn(n),['구절로 돌아가기','toVerse','ghost']])});
   render();celebrate();sfx('win');
 }
 
 /* ---------- 직접 써보기 ---------- */
-function startType(n){G={type:'type',n,d:S.diff,hint:DIFF[S.diff].hint==='on',input:'',res:null,passed:false,recorded:false,result:null,refShow:new Set(),refB:'',refC:'',refV:'',refV2:''};go({name:'type',n})}
+function startType(n){G={type:'type',n,d:S.diff,hint:DIFF[S.diff].hint==='on',input:'',res:null,passed:false,recorded:false,result:null,refShow:new Set(),refS:'',refT:'',refB:'',refC:'',refV:'',refV2:''};go({name:'type',n})}
 const BOOKS=[...new Set(VERSES.map(v=>v.b))];
 // a typed book name counts with or without spaces, and by its usual short form (고후, 롬, 벧전 …)
 const BOOK_ABBR={고린도후서:'고후',갈라디아서:'갈',요한복음:'요',골로새서:'골',사도행전:'행',이사야:'사',창세기:'창',욥기:'욥',출애굽기:'출',누가복음:'눅',베드로전서:'벧전',데살로니가전서:'살전',로마서:'롬'};
@@ -1614,13 +1718,15 @@ function gradeHtml(r){
   return out;
 }
 function typeView(){
-  const v=byN(G.n),t=toks(v),r=G.res,df=DIFF[G.d],pass=df.pass;
+  const v=byN(G.n),t=toks(v),r=G.res,df=DIFF[G.d],pass=df.pass,hs=refHideSet('type',G.d);
   const hint=t.map(x=>vnHtml(x)+`<span class="ini">${esc([...norm(x.w)||x.w][0])}</span>`).join(' ');
   return `<div class="gtop">${gref(v)}</div>
   ${df.hint==='none'?'':`<div class="hintbox ${G.hint?'':'off'}" aria-label="첫 글자 힌트">${G.hint?hint:'힌트를 껐어요. 힌트 없이 통과하면 보너스 XP를 받아요.'}</div>`}
   <label class="lbl" for="typeBox">기억나는 대로 구절을 써 보세요. 띄어쓰기와 문장부호는 채점하지 않아요.</label>
   <textarea id="typeBox" rows="6" lang="ko" maxlength="600" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="여기에 구절을 써 보세요">${esc(G.input)}</textarea>
-  <div class="refrow"><span class="lbl" id="refLbl">어느 책 몇 장 몇 절인지도 써 보세요. ${refHideSet('type',G.d).length?'위에서 가려진 부분을 힌트 없이 맞히면 보너스 XP':'이 난이도에서는 위에 다 보여서 보너스는 없어요'}</span>
+  <div class="refrow"><span class="lbl" id="refLbl">${hs.includes('t')?'제목과 ':''}어느 책 몇 장 몇 절인지도 써 보세요. ${hs.length?'위에서 가려진 부분을 힌트 없이 맞히면 보너스 XP':'이 난이도에서는 위에 다 보여서 보너스는 없어요'}</span>
+    ${hs.includes('s')?`<select id="refS" class="refin" aria-label="시리즈"><option value="">시리즈 고르기</option>${SERIES.map(s=>`<option value="${s.id}" ${G.refS===s.id?'selected':''}>${esc(seriesLabel(s))}</option>`).join('')}</select>`:''}
+    ${hs.includes('t')?`<input id="refT" class="refin" lang="ko" maxlength="60" autocomplete="off" autocorrect="off" spellcheck="false" value="${esc(G.refT||'')}" placeholder="말씀 제목 (예: 오직 예수)" aria-label="말씀 제목">`:''}
     <!-- the book: a list up to 보통, typed from 어려움; three number boxes, because a phone's number pad has no ":" or space -->
     <div class="refnums" role="group" aria-labelledby="refLbl">
       ${G.d<=2?`<select id="refB" class="refin refbook" aria-label="책"><option value="">책 고르기</option>${BOOKS.map(b=>`<option ${G.refB===b?'selected':''}>${esc(b)}</option>`).join('')}</select>`
@@ -1638,139 +1744,322 @@ function typeView(){
     <p class="tiny">${r.score>=pass?`통과 기준 ${pass}%를 넘었어요.`:`${pass}% 이상이면 통과예요.`} 빠진 글자 ${r.missed}개 · 더 쓴 글자 ${r.extra}개</p>
     <p class="verse" style="font-size:18px">${gradeHtml(r)}</p>
     <p class="tiny">밑줄 친 부분이 빠졌거나 틀린 곳이에요.</p>
-    <p class="tiny refres ${r.ref.all?'ok':'no'}">${['b','c','v'].map(p=>`${REF_LABEL[p]} ${r.ref.ok[p]?'✓':'✗'}`).join(' · ')} · 정답은 <b>${ref(v)}</b>${r.ref.bonus?` · 보너스 +${r.ref.bonus} XP`:r.ref.all&&r.ref.hidden.length?' · 힌트를 써서 보너스는 없어요':''}</p>
+    <p class="tiny refres ${r.ref.all?'ok':'no'}">${r.ref.asked.map(p=>`${REF_LABEL[p]} ${r.ref.ok[p]?'✓':'✗'}`).join(' · ')} · 정답은 <b>${ref(v)}</b>${r.ref.bonus?` · 보너스 +${r.ref.bonus} XP`:r.ref.all&&r.ref.hidden.length?' · 힌트를 써서 보너스는 없어요':''}</p>
+    ${r.ref.asked.includes('t')||r.ref.asked.includes('s')?`<p class="tiny refres">${r.ref.asked.includes('s')?`시리즈 <b>${esc(seriesLabel(seriesOf(v.s)))}</b> · `:''}제목 <b>${esc(v.t)}</b></p>`:''}
     <div class="row"><button class="btn" data-act="clearType">처음부터 다시 쓰기</button></div>
   </section>`:''}`;
 }
 // Book, chapter and verse are scored one by one. A part earns its bonus only when this level hid it
-// and no hint was used for it (책 3 · 장 3 · 절 4, +5 when all three are right with no hint), × the level's XP multiplier.
+// and no hint was used for it (시리즈 2 · 제목 5 · 책 3 · 장 3 · 절 4, +5 when all are right with no hint), × the level's XP multiplier.
+// The title and series are asked only at the levels that hide them.
 function refScore(v,d,df){
-  const ok={b:normBook(G.refB)===v.b,c:G.refC!==''&&+G.refC===v.c,v:G.refV!==''&&[G.refV,G.refV2].filter(Boolean).map(Number).join('-')===String(v.v)};
-  const hidden=refHideSet('type',d),earned=p=>hidden.includes(p)&&!G.refShow.has(p)&&ok[p];
-  let bonus=({b:3,c:3,v:4}),sum=['b','c','v'].filter(earned).reduce((a,p)=>a+bonus[p],0);
-  const all=ok.b&&ok.c&&ok.v;
+  const hidden=refHideSet('type',d),asked=['s','t','b','c','v'].filter(p=>'bcv'.includes(p)||hidden.includes(p));
+  const ok={s:G.refS===v.s,t:titleOk(G.refT||'',v),b:normBook(G.refB)===v.b,c:G.refC!==''&&+G.refC===v.c,v:G.refV!==''&&[G.refV,G.refV2].filter(Boolean).map(Number).join('-')===String(v.v)};
+  const earned=p=>hidden.includes(p)&&!G.refShow.has(p)&&ok[p];
+  let bonus=({s:2,t:5,b:3,c:3,v:4}),sum=asked.filter(earned).reduce((a,p)=>a+bonus[p],0);
+  const all=asked.every(p=>ok[p]);
   if(all&&hidden.length&&hidden.every(p=>!G.refShow.has(p)))sum+=5;
-  return {ok,all,hidden,bonus:Math.round(sum*df.mult)};
+  return {ok,all,asked,hidden,bonus:Math.round(sum*df.mult)};
 }
 function check(){
   const box=$('#typeBox');G.input=box?box.value:G.input;
   for(const k of ['refC','refV','refV2']){const el=$('#'+k);if(el)G[k]=el.value.replace(/\D/g,'')}
-  {const el=$('#refB');if(el)G.refB=el.value}
+  for(const k of ['refB','refS','refT']){const el=$('#'+k);if(el)G[k]=el.value}
   if(!G.input.trim()){flash('#typeBox','shake');return}
   const n=G.n,d=G.d,df=DIFF[d],v=byN(n),x=vs(n),before=stars(n),lvB=lvl().L;
   G.res=grade(v,G.input);G.res.ref=refScore(v,d,df);
   if(G.res.score>(x.t[d-1]||0))x.t[d-1]=G.res.score;x.last=Date.now();
   if(G.res.score>=df.pass&&!G.passed){
     G.passed=true;G.recorded=true;
-    const rs=G.res.ref,xp=Math.round(40*df.mult)+(df.hint==='opt'&&!G.hint?15:0)+rs.bonus;recordGame(xp);
+    const rs=G.res.ref,xp=Math.round(40*df.mult)+(df.hint==='opt'&&!G.hint?15:0)+rs.bonus;recordGame(xp,{k:'w',n,d,p:1,s:G.res.score});
     const idx=VERSES.indexOf(v),next=VERSES[idx+1];
-    G.result=wrapResult(n,2,before,lvB,{pass:true,title:G.res.score===100?'한 글자도 틀리지 않았어요!':'통과!',msg:`정확도 ${G.res.score}%${G.hint?'':' · 힌트 없이 성공'}${rs.all?` · 책·장·절도 정답${rs.bonus?` (+${rs.bonus} XP)`:''}`:` · 정답은 ${ref(v)}`}.`,xp,
+    G.result=wrapResult(n,2,before,lvB,{pass:true,title:G.res.score===100?'한 글자도 틀리지 않았어요!':'통과!',msg:`정확도 ${G.res.score}%${G.hint?'':' · 힌트 없이 성공'}${rs.all?` · ${rs.asked.map(p=>REF_LABEL[p]).join('·')}도 정답${rs.bonus?` (+${rs.bonus} XP)`:''}`:` · 정답은 ${ref(v)}`}.`,xp,
       actions:btns([...(next?[[`다음 구절 · ${next.n}번`,'open','primary',`data-n="${next.n}"`]]:[]),['결과 자세히 보기','closeSheet'],['구절로 돌아가기','toVerse','ghost']])});
     render();celebrate();sfx('win');
   }else{
-    if(!G.recorded){G.recorded=true;recordGame(3)}else save();
+    // the first try that doesn't pass goes in 내 기록; later tries only raise its best score
+    if(!G.recorded){G.recorded=true;recordGame(3,{k:'w',n,d,p:0,s:G.res.score});G.logT=S.log[0]&&S.log[0].t}
+    else{const e=S.log.find(e=>e.t===G.logT);if(e)e.s=Math.max(e.s,G.res.score);save()}
     render();sfx(G.res.score>=df.pass?'ok':'bad');
     const gEl=$('#grade');if(gEl)gEl.scrollIntoView({behavior:reduceMotion()?'auto':'smooth',block:'start'});
   }
 }
 
 /* ---------- 오늘의 도전 (퀴즈) ---------- */
-const others=(v,k)=>pick(VERSES.filter(x=>x.n!==v.n),k);
+// The verses a 도전 asks about: the ones the player picked (S.qset), else the series tab on the home page.
+// Church feedback: people learn 6-7 verses at a time, so a whole series asks about verses not learned yet
+// and leaves out the ones learned earlier from another series.
+const qPool=()=>S.qset?S.qset.map(byN).filter(Boolean):filtered();
+// "1–7, 9, 12–14번" for a set of verse numbers
+function rangeText(ns){
+  const out=[];let a=null,b=null;
+  const push=()=>{if(a!==null)out.push(a===b?a:`${a}–${b}`)};
+  ns.slice().sort((x,y)=>x-y).forEach(n=>{if(b!==null&&n===b+1)b=n;else{push();a=b=n}});
+  push();return out.join(', ')+'번';
+}
+function scopeText(){
+  if(!S.qset){const sel=S.series==='all'?null:seriesOf(S.series);return sel?sel.short:'전체 구절'}
+  if(S.qset.length===VERSES.length)return '전체 구절';
+  const s=SERIES.find(s=>{const ns=VERSES.filter(v=>v.s===s.id).map(v=>v.n);return ns.length===S.qset.length&&ns.every(n=>S.qset.includes(n))});
+  return s?s.short:rangeText(S.qset);
+}
+// what the 10 questions ask: the verse itself, its handout title and series, or both
+const QMODE={verse:{name:'말씀',desc:'빈칸 · 이어지는 말씀 · 말씀 주소'},name:{name:'제목·시리즈',desc:'말씀의 제목 · 시리즈 이름 · 제목의 주소'},mix:{name:'섞어서',desc:'말씀과 제목·시리즈를 골고루'}};
+const QKINDS={verse:['ref','word','next','title','word','ref','next','word','title','ref'],
+  name:['vtitle','rtitle','series','vtitle','rtitle','series','vtitle','rtitle','title','vtitle'],
+  mix:['ref','word','next','title','vtitle','rtitle','series','word','vtitle','ref']};
+const TYPEABLE=['ref','title','word','vtitle','rtitle'];
+// How hard each level makes the 도전: near — where the wrong choices come from (0 any book · 1 the same
+// series · 2 the same book first, so 사도행전 asks between 사도행전 addresses); typed — how many of the
+// 10 are answered by writing instead of picking (the book from a list at 어려움, written at 오직말씀)
+const QD=[null,
+  {near:0,typed:0,desc:'보기는 여러 성경에서'},
+  {near:1,typed:0,desc:'보기는 같은 시리즈에서'},
+  {near:2,typed:3,desc:'보기는 같은 성경 안에서 · 3문제는 직접 쓰기'},
+  {near:2,typed:6,desc:'같은 성경 보기 · 6문제는 직접 쓰기 (책 이름도)'}];
+// wrong choices for v: the same book first (어려움+), then the same series (보통+), then anywhere
+function near(v,k,d){
+  const lv=QD[d].near,rest=VERSES.filter(x=>x.n!==v.n),out=[];
+  for(const tier of [lv>=2?rest.filter(x=>x.b===v.b):[],lv>=1?rest.filter(x=>x.s===v.s):[],rest])
+    for(const x of shuffle(tier))if(out.length<k&&!out.includes(x))out.push(x);
+  return out;
+}
 function halves(v){const w=toks(v).map(x=>x.w),h=Math.ceil(w.length/2);return {a:w.slice(0,h).join(' '),b:w.slice(h).join(' ')}}
-// every question shows the heading, title and chapter:verse as context, but never the small verse
-// numbers inside the text (they alone gave the answer away)
-function makeQ(v,kind){
-  const sup=()=>'';
+// every question about the verse text shows the heading and title as context, but never the small verse
+// numbers inside the text (they alone gave the answer away). Questions about the title hide the title.
+function makeQ(v,kind,d,typed){
   const sub=headHtml(v,'q-head')+`<div class="q-sub">${sref(v)}</div>`;
-  // no verse-number superscripts here: they would give the answer away
-  if(kind==='ref')return {n:v.n,label:'이 말씀은 어디에 있을까요?',sub:headHtml(v,'q-head'),body:`<p class="verse q-verse">${v.p.map(([,txt])=>esc(txt)).join(' ')}</p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)};
-  // the title alone was too hard to place, so the first few words of the verse come along as a hint
+  const plain=`<p class="verse q-verse">${v.p.map(([,txt])=>esc(txt)).join(' ')}</p>`;
+  const seriesHead=`<div class="vhead q-head"><small>${esc(head(v))}</small></div>`;
+  // the address: four choices, or written in book · 장 · 절 boxes
+  const refQ=(label,sub,body)=>({n:v.n,kind,label,sub,body,typed:typed?'ref':null,answer:sref(v),
+    opts:typed?null:shuffle([v,...near(v,3,d)]).map(x=>({label:sref(x),ok:x===v}))});
+  // the handout title: four titles to choose from, or written
+  const titleQ=(label,sub,body)=>({n:v.n,kind,label,sub,body,typed:typed?'title':null,answer:v.t,
+    opts:typed?null:shuffle([v,...near(v,3,d)]).map(x=>({label:x.t,ok:x===v}))});
+  if(kind==='ref')return refQ(typed?'이 말씀의 주소를 써 보세요':'이 말씀은 어디에 있을까요?',headHtml(v,'q-head'),plain);
+  // the title alone was too hard to place, so up to 보통 the first few words of the verse come along as a hint
   if(kind==='title'){const w=toks(v).map(x=>x.w),k=Math.min(w.length-1,Math.max(3,Math.round(w.length/4)));
-    return {n:v.n,label:'이 제목의 암송 구절은?',body:`<p class="tiny">${esc(head(v))}</p><p class="q-title">${esc(v.t)}</p><p class="q-hint"><small>말씀 첫머리</small><span class="verse">${esc(w.slice(0,k).join(' '))} …</span></p>`,opts:shuffle([v,...others(v,3)]).map(x=>({label:sref(x),ok:x===v})),answer:sref(v)}}
+    return refQ(typed?'이 제목의 말씀 주소를 써 보세요':'이 제목의 암송 구절은?','',`<p class="tiny">${esc(head(v))}</p><p class="q-title">${esc(v.t)}</p>${d<=2?`<p class="q-hint"><small>말씀 첫머리</small><span class="verse">${esc(w.slice(0,k).join(' '))} …</span></p>`:''}`)}
+  if(kind==='vtitle')return titleQ(typed?'이 말씀의 제목을 써 보세요':'이 말씀의 제목은?',seriesHead+(d<=2?`<div class="q-sub">${sref(v)}</div>`:''),plain);
+  if(kind==='rtitle')return titleQ(typed?'이 주소의 말씀 제목을 써 보세요':'이 주소의 말씀 제목은?',seriesHead,`<p class="q-title">${esc(ref(v))}</p>`);
+  if(kind==='series')return {n:v.n,kind,label:'이 말씀은 어느 시리즈일까요?',body:`<p class="q-title">${esc(v.t)}</p>${d<=1?`<div class="q-sub">${v.n}번 구절</div>`:''}`,
+    opts:SERIES.map(s=>({label:seriesLabel(s),ok:s.id===v.s})),answer:seriesLabel(seriesOf(v.s))};
   if(kind==='word'){
     // the blank is one of the verse's key words (any word only when a verse has none listed)
     const t=toks(v),cand=t.map((x,i)=>i).filter(i=>norm(t[i].w).length>=2&&!awk(t[i].w)),keys=keyIdx(v,t).filter(i=>cand.includes(i)),from=keys.length?keys:cand,bi=from[Math.floor(Math.random()*from.length)],ans=norm(t[bi].w);
     const own=new Set(t.map(x=>norm(x.w)));
-    let dp=[...new Set(VERSES.flatMap(x=>toks(x).map(y=>norm(y.w))))].filter(w=>!own.has(w)&&w.length>=2&&!awk(w));
-    const near=dp.filter(w=>Math.abs(w.length-ans.length)<=1);if(near.length>=3)dp=near;
-    const verse=slot=>`<p class="verse q-verse">${t.map((x,i)=>(x.vn?sup(x.vn):'')+(i===bi?slot:esc(x.w))).join(' ')}</p>`;
+    const words=vv=>[...new Set(vv.flatMap(x=>toks(x).map(y=>norm(y.w))))].filter(w=>!own.has(w)&&w.length>=2&&!awk(w));
+    // from 보통 the wrong words come from the neighbouring verses, so they sound like they belong
+    let dp=QD[d].near?words(near(v,6,d)):[];if(dp.length<6)dp=words(VERSES);
+    const close=dp.filter(w=>Math.abs(w.length-ans.length)<=1);if(close.length>=3)dp=close;
+    const verse=slot=>`<p class="verse q-verse">${t.map((x,i)=>i===bi?slot:esc(x.w)).join(' ')}</p>`;
     // once answered, right or wrong, the blank shows the word that belongs there
-    return {n:v.n,label:'빈칸에 들어갈 말은?',sub,body:verse(`<span class="slot cur" style="--len:${ans.length}"></span>`),done:verse(`<span class="slot filled just">${esc(t[bi].w)}</span>`),opts:shuffle([{label:ans,ok:true},...pick(dp,3).map(w=>({label:w,ok:false}))]),answer:ans};
+    return {n:v.n,kind,label:typed?'빈칸에 들어갈 말을 써 보세요':'빈칸에 들어갈 말은?',sub,typed:typed?'word':null,body:verse(`<span class="slot cur" style="--len:${ans.length}"></span>`),done:verse(`<span class="slot filled just">${esc(t[bi].w)}</span>`),
+      opts:typed?null:shuffle([{label:ans,ok:true},...pick(dp,3).map(w=>({label:w,ok:false}))]),answer:ans};
   }
   const me=halves(v);
-  return {n:v.n,label:'이어지는 말씀은?',sub,body:`<p class="verse q-verse">${esc(me.a)} …</p>`,opts:shuffle([{label:me.b,ok:true},...others(v,3).map(x=>({label:halves(x).b,ok:false}))]),answer:me.b};
+  return {n:v.n,kind,label:'이어지는 말씀은?',sub,body:`<p class="verse q-verse">${esc(me.a)} …</p>`,opts:shuffle([{label:me.b,ok:true},...near(v,3,d).map(x=>({label:halves(x).b,ok:false}))]),answer:me.b};
 }
 function startQuiz(){
-  const d=S.diff,df=DIFF[d];
-  const pool=filtered().map(v=>({v,k:starCount(v.n)+Math.random()*1.6})).sort((a,b)=>a.k-b.k).map(o=>o.v);
+  const d=S.diff,df=DIFF[d],src=qPool();
+  if(!src.length){go({name:'qset'});return}
+  const pool=src.map(v=>({v,k:starCount(v.n)+Math.random()*1.6})).sort((a,b)=>a.k-b.k).map(o=>o.v);
   const chosen=[];for(let i=0;i<10;i++)chosen.push(pool[i%pool.length]);
-  const kinds=shuffle(['ref','word','next','title','word','ref','next','word','title','next']);
-  G={type:'quiz',d,qt:df.qt,qs:shuffle(chosen).map((v,i)=>makeQ(v,kinds[i])),qi:0,score:0,combo:0,maxCombo:0,correct:0,missed:new Set(),answered:null,left:1,result:null};
+  const kinds=shuffle(QKINDS[S.qmode]||QKINDS.mix),order=shuffle(chosen);
+  const typed=new Set(shuffle(kinds.map((k,i)=>i).filter(i=>TYPEABLE.includes(kinds[i]))).slice(0,QD[d].typed));
+  G={type:'quiz',d,qt:df.qt,qs:order.map((v,i)=>makeQ(v,kinds[i],d,typed.has(i))),qi:0,score:0,combo:0,maxCombo:0,correct:0,missed:new Set(),answered:null,left:1,result:null,typed:{},
+    scope:`${scopeText()} · ${QMODE[S.qmode].name}`};
   ui.qdiffAsk=null;
-  go({name:'quiz'});startTimer();
+  go({name:'quiz'});startTimer();focusTyped();
 }
+// a written answer's box takes the keyboard right away (the book list and number boxes are tapped)
+function focusTyped(){const q=G&&G.qs&&G.qs[G.qi];if(q&&(q.typed==='word'||q.typed==='title')){const f=$('#qaW')||$('#qaT');if(f)f.focus({preventScroll:true})}}
 // the quiz's own difficulty switch: before the first answer it restarts at once, later it asks first
 // (switching starts the 10 questions over)
 function qdiffView(){
   const ask=ui.qdiffAsk;
   return `<div class="seg qseg" aria-label="난이도">${[1,2,3,4].map(i=>`<button class="d${i}" aria-pressed="${G.d===i}" data-act="qdiff" data-d="${i}">${DIFF[i].name}</button>`).join('')}</div>
   ${ask?`<div class="qask"><span><b>${DIFF[ask].name}</b>으로 바꾸면 처음부터 다시 해요</span><button class="btn small primary" data-act="qdiffYes">바꾸기</button><button class="btn small ghost" data-act="qdiffNo">취소</button></div>`
-    :`<p class="tiny qdesc">${DIFF[G.d].desc} · XP ×${DIFF[G.d].mult}</p>`}`;
+    :`<p class="tiny qdesc">${esc(G.scope)} · ${QD[G.d].desc} · XP ×${DIFF[G.d].mult}</p>`}`;
+}
+// the boxes for a written answer: the address (book · 장 · 절), one word, or the title
+function typedForm(q,a){
+  const val=k=>esc((G.typed||{})[k]||''),dis=a?'disabled':'';
+  if(q.typed==='ref')return `<div class="qtype refrow">
+    <div class="refnums">${G.d<=3?`<select id="qaB" class="refin refbook" aria-label="책" ${dis}><option value="">책 고르기</option>${BOOKS.map(b=>`<option ${G.typed.qaB===b?'selected':''}>${esc(b)}</option>`).join('')}</select>`
+      :`<input id="qaB" class="refin refbook" lang="ko" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false" value="${val('qaB')}" placeholder="책 이름 (예: 롬)" aria-label="책 이름" ${dis}>`}</div>
+    <div class="refnums"><input id="qaC" class="refin" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="${val('qaC')}" aria-label="장" ${dis}><span>장</span>
+      <input id="qaV" class="refin" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="${val('qaV')}" aria-label="절" ${dis}><span>절</span>
+      <span class="refto">~</span><input id="qaV2" class="refin" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="${val('qaV2')}" placeholder="끝" aria-label="끝 절 (여러 절일 때만)" ${dis}><span>절</span></div>
+    ${a?'':`<button class="btn primary" data-act="qaSubmit">확인</button>`}</div>`;
+  const id=q.typed==='word'?'qaW':'qaT';
+  return `<div class="qtype refrow"><input id="${id}" class="refin" lang="ko" maxlength="60" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="${val(id)}" placeholder="${q.typed==='word'?'빈칸에 들어갈 말':'말씀 제목'}" aria-label="${q.typed==='word'?'빈칸에 들어갈 말':'말씀 제목'}" ${dis}>
+    ${a?'':`<button class="btn primary" data-act="qaSubmit">확인</button>`}</div>`;
 }
 function quizView(){
   const q=G.qs[G.qi],a=G.answered;
-  return `${qdiffView()}<div class="qtop"><span class="qcount">${G.qi+1} / ${G.qs.length}</span>${G.combo>=2?`<span class="combo">${G.combo}연속!${G.combo>=3?' ×1.5':''}</span>`:''}<span class="qscore">${G.score.toLocaleString()}점</span></div>
+  return `${qdiffView()}<div class="qtop"><span class="qcount">${G.qi+1} / ${G.qs.length}${q.typed?' · <b class="qtag">직접 쓰기</b>':''}</span>${G.combo>=2?`<span class="combo">${G.combo}연속!${G.combo>=3?' ×1.5':''}</span>`:''}<span class="qscore">${G.score.toLocaleString()}점</span></div>
   <div class="timer" aria-hidden="true"><i id="tbar" class="${G.left<.25?'low':''}" style="width:${G.left*100}%"></i></div>
   <section class="qcard"><div class="q-label">${q.label}</div>${q.sub||''}${a&&q.done?q.done:q.body}</section>
-  <div class="opts">${q.opts.map((o,i)=>`<button class="opt ${a?(o.ok?'right':(a.i===i?'wrong':'dim')):''}" data-act="ans" data-i="${i}" ${a?'disabled':''}>${esc(o.label)}</button>`).join('')}</div>
-  ${a?`<div id="reveal" class="feedback ${a.ok?'good':'bad'}" aria-live="polite"><span>${a.ok?`정답! +${a.pts}점`:(a.i<0?'시간이 다 됐어요':'아쉬워요')}</span><small>${a.ok?'전체 구절을 한 번 읽고 넘어가요':'정답 구절을 읽어 보세요'}</small></div>
+  ${q.typed?typedForm(q,a):`<div class="opts">${q.opts.map((o,i)=>`<button class="opt ${a?(o.ok?'right':(a.i===i?'wrong':'dim')):''}" data-act="ans" data-i="${i}" ${a?'disabled':''}>${esc(o.label)}</button>`).join('')}</div>`}
+  ${a?`<div id="reveal" class="feedback ${a.ok?'good':'bad'}" aria-live="polite"><span>${a.ok?`정답! +${a.pts}점`:(a.i===-1&&!a.mine?'시간이 다 됐어요':'아쉬워요')}</span><small>${a.ok?'전체 구절을 한 번 읽고 넘어가요':'정답 구절을 읽어 보세요'}</small></div>
+  ${q.typed||q.kind==='vtitle'||q.kind==='rtitle'||q.kind==='series'?`<p class="tiny qans">${q.typed?`내 답: ${esc(a.mine||'(비어 있음)')} · `:''}정답: <b>${esc(q.answer)}</b></p>`:''}
   ${verseCard(byN(q.n))}
   <button class="btn primary" data-act="nextQ">${G.qi+1<G.qs.length?'다음 문제':'결과 보기'}</button>`:''}`;
 }
 function startTimer(){
   clearTimers();G.t0=performance.now();G.left=1;
+  // writing takes longer than tapping, so a written answer gets half as much time again
+  const q=G.qs[G.qi],qt=G.qt*(q&&q.typed?1.5:1);
   const id=setInterval(()=>{
     if(!G||G.type!=='quiz')return clearTimers();
-    G.left=Math.max(0,1-(performance.now()-G.t0)/G.qt);
+    G.left=Math.max(0,1-(performance.now()-G.t0)/qt);
     const el=document.getElementById('tbar');
     if(el){el.style.width=(G.left*100)+'%';el.classList.toggle('low',G.left<.25)}
-    if(G.left<=0)answer(-1);
+    if(G.left<=0){const cq=G.qs[G.qi];cq.typed?answerTyped(true):answer(-1)}
   },100);
   timers.push(()=>clearInterval(id));
 }
 function answer(i){
   if(!G||G.type!=='quiz'||G.answered)return;
+  const q=G.qs[G.qi];
+  settle(i>=0&&!q.typed&&q.opts[i].ok,i,'');
+}
+// a written answer: the address must match in book (by name or short form), chapter and verse; the word
+// exactly (spaces and punctuation aside); the title closely enough. timeUp grades whatever is written.
+function answerTyped(timeUp){
+  if(!G||G.type!=='quiz'||G.answered)return;
+  const q=G.qs[G.qi];if(!q.typed)return;
+  for(const k of ['qaB','qaC','qaV','qaV2','qaW','qaT']){const el=$('#'+k);if(el)G.typed[k]=k==='qaB'||k==='qaW'||k==='qaT'?el.value:el.value.replace(/\D/g,'')}
+  const a=G.typed,v=byN(q.n);let ok=false,mine='';
+  if(q.typed==='ref'){
+    if(!timeUp&&!a.qaB&&!a.qaC){flash('.qtype','shake');return}
+    const vv=[a.qaV,a.qaV2].filter(Boolean);
+    ok=normBook(a.qaB)===v.b&&+a.qaC===v.c&&vv.map(Number).join('-')===String(v.v);
+    mine=a.qaB||a.qaC||vv.length?`${a.qaB||'?'} ${a.qaC||'?'}:${vv.join('-')||'?'}`:'';
+  }else{
+    const s=(q.typed==='word'?a.qaW:a.qaT)||'';
+    if(!timeUp&&!norm(s)){flash('.qtype','shake');return}
+    ok=q.typed==='word'?norm(s)===q.answer:titleOk(s,v);mine=s.trim();
+  }
+  settle(ok,timeUp?-1:-2,mine);
+}
+function settle(ok,i,mine){
   clearTimers();
-  const q=G.qs[G.qi],ok=i>=0&&q.opts[i].ok;let pts=0;
-  if(ok){G.combo++;G.maxCombo=Math.max(G.maxCombo,G.combo);G.correct++;pts=Math.round((100+G.left*DIFF[G.d].qb)*(G.combo>=3?1.5:1));G.score+=pts;sfx('ok')}
+  const q=G.qs[G.qi];let pts=0;
+  // a written answer is worth half again as much as a tapped one
+  if(ok){G.combo++;G.maxCombo=Math.max(G.maxCombo,G.combo);G.correct++;pts=Math.round((100+G.left*DIFF[G.d].qb)*(G.combo>=3?1.5:1)*(q.typed?1.5:1));G.score+=pts;sfx('ok')}
   else{G.combo=0;G.missed.add(q.n);sfx('bad');buzz()}
   // right or wrong, the whole verse is shown and the player moves on with the 다음 문제 button
-  G.answered={i,ok,pts};render();
+  G.answered={i,ok,pts,mine};render();
   // bring the verse and the button into view while keeping the answered options above them
   const nb=$('[data-act="nextQ"]');if(nb)nb.scrollIntoView({behavior:reduceMotion()?'auto':'smooth',block:'nearest'});
 }
 function nextQ(){
   clearTimers();
   if(G.qi+1>=G.qs.length)return finishQuiz();
-  G.qi++;G.answered=null;render();startTimer();
+  G.qi++;G.answered=null;G.typed={};render();startTimer();focusTyped();
 }
 function finishQuiz(){
-  const lvB=lvl().L,xp=Math.max(5,Math.round(G.score/20*DIFF[G.d].mult));recordGame(xp);
-  const good=G.correct>=8;
+  const lvB=lvl().L,xp=Math.max(5,Math.round(G.score/20*DIFF[G.d].mult)),good=G.correct>=8;
+  recordGame(xp,{k:'q',n:0,d:G.d,p:good?1:0,s:G.correct,m:[...G.missed],z:G.scope});
   const miss=[...G.missed].map(byN);
-  G.result={pass:good,title:G.correct===10?'만점이에요!':good?'잘했어요!':'좋은 연습이었어요',msg:`10문제 중 ${G.correct}문제를 맞혔어요.`,xp,levelUp:lvl().L>lvB,
+  G.result={pass:good,title:G.correct===10?'만점이에요!':good?'잘했어요!':'좋은 연습이었어요',msg:`${esc(G.scope)} · 10문제 중 ${G.correct}문제를 맞혔어요.`,xp,levelUp:lvl().L>lvB,
     extra:`<div class="r-stats"><div><b>${G.score.toLocaleString()}</b><span>점수</span></div><div><b>${G.correct}/10</b><span>정답</span></div><div><b>${G.maxCombo}</b><span>최고 연속</span></div></div>
     ${miss.length?`<p>다시 볼 구절</p><div class="r-list">${miss.map(v=>`<button class="btn small" data-act="open" data-n="${v.n}">${v.n}. ${esc(v.t)}</button>`).join('')}</div>`:''}`,
     actions:btns([...(good&&G.d<ND?[[`${DIFF[G.d+1].name} 난이도로 도전`,'quizAt','primary',`data-d="${G.d+1}"`]]:[]),
       [`${DIFF[G.d].name}으로 한 번 더`,'quizAt',good&&G.d<ND?'':'primary',`data-d="${G.d}"`],
       ...(G.d>1?[[`${DIFF[G.d-1].name} 난이도로`,'quizAt','',`data-d="${G.d-1}"`]]:[]),
-      ['처음 화면으로','home','ghost']])};
+      ['범위·문제 바꾸기','qsetOpen'],['처음 화면으로','home','ghost']])};
   render();if(good){celebrate();sfx('win')}
+}
+
+/* ---------- 도전 설정 (범위 · 문제 종류 · 난이도) ---------- */
+function qsetOpen(){ui.qsel=new Set(qPool().map(v=>v.n));ui.qmode=S.qmode;G=null;go({name:'qset'})}
+function qsetView(){
+  const sel=ui.qsel,cnt=sel.size;
+  const quick=[{id:'all',label:'전체'},...SERIES.map(s=>({id:s.id,label:s.short}))];
+  return `<p class="tiny">지금 외우고 있는 구절만 골라 두면 오늘의 도전이 그 구절에서만 나와요. 시리즈가 달라도 섞어서 고를 수 있어요.</p>
+  <section class="qset" aria-label="도전 범위">
+    <h2 class="sec"><span>범위</span><span class="range">${cnt?`${cnt}구절 · ${esc(rangeText([...sel]))}`:'골라 주세요'}</span></h2>
+    <div class="qquick">${quick.map(o=>`<button class="btn small" data-act="qsetQuick" data-id="${o.id}">${esc(o.label)}만</button>`).join('')}<button class="btn small ghost" data-act="qsetQuick" data-id="none">모두 지우기</button></div>
+    ${SERIES.map(s=>{const vv=VERSES.filter(v=>v.s===s.id),all=vv.every(v=>sel.has(v.n));
+      return `<div class="qgroup" style="--sc:var(--c${s.c})">
+        <button class="qghead" data-act="qsetSeries" data-id="${s.id}" aria-pressed="${all}"><span><span class="sheet-no">${esc(s.sheet)}</span> ${esc(s.name)}</span><small>${all?'모두 빼기':'모두 넣기'}</small></button>
+        <div class="qgrid">${vv.map(v=>`<button class="qv" data-act="qsetToggle" data-n="${v.n}" aria-pressed="${sel.has(v.n)}"><b>${v.n}</b><span>${esc(v.t)}</span></button>`).join('')}</div></div>`}).join('')}
+  </section>
+  <section class="qset" aria-label="문제 종류">
+    <h2 class="sec"><span>문제 종류</span></h2>
+    <div class="seg seg3">${Object.keys(QMODE).map(k=>`<button aria-pressed="${ui.qmode===k}" data-act="qsetMode" data-m="${k}">${QMODE[k].name}</button>`).join('')}</div>
+    <p class="tiny">${QMODE[ui.qmode].desc}</p>
+  </section>
+  <section class="qset" aria-label="난이도">
+    <h2 class="sec"><span>난이도</span><span class="range">XP ×${DIFF[S.diff].mult}</span></h2>
+    <div class="seg">${[1,2,3,4].map(i=>`<button class="d${i}" aria-pressed="${S.diff===i}" data-act="diff" data-d="${i}">${DIFF[i].name}</button>`).join('')}</div>
+    <p class="tiny">${QD[S.diff].desc} · 문제당 ${DIFF[S.diff].qt/1000}초</p>
+  </section>
+  <div class="qgo"><button class="btn primary" data-act="qsetGo" ${cnt?'':'disabled'}>${cnt?`${cnt}구절로 도전 시작`:'구절을 골라 주세요'}</button><button class="btn ghost" data-act="qsetSave" ${cnt?'':'disabled'}>저장만 하기</button></div>`;
+}
+function qsetCommit(){
+  const ns=[...ui.qsel].sort((a,b)=>a-b);if(!ns.length)return false;
+  S.qset=ns;S.qmode=ui.qmode;save();return true;
+}
+
+/* ---------- 내 기록 ---------- */
+const KIND_NAME={b:'빈칸 채우기',o:'순서 맞추기',w:'직접 써보기',q:'오늘의 도전'};
+const WDAY='일월화수목금토';
+function logLine(e){
+  const v=e.n?byN(e.n):null,dn=DIFF[e.d].name;
+  const what=e.k==='q'?`${e.s}/10 정답${e.z?` · ${esc(e.z)}`:''}`
+    :e.k==='w'?`정확도 ${e.s}%${e.p?' · 통과':''}`
+    :e.p?(e.s?`실수 ${e.s}번`:'실수 없이'):'기회를 다 썼어요';
+  return `<li class="lg ${e.p?'ok':'no'}"><span class="lg-time">${timeStr(e.t)}</span>
+    <span class="lg-main"><b>${KIND_NAME[e.k]} · ${dn}</b>${v?`<button class="link" data-act="open" data-n="${v.n}">${v.n}. ${esc(v.t)}</button>`:''}<small>${what}</small>
+      ${e.m&&e.m.length?`<span class="lg-miss">틀린 구절 ${e.m.map(n=>`<button class="link" data-act="open" data-n="${n}">${n}번</button>`).join(' ')}</span>`:''}</span>
+    <span class="lg-xp">+${e.x}</span></li>`;
+}
+function recordsView(){
+  const log=S.log||[],today=dayStr();
+  const perDay=new Map();log.forEach(e=>{const k=dayStr(new Date(e.t));perDay.set(k,(perDay.get(k)||0)+1)});
+  // the last five weeks, Sunday first, today in the bottom row
+  const end=new Date();end.setHours(12,0,0,0);const start=new Date(end);start.setDate(end.getDate()-end.getDay()-28);
+  const cells=[];for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){const k=dayStr(d),c=perDay.get(k)||0;cells.push(`<i class="cal-d ${c?c>=3?'c3':'c1':''} ${k===today?'now':''}" title="${d.getMonth()+1}/${d.getDate()} · ${c}번"></i>`)}
+  const cnt=k=>log.filter(e=>e.k===k).length,quizzes=log.filter(e=>e.k==='q');
+  const best=quizzes.reduce((m,e)=>Math.max(m,e.s),0),days=[...perDay.keys()].length;
+  const mast=z4().map((_,i)=>VERSES.filter(v=>mastered(v.n,i+1)).length);
+  // verses missed most often in 오늘의 도전
+  const miss=new Map();quizzes.forEach(e=>(e.m||[]).forEach(n=>miss.set(n,(miss.get(n)||0)+1)));
+  const weak=[...miss.entries()].sort((a,b)=>b[1]-a[1]).slice(0,6);
+  // the log, newest first, under one heading per day
+  let lastDay='',list='';
+  log.slice(0,60).forEach(e=>{const d=new Date(e.t),k=dayStr(d);if(k!==lastDay){if(lastDay)list+='</ol>';list+=`<h3 class="lg-day">${k===today?'오늘':`${d.getMonth()+1}월 ${d.getDate()}일 (${WDAY[d.getDay()]})`}</h3><ol class="lgs">`;lastDay=k}list+=logLine(e)});
+  if(lastDay)list+='</ol>';
+  return `<section class="rec-sum" aria-label="요약">
+    <div class="r-stats"><div><b>${log.length}</b><span>기록된 게임</span></div><div><b>${days}</b><span>한 날</span></div><div><b>${curStreak()}</b><span>일 연속</span></div></div>
+    <div class="r-stats four">${mast.map((c,i)=>`<div><b>${c}<em>/42</em></b><span>${DIFF[i+1].name} 정복</span></div>`).join('')}</div>
+    <div class="r-stats four"><div><b>${cnt('b')}</b><span>빈칸</span></div><div><b>${cnt('o')}</b><span>순서</span></div><div><b>${cnt('w')}</b><span>써보기</span></div><div><b>${quizzes.length}</b><span>도전${best?` · 최고 ${best}`:''}</span></div></div>
+  </section>
+  <section class="cal" aria-label="최근 5주">
+    <h2 class="sec"><span>최근 5주</span><span class="range">진할수록 많이 했어요</span></h2>
+    <div class="cal-grid">${[...WDAY].map(w=>`<span>${w}</span>`).join('')}${cells.join('')}</div>
+  </section>
+  ${weak.length?`<section class="weak" aria-label="자주 틀린 구절"><h2 class="sec"><span>도전에서 자주 틀린 구절</span></h2>
+    <div class="r-list">${weak.map(([n,c])=>`<button class="btn small" data-act="open" data-n="${n}">${n}. ${esc(byN(n).t)} · ${c}번</button>`).join('')}</div></section>`:''}
+  <section class="vgrid" aria-label="구절별 별">
+    <h2 class="sec"><span>구절별 별</span><span class="range">${[1,2,3,4].map(i=>DIFF[i].name[0]).join(' · ')}</span></h2>
+    ${SERIES.map(s=>`<div class="vg-s" style="--sc:var(--c${s.c})"><small class="sheet-no">${esc(s.sheet)} ${esc(s.name)}</small>
+      ${VERSES.filter(v=>v.s===s.id).map(v=>`<button class="vg-row" data-act="open" data-n="${v.n}"><b>${v.n}</b><span>${esc(v.t)}</span><span class="vg-c">${[1,2,3,4].map(d=>{const c=starCount(v.n,d);return `<i class="s${c}" title="${DIFF[d].name} 별 ${c}개">${c===3?'✓':c||''}</i>`}).join('')}</span></button>`).join('')}</div>`).join('')}
+  </section>
+  <section class="lgbox" aria-label="최근 기록">
+    <h2 class="sec"><span>최근 기록</span>${log.length>60?`<span class="range">최근 60개</span>`:''}</h2>
+    ${list||'<p class="tiny">아직 기록이 없어요. 게임을 하면 여기에 하나씩 쌓여요. (이번 업데이트부터 기록돼요)</p>'}
+  </section>`;
 }
 
 /* ---------- 이벤트 ---------- */
 function back(){
-  if(view.name==='verse'){go({name:'home'});return}
+  if(['verse','records','qset'].includes(view.name)){go({name:'home'});return}
   if(view.name==='quiz'){G=null;go({name:'home'});return}
   const n=view.n;G=null;go({name:'verse',n});
 }
@@ -1811,7 +2100,7 @@ app.addEventListener('click',e=>{
     case 'chip':onChip(i);break;
     case 'piece':onPiece(i);break;
     case 'toggleHint':{const b=$('#typeBox');if(b)G.input=b.value;G.hint=!G.hint;render();break}
-    case 'refShow':{const b=$('#typeBox');if(b)G.input=b.value;for(const k of ['refC','refV','refV2','refB']){const f=$('#'+k);if(f)G[k]=f.value}G.refShow.add(el.dataset.p);render();break}
+    case 'refShow':{const b=$('#typeBox');if(b)G.input=b.value;for(const k of ['refC','refV','refV2','refB','refS','refT']){const f=$('#'+k);if(f)G[k]=f.value}G.refShow.add(el.dataset.p);render();break}
     case 'check':check();break;
     case 'clearType':G.input='';G.res=null;render();{const b=$('#typeBox');if(b)b.focus()}break;
     case 'closeSheet':G.result=null;render();{const g=$('#grade');if(g)g.scrollIntoView({block:'start'})}break;
@@ -1825,6 +2114,15 @@ app.addEventListener('click',e=>{
     case 'quizAt':S.diff=+el.dataset.d;save();startQuiz();break;
     case 'home':G=null;go({name:'home'});break;
     case 'ans':answer(i);break;
+    case 'qaSubmit':answerTyped();break;
+    case 'qsetOpen':qsetOpen();break;
+    case 'qsetToggle':ui.qsel.has(n)?ui.qsel.delete(n):ui.qsel.add(n);render();break;
+    case 'qsetSeries':{const ns=VERSES.filter(v=>v.s===el.dataset.id).map(v=>v.n),all=ns.every(x=>ui.qsel.has(x));ns.forEach(x=>all?ui.qsel.delete(x):ui.qsel.add(x));render();break}
+    case 'qsetQuick':{const id=el.dataset.id;ui.qsel=new Set(id==='none'?[]:VERSES.filter(v=>id==='all'||v.s===id).map(v=>v.n));render();break}
+    case 'qsetMode':ui.qmode=el.dataset.m;render();break;
+    case 'qsetGo':if(qsetCommit())startQuiz();break;
+    case 'qsetSave':if(qsetCommit())go({name:'home'});break;
+    case 'records':G=null;go({name:'records'});break;
     case 'nextQ':nextQ();break;
     case 'reset':ui.confirmReset=true;render();break;
     case 'resetNo':ui.confirmReset=false;render();break;
@@ -1876,7 +2174,8 @@ document.addEventListener('keydown',e=>{
 });
 app.addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role="button"][data-act]')){e.preventDefault();e.target.click()}
-  if(e.key==='Enter'&&/^ref(B|C|V|V2)$/.test(e.target.id)){e.preventDefault();check()}
+  if(e.key==='Enter'&&/^ref(B|C|V|V2|T)$/.test(e.target.id)){e.preventDefault();check()}
+  if(e.key==='Enter'&&/^qa(B|C|V|V2|W|T)$/.test(e.target.id)){e.preventDefault();answerTyped()}
   if(e.key==='Enter'&&/^(renName|renPin)$/.test(e.target.id)){e.preventDefault();const b=$('[data-act="renameSave"]');if(b)b.click()}
   if(e.key==='Enter'&&/^(nameIn|acctName|pin|pin2)$/.test(e.target.id)){e.preventDefault();const b=$(e.target.id==='nameIn'?'[data-act="nameSave"]':e.target.id==='pin2'?'[data-act="signup"]':'[data-act="save"],[data-act="signup"],[data-act="login"]');if(b)b.click()}
 });
@@ -1886,7 +2185,8 @@ app.addEventListener('input',e=>{
   else if(/^ref(C|V|V2)$/.test(t.id)&&G){t.value=t.value.replace(/\D/g,'');G[t.id]=t.value;
     // after the chapter, hop to the verse box once two digits are in (most chapters here are 1–2 digits)
     if(t.id==='refC'&&t.value.length>=2){const nx=$('#refV');if(nx&&!nx.value)nx.focus()}}
-  else if(t.id==='refB'&&G)G.refB=t.value;
+  else if(/^ref(B|S|T)$/.test(t.id)&&G)G[t.id]=t.value;
+  else if(/^qa(B|C|V|V2|W|T)$/.test(t.id)&&G&&G.type==='quiz'){if(/^qa(C|V|V2)$/.test(t.id))t.value=t.value.replace(/\D/g,'');G.typed[t.id]=t.value}
   else if(t.id==='renName')ui.renName=t.value;
   else if(t.id==='renPin')ui.renPin=t.value.replace(/\D/g,'');
   else if(t.id==='bkIn')ui.bkIn=t.value;
