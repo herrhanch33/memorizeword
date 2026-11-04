@@ -416,6 +416,13 @@ body.pl-on .sheet{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
 .piece.on svg{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--gold) 70%,transparent))}
 .piece small{font-size:10.5px;color:inherit}
 .piece.on small{color:var(--accent-ink);opacity:.95}
+/* from 21 the row holds this chapter's nine fruits, nine people or twelve stones */
+.armor-row.ch{grid-template-columns:repeat(var(--n,9),minmax(0,1fr));gap:4px 1px}
+.armor-row .row-head{grid-column:1/-1;text-align:center;font-family:var(--f-display);font-size:12px;opacity:.85}
+.armor-row.ch .piece svg{width:22px;height:22px}
+.armor-row.ch .piece small{font-size:10px;word-break:keep-all;text-align:center}
+.piece.col:not(.on) svg{opacity:.35;filter:grayscale(1)}
+.g-head{margin:4px 0 0;font-family:var(--f-display);font-weight:400;font-size:13px;color:var(--muted)}
 /* levels 9+: the card glows in its colour, brighter every level; the armour pieces shine with it */
 .hero.lit{box-shadow:0 6px 0 var(--accent-deep),0 0 var(--glow-r) color-mix(in srgb,var(--glow) calc(var(--glow-a) * 100%),transparent);animation:heroglow 3s ease-in-out infinite}
 .hero.lit .piece.on{color:var(--glow)}
@@ -1004,8 +1011,43 @@ const ARMOR=[
   {t:'그리스도의 편지',short:'편지',piece:'full',ref:'고후 3:3',desc:'너희는 우리로 말미암아 나타난 그리스도의 편지니'},
   {t:'그리스도의 향기',short:'향기',piece:'full',ref:'고후 2:15',desc:'우리는 구원 받는 자들에게나 망하는 자들에게나 하나님 앞에서 그리스도의 향기니'},
   {t:'믿음의 선한 싸움',short:'선한 싸움',piece:'full',ref:'딤전 6:12',desc:'믿음의 선한 싸움을 싸우라 영생을 취하라'},
-  {t:'생명의 면류관',short:'면류관',piece:'full',ref:'계 2:10',desc:'네가 죽도록 충성하라 그리하면 내가 생명의 관을 네게 주리라'}];
+  {t:'생명의 면류관',short:'면류관',piece:'full',ref:'계 2:10',desc:'네가 죽도록 충성하라 그리하면 내가 생명의 관을 네게 주리라'},
+  // 21-30 성령의 열매 (갈 5:22-23): one fruit each, then the branch that bears them
+  {t:'사랑의 열매',short:'사랑',piece:'full',ref:'요일 4:8',desc:'하나님은 사랑이심이라'},
+  {t:'희락의 열매',short:'희락',piece:'full',ref:'빌 4:4',desc:'주 안에서 항상 기뻐하라 내가 다시 말하노니 기뻐하라'},
+  {t:'화평의 열매',short:'화평',piece:'full',ref:'마 5:9',desc:'화평하게 하는 자는 복이 있나니 그들이 하나님의 아들이라 일컬음을 받을 것임이요'},
+  {t:'오래 참음의 열매',short:'오래 참음',piece:'full',ref:'엡 4:2',desc:'모든 겸손과 온유로 하고 오래 참음으로 사랑 가운데서 서로 용납하고'},
+  {t:'자비의 열매',short:'자비',piece:'full',ref:'눅 6:36',desc:'너희 아버지의 자비로우심 같이 너희도 자비로운 자가 되라'},
+  {t:'양선의 열매',short:'양선',piece:'full',ref:'갈 6:9',desc:'우리가 선을 행하되 낙심하지 말지니 포기하지 아니하면 때가 이르매 거두리라'},
+  {t:'충성의 열매',short:'충성',piece:'full',ref:'고전 4:2',desc:'그리고 맡은 자들에게 구할 것은 충성이니라'},
+  {t:'온유의 열매',short:'온유',piece:'full',ref:'마 5:5',desc:'온유한 자는 복이 있나니 그들이 땅을 기업으로 받을 것임이요'},
+  {t:'절제의 열매',short:'절제',piece:'full',ref:'고전 9:25',desc:'이기기를 다투는 자마다 모든 일에 절제하나니'},
+  {t:'열매 맺는 가지',short:'가지',piece:'full',ref:'요 15:5',desc:'나는 포도나무요 너희는 가지라 그가 내 안에, 내가 그 안에 거하면 사람이 열매를 많이 맺나니'},
+  // 31-40 믿음의 선진 (히 11), then the cloud of witnesses
+  {t:'아벨의 제사',short:'아벨',piece:'full',ref:'히 11:4',desc:'믿음으로 아벨은 가인보다 더 나은 제사를 하나님께 드림으로 의로운 자라 하시는 증거를 얻었으니'},
+  {t:'에녹의 동행',short:'에녹',piece:'full',ref:'창 5:24',desc:'에녹이 하나님과 동행하더니 하나님이 그를 데려가시므로 세상에 있지 아니하였더라'},
+  {t:'노아의 방주',short:'노아',piece:'full',ref:'히 11:7',desc:'믿음으로 노아는 아직 보이지 않는 일에 경고하심을 받아 경외함으로 방주를 준비하여 그 집을 구원하였으니'},
+  {t:'아브라함의 순종',short:'아브라함',piece:'full',ref:'히 11:8',desc:'믿음으로 아브라함은 부르심을 받았을 때에 순종하여 장래의 유업으로 받을 땅에 나아갈새 갈 바를 알지 못하고 나아갔으며'},
+  {t:'사라의 믿음',short:'사라',piece:'full',ref:'히 11:11',desc:'믿음으로 사라 자신도 나이가 많아 단산하였으나 잉태할 수 있는 힘을 얻었으니 이는 약속하신 이를 미쁘신 줄 알았음이라'},
+  {t:'요셉의 용서',short:'요셉',piece:'full',ref:'창 50:20',desc:'당신들은 나를 해하려 하였으나 하나님은 그것을 선으로 바꾸사'},
+  {t:'모세의 선택',short:'모세',piece:'full',ref:'히 11:25',desc:'도리어 하나님의 백성과 함께 고난 받기를 잠시 죄악의 낙을 누리는 것보다 더 좋아하고'},
+  {t:'룻의 헌신',short:'룻',piece:'full',ref:'룻 1:16',desc:'어머니께서 가시는 곳에 나도 가고 어머니께서 머무시는 곳에서 나도 머물겠나이다'},
+  {t:'다윗의 노래',short:'다윗',piece:'full',ref:'시 23:1',desc:'여호와는 나의 목자시니 내게 부족함이 없으리로다'},
+  {t:'구름 같은 증인들',short:'증인들',piece:'full',ref:'히 12:1',desc:'이러므로 우리에게 구름 같이 둘러싼 허다한 증인들이 있으니'},
+  // 41-50 새 예루살렘: the names of those who belong to heaven; a foundation stone each (계 21:19-20)
+  {t:'하늘의 시민',short:'시민',piece:'full',ref:'빌 3:20',desc:'그러나 우리의 시민권은 하늘에 있는지라'},
+  {t:'왕 같은 제사장',short:'제사장',piece:'full',ref:'벧전 2:9',desc:'그러나 너희는 택하신 족속이요 왕 같은 제사장들이요 거룩한 나라요'},
+  {t:'하나님의 동역자',short:'동역자',piece:'full',ref:'고전 3:9',desc:'우리는 하나님의 동역자들이요'},
+  {t:'그리스도의 사신',short:'사신',piece:'full',ref:'고후 5:20',desc:'그러므로 우리가 그리스도를 대신하여 사신이 되어'},
+  {t:'착하고 충성된 종',short:'충성된 종',piece:'full',ref:'마 25:21',desc:'잘하였도다 착하고 충성된 종아'},
+  {t:'이기는 자',short:'이기는 자',piece:'full',ref:'계 2:7',desc:'이기는 그에게는 내가 하나님의 낙원에 있는 생명나무의 열매를 주어 먹게 하리라'},
+  {t:'새 노래',short:'새 노래',piece:'full',ref:'시 96:1',desc:'새 노래로 여호와께 노래하라'},
+  {t:'영광의 면류관',short:'영광의 관',piece:'full',ref:'벧전 5:4',desc:'그리하면 목자장이 나타나실 때에 시들지 아니하는 영광의 관을 얻으리라'},
+  {t:'하늘에 기록된 이름',short:'기록된 이름',piece:'full',ref:'눅 10:20',desc:'너희 이름이 하늘에 기록된 것으로 기뻐하라'},
+  {t:'새 예루살렘',short:'새 예루살렘',piece:'full',ref:'계 21:2',desc:'또 내가 보매 거룩한 성 새 예루살렘이 하나님께로부터 하늘에서 내려오니'}];
 const LV_AT=[0,120,300,550,900,1350,1900,2600,3400,4300,5300,6400,7600,8900,10300,11800,13400,15100,16900,18800];  // XP needed to reach each level
+// 21-50 keep the same rule: each level needs 100 XP more than the one before (20→21 2,000 … 49→50 4,900)
+while(LV_AT.length<ARMOR.length)LV_AT.push(LV_AT[LV_AT.length-1]+LV_AT[LV_AT.length-1]-LV_AT[LV_AT.length-2]+100);
 // Levels 9+ colour the hero card in the colours of the tabernacle curtain and the priest's garments
 // (출 26:1, 28:5): blue, purple, scarlet, gold, then the white linen; the cycle repeats, each round
 // brighter (tier 1→3), with the glow growing every level
@@ -1015,6 +1057,25 @@ const THEMES=[
   {name:'홍색',bg:'#B5383F',deep:'#80262B',ink:'#FFFFFF',glow:'#FF9CA3'},
   {name:'금색',bg:'#C8962A',deep:'#8F6A1B',ink:'#2A1E05',glow:'#FFE08A'},
   {name:'백색',bg:'#F3EFE6',deep:'#CFC6B3',ink:'#2B2B2B',glow:'#FFFFFF'}];
+// From 21 each chapter has its own colours: the vineyard (21-30), the wilderness and the sea (31-40),
+// then the foundation stone of that level (계 21:19-20), and gold and pearl at 50 (계 21:18,21)
+const VINE=[{name:'포도빛',bg:'#6B2C5F',deep:'#471C3F',ink:'#FFFFFF',glow:'#E7A9DA'},{name:'감람빛',bg:'#56732C',deep:'#3A4E1D',ink:'#FFFFFF',glow:'#D3EC9E'},{name:'석류빛',bg:'#9E2638',deep:'#701A27',ink:'#FFFFFF',glow:'#FFA3B0'}];
+const DESERT=[{name:'광야빛',bg:'#9A6A30',deep:'#6E4B20',ink:'#FFFFFF',glow:'#FFD89A'},{name:'홍해빛',bg:'#1D6582',deep:'#12465B',ink:'#FFFFFF',glow:'#9EE3FF'},{name:'밤하늘빛',bg:'#25306A',deep:'#161E47',ink:'#FFFFFF',glow:'#C2CCFF'}];
+// c: the stone's own colour (gem icons, the city's foundation); bg/deep/ink: the card, dark enough for its text
+const STONES=[
+  {name:'벽옥',c:'#3E8A70',bg:'#357A63',deep:'#24564A',ink:'#FFFFFF'},
+  {name:'남보석',c:'#2A54A6',bg:'#2A54A6',deep:'#1C3A76',ink:'#FFFFFF'},
+  {name:'옥수',c:'#8FA9BD',bg:'#5A7890',deep:'#3E5466',ink:'#FFFFFF'},
+  {name:'녹보석',c:'#1D9F62',bg:'#1A7A4E',deep:'#115636',ink:'#FFFFFF'},
+  {name:'홍마노',c:'#B5523B',bg:'#A2482F',deep:'#743221',ink:'#FFFFFF'},
+  {name:'홍보석',c:'#C2263D',bg:'#A82235',deep:'#781726',ink:'#FFFFFF'},
+  {name:'황옥',c:'#D4B62E',bg:'#C9AB2E',deep:'#8F7A1E',ink:'#231C02'},
+  {name:'녹옥',c:'#4FB3A0',bg:'#2F8577',deep:'#1F5E54',ink:'#FFFFFF'},
+  {name:'담황옥',c:'#E3A33A',bg:'#D99A31',deep:'#9C6E1F',ink:'#2A1A02'},
+  {name:'비취옥',c:'#7CC46A',bg:'#7CC46A',deep:'#4F8A42',ink:'#13270E'},
+  {name:'청옥',c:'#3949A8',bg:'#3949A8',deep:'#263277',ink:'#FFFFFF'},
+  {name:'자수정',c:'#8A55B8',bg:'#8A55B8',deep:'#603A82',ink:'#FFFFFF'}];
+const PEARL={name:'정금과 진주',bg:'#F6EDD6',deep:'#D8C79A',ink:'#2B2414',glow:'#FFE7A0'};
 // Biblical keepsakes gathered as the level rises, shown in a strip under the hero card (locked ones
 // faintly, with the level that earns them). Only objects from Scripture, nothing else.
 const ORN=[
@@ -1029,13 +1090,37 @@ const ORN=[
   {L:12,name:'등잔대',ref:'출 25:31',svg:'<path d="M24 10v28M12 16q0 14 12 14t12-14M16 14q0 10 8 10t8-10M14 42h20"/>'},
   {L:14,name:'무지개',ref:'창 9:13',svg:'<path d="M6 36a18 18 0 0 1 36 0M12 36a12 12 0 0 1 24 0M18 36a6 6 0 0 1 12 0"/>'},
   {L:16,name:'감람나무 가지',ref:'창 8:11',svg:'<path d="M10 38q14-2 26-26"/><path d="M18 30q-6-2-8-8 6 0 8 8zM24 24q-6-2-8-8 6 0 8 8zM30 18q-6-2-8-8 6 0 8 8z"/>'},
-  {L:18,name:'성전',ref:'시 122:1',svg:'<path d="M8 40h32M10 40V22h28v18M12 22l12-10 12 10M18 40V28M30 40V28M24 40V28"/>'}];
+  {L:18,name:'성전',ref:'시 122:1',svg:'<path d="M8 40h32M10 40V22h28v18M12 22l12-10 12 10M18 40V28M30 40V28M24 40V28"/>'},
+  // 성령의 열매
+  {L:22,name:'포도송이',ref:'민 13:23',svg:'<circle cx="19" cy="18" r="5"/><circle cx="29" cy="18" r="5"/><circle cx="14" cy="26" r="5"/><circle cx="24" cy="26" r="5"/><circle cx="34" cy="26" r="5"/><circle cx="19" cy="34" r="5"/><circle cx="29" cy="34" r="5"/><circle cx="24" cy="41" r="4"/><path d="M24 13V6q6-3 12 0"/>'},
+  {L:24,name:'석류',ref:'출 28:34',svg:'<circle cx="24" cy="28" r="13"/><path d="M18 16l2-7 4 4 4-4 2 7"/>'},
+  {L:26,name:'겨자씨',ref:'마 13:31',svg:'<path d="M24 42V16"/><path d="M24 26q-10-2-14-10M24 21q10-2 14-10M24 33q-8 0-12-6M24 31q8 0 12-6"/><circle cx="24" cy="44" r="2"/>'},
+  {L:28,name:'만나 항아리',ref:'출 16:33',svg:'<path d="M17 14h14M18 14q-6 6-6 14 0 12 12 14 12-2 12-14 0-8-6-14"/><path d="M18 9h12v5H18z"/>'},
+  {L:30,name:'포도나무',ref:'요 15:5',svg:'<path d="M8 42q10-6 14-18t18-16"/><path d="M22 24q-8-2-10-10 8 0 10 10zM31 14q2-7 9-7-1 7-9 7z"/><circle cx="16" cy="34" r="3"/><circle cx="21" cy="38" r="3"/><circle cx="13" cy="40" r="3"/>'},
+  // 믿음의 선진
+  {L:32,name:'방주',ref:'창 6:14',svg:'<path d="M6 30h36l-5 9H11z"/><path d="M12 30V20h24v10M16 20l8-6 8 6"/><path d="M4 43q5-3 10 0t10 0 10 0 10 0"/>'},
+  {L:34,name:'뭇별',ref:'창 15:5',svg:'<path d="M14 8l2 5 5 1-4 3 1 5-4-3-4 3 1-5-4-3 5-1z"/><path d="M34 16l2 4 4 1-3 3 1 4-4-2-4 2 1-4-3-3 4-1z"/><path d="M22 30l1.5 3.5 3.5.5-2.5 2.5.5 3.5-3-1.5-3 1.5.5-3.5-2.5-2.5 3.5-.5z"/>'},
+  {L:36,name:'채색옷',ref:'창 37:3',svg:'<path d="M17 7l-9 8 5 5 3-3v24h16V17l3 3 5-5-9-8h-4q-2 4-4 4t-4-4z"/><path d="M16 25h16M16 31h16M16 37h16"/>'},
+  {L:38,name:'보리 이삭',ref:'룻 2:2',svg:'<path d="M24 42V12M17 42l7-12 7 12"/><path d="M24 15q-4-2-4-7 4 1 4 7zM24 15q4-2 4-7-4 1-4 7zM24 22q-4-2-4-7 4 1 4 7zM24 22q4-2 4-7-4 1-4 7z"/><path d="M16 31h16"/>'},
+  {L:40,name:'물매와 돌',ref:'삼상 17:40',svg:'<path d="M8 10q4 18 16 20 12-2 16-20"/><circle cx="24" cy="30" r="5"/><circle cx="14" cy="41" r="3"/><circle cx="24" cy="43" r="3"/><circle cx="34" cy="41" r="3"/>'},
+  // 새 예루살렘
+  {L:42,name:'흰 돌',ref:'계 2:17',svg:'<path d="M10 28q0-12 14-14 14 2 14 14-2 10-14 10-12 0-14-10z"/><path d="M18 26h12M18 31h8"/>'},
+  {L:44,name:'금 향로',ref:'계 8:3',svg:'<path d="M12 22h24q0 12-12 14-12-2-12-14z"/><path d="M24 36v6M16 42h16"/><path d="M20 16q-2-4 2-7M28 16q2-4-2-7"/>'},
+  {L:46,name:'진주 문',ref:'계 21:21',svg:'<path d="M10 42V22a14 14 0 0 1 28 0v20"/><path d="M17 42V24a7 7 0 0 1 14 0v18"/><circle cx="24" cy="11" r="3"/>'},
+  {L:48,name:'생명나무',ref:'계 22:2',svg:'<path d="M24 42V28"/><circle cx="24" cy="18" r="12"/><circle cx="19" cy="15" r="2"/><circle cx="28" cy="13" r="2"/><circle cx="29" cy="22" r="2"/><path d="M8 43q8-4 16 0t16 0"/>'},
+  {L:50,name:'종려 가지',ref:'계 7:9',svg:'<path d="M14 42Q24 26 34 6"/><path d="M30 14q-8-2-12 2M28 19q8 0 10 4M26 23q-8 0-12 4M24 28q8 0 10 5M21 32q-7 1-10 5"/>'}];
 const ornSvg=o=>`<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${o.svg}</svg>`;
+// The keepsakes come in groups: the first twelve, then one group per chapter. A chapter's group shows
+// (faintly, to look forward to) from ten levels before it starts, so the strip grows with the player.
+const ORN_GROUPS=[['',1,20],['성령의 열매',21,30],['믿음의 선진',31,40],['새 예루살렘',41,50]];
 function gardenView(L,th){
   const next=ORN.find(o=>o.L>L),have=ORN.filter(o=>o.L<=L).length;
   if(!have)return '';
-  return `<section class="garden ${th?'lit':''}" aria-label="모은 상징" ${th?`style="--gcol:${th.glow};--gink:${th.bg}"`:''}>
-    <div class="g-items">${ORN.map(o=>`<span class="g-item ${o.L<=L?'on':'off'}" title="${esc(o.name)} · ${esc(o.ref)}${o.L>L?` · Lv.${o.L}에 받아요`:''}">${ornSvg(o)}<small>${o.L<=L?esc(o.name):`Lv.${o.L}`}</small></span>`).join('')}</div>
+  const groups=ORN_GROUPS.filter(([,a])=>a===1||L>=a-10);
+  const item=o=>`<span class="g-item ${o.L<=L?'on':'off'}" title="${esc(o.name)} · ${esc(o.ref)}${o.L>L?` · Lv.${o.L}에 받아요`:''}">${ornSvg(o)}<small>${o.L<=L?esc(o.name):`Lv.${o.L}`}</small></span>`;
+  // the item colour leans toward the page's ink, so a pale card colour (백색, 진주) or a deep one in dark mode stays readable
+  return `<section class="garden ${th?'lit':''}" aria-label="모은 상징" ${th?`style="--gcol:${th.glow};--gink:color-mix(in srgb,${th.bg} 50%,var(--ink))"`:''}>
+    ${groups.map(([h,a,b])=>`${h?`<h3 class="g-head">${h}</h3>`:''}<div class="g-items">${ORN.filter(o=>o.L>=a&&o.L<=b).map(item).join('')}</div>`).join('')}
     <p class="tiny">${next?`다음 상징: 레벨 ${next.L}에서 <b>${esc(next.name)}</b> (${esc(next.ref)})`:'성경의 상징을 모두 모았어요'}</p></section>`;
 }
 // Behind the home page: from level 9 a soft tint in the card's colour at the top, and a few verse
@@ -1059,33 +1144,61 @@ function decoView(L,th){
 // stars (more each level), a cross on the hill (2), a dove (3), a lamp (4), an olive tree that keeps
 // growing (5), the star of Bethlehem (6), the river of life with fish (7), the dawn (8), a vine (10),
 // the lampstand (12), a rainbow (14), the dove's olive branch (16), the temple (18), a crown of light (20).
+// Then a vine along the top with a cluster for each fruit (21–29) and its leaves (30); Abel's altar (31),
+// the ark on a far mountain (33), many more stars (34, 창 15:5), tents (35), the pillar of cloud (37),
+// barley sheaves (38), sheep (39), a band of clouds (40); from 41 the city comes down on the horizon and
+// the temple is gone (계 21:22), with gates of pearl (43), its foundation stones in colour (45), trees of
+// life by the river (47), its light (49), and at 50 no more night: the stars go (계 22:5).
+// On a phone the card is taller than the scene, so only about x 82–318 shows: the new pieces stay inside it.
 function sceneView(L){
   const rnd=i=>{const x=Math.sin(i*127.1+311.7)*43758.5;return x-Math.floor(x)};
-  const stars=Array.from({length:Math.min(34,4+L*2)},(_,i)=>{const x=rnd(i)*400,y=rnd(i+50)*140,r=.9+rnd(i+90)*1.3;
+  const stars=Array.from({length:L>=50?0:Math.min(L>=34?64:34,4+L*2)},(_,i)=>{const x=rnd(i)*400,y=rnd(i+50)*140,r=.9+rnd(i+90)*1.3;
     return `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(1)}" opacity="${(.35+rnd(i+130)*.45).toFixed(2)}" class="${i%3?'':'tw'}" style="animation-delay:${(rnd(i+7)*3).toFixed(1)}s"/>`}).join('');
   const tree=L>=5?(()=>{const g=Math.min(1,.45+(L-5)*.08);return `<g transform="translate(66 ${196-30*g}) scale(${g})"><rect x="-3" y="0" width="6" height="34" rx="2" opacity=".55"/><circle cx="0" cy="-6" r="20" opacity=".35"/><circle cx="-14" cy="4" r="13" opacity=".35"/><circle cx="14" cy="4" r="13" opacity=".35"/></g>`})():'';
-  return `<svg class="scene" viewBox="0 0 400 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true" fill="currentColor">
-    ${L>=8?`<g opacity=".18"><path d="M330 200 L150 20 L170 14z"/><path d="M330 200 L240 0 L262 0z"/><path d="M330 200 L360 0 L386 0z"/><path d="M330 200 L400 60 L400 90z"/></g><circle cx="330" cy="200" r="46" opacity=".16"/>`:''}
+  const p=sceneParts(L),city=L>=41;
+  // on the pale card of 50 the scene is drawn in gold, so its light reads as light rather than shadow
+  return `<svg class="scene" viewBox="0 0 400 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true" fill="currentColor" ${L>=50?'style="color:#C9A227"':''}>
+    ${L>=8&&!city?`<g opacity=".18"><path d="M330 200 L150 20 L170 14z"/><path d="M330 200 L240 0 L262 0z"/><path d="M330 200 L360 0 L386 0z"/><path d="M330 200 L400 60 L400 90z"/></g><circle cx="330" cy="200" r="46" opacity=".16"/>`:''}
     ${L>=14?`<g fill="none" stroke="currentColor" opacity=".3" stroke-width="5"><path d="M20 190a110 110 0 0 1 220 0"/><path d="M34 190a96 96 0 0 1 192 0" opacity=".7"/><path d="M48 190a82 82 0 0 1 164 0" opacity=".45"/></g>`:''}
-    <g>${stars}</g>
-    ${L>=6?`<g transform="translate(372 26) scale(.8)" opacity=".9" class="tw"><path d="M0-16L4-4 16 0 4 4 0 16-4 4-16 0-4-4z"/><path d="M0-30V30M-30 0H30" stroke="currentColor" stroke-width="1.2" opacity=".35"/></g>`:''}
+    <g>${stars}</g>${p.clouds}${p.vine}${p.ark}${p.pillar}${p.city}
+    ${L>=6&&L<50?`<g transform="translate(372 26) scale(.8)" opacity=".9" class="tw"><path d="M0-16L4-4 16 0 4 4 0 16-4 4-16 0-4-4z"/><path d="M0-30V30M-30 0H30" stroke="currentColor" stroke-width="1.2" opacity=".35"/></g>`:''}
     ${L>=20?`<g transform="translate(118 22) scale(.65)" opacity=".8"><path d="M-26 10h52l3-24-13 10-11-16-11 16-13-10z"/><rect x="-26" y="10" width="52" height="6" rx="2"/></g><circle cx="118" cy="22" r="28" opacity=".1"/>`:''}
     ${L>=3?`<g transform="translate(${L>=16?150:130} 70)" class="dove" opacity=".85"><path d="M-14 4c6-8 14-9 20-5l9-7-3 9c3 2 5 5 5 9H1c-6 0-11-2-15-6z"/>${L>=16?`<path d="M10 11q10-2 18-12" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16 7q-3-2-3-6 4 0 4 5zM22 3q-3-2-3-6 4 0 4 5z"/>`:''}</g>`:''}
     <path d="M0 260V206q60-26 120-12t90-6q70-24 120 2 40 20 70 6V260z" opacity=".16"/>
     <path d="M0 260V226q90-30 170-8t110-4q60-16 120 10V260z" opacity=".2"/>
-    ${L>=7?`<g opacity=".32"><path d="M0 244q50-10 100 0t100 0 100 0 100 0V260H0z" fill="currentColor" opacity=".5"/>${[40,150,270].slice(0,Math.min(3,L-6)).map((x,i)=>`<g transform="translate(${x} ${248+(i%2)*4})"><path d="M0 0q6-5 12 0-6 5-12 0z"/><path d="M12 0l4-3M12 0l4 3" stroke="currentColor" stroke-width="1.2"/></g>`).join('')}</g>`:''}
-    ${tree}
+    ${L>=7?`<g opacity="${L>=47?.5:.32}"><path d="M0 244q50-10 100 0t100 0 100 0 100 0V260H0z" fill="currentColor" opacity=".5"/>${[40,150,270].slice(0,Math.min(3,L-6)).map((x,i)=>`<g transform="translate(${x} ${248+(i%2)*4})"><path d="M0 0q6-5 12 0-6 5-12 0z"/><path d="M12 0l4-3M12 0l4 3" stroke="currentColor" stroke-width="1.2"/></g>`).join('')}</g>`:''}
+    ${tree}${p.altar}${p.tents}${p.sheaves}${p.sheep}${p.life}
     ${L>=2?`<g transform="translate(330 ${L>=18?150:160})"><rect x="-2.5" y="-34" width="5" height="46" rx="1.5" opacity=".8"/><rect x="-12" y="-22" width="24" height="5" rx="1.5" opacity=".8"/></g>`:''}
-    ${L>=18?`<g transform="translate(200 192)" opacity=".7"><path d="M-44 0h88M-40 0V-26h80V0M-44-26l44-22 44 22z"/><g fill="none" stroke="currentColor" stroke-width="3"><path d="M-28 0v-24M-10 0v-24M10 0v-24M28 0v-24"/></g></g>`:''}
+    ${L>=18&&!city?`<g transform="translate(200 192)" opacity=".7"><path d="M-44 0h88M-40 0V-26h80V0M-44-26l44-22 44 22z"/><g fill="none" stroke="currentColor" stroke-width="3"><path d="M-28 0v-24M-10 0v-24M10 0v-24M28 0v-24"/></g></g>`:''}
     ${L>=4?`<g transform="translate(248 ${L>=18?186:190})" opacity=".85"><path d="M-9 0h18q0 6-9 6T-9 0z"/><path d="M0-4q-3-5 0-9 3 4 0 9z" class="tw"/></g>`:''}
     ${L>=12?`<g transform="translate(112 196)" opacity=".8"><path d="M0 2v12M-18 0q0 10 18 10T18 0M-12-2q0 8 12 8T12-2M-6-4q0 6 6 6T6-4M-10 14h20" fill="none" stroke="currentColor" stroke-width="2"/>${[-18,-12,-6,0,6,12,18].map((x,i)=>`<path d="M${x} ${i===3?-6:i%2?-4:-2}q-2-4 0-7 2 3 0 7z" class="tw" style="animation-delay:${i*.3}s"/>`).join('')}</g>`:''}
     ${L>=10?`<g transform="translate(20 206)" opacity=".7"><path d="M0 0q20-18 40-2t40-2" fill="none" stroke="currentColor" stroke-width="2"/>${[14,36,58].map(x=>`<g transform="translate(${x} 2)"><circle cx="0" cy="0" r="2.2"/><circle cx="-2.5" cy="3.5" r="2.2"/><circle cx="2.5" cy="3.5" r="2.2"/><circle cx="0" cy="7" r="2.2"/></g>`).join('')}</g>`:''}
   </svg>`;
 }
+// The scene's pieces for levels 21-50 (see sceneView)
+function sceneParts(L){
+  const p={},shown=L>=50?12:Math.max(0,L-40);
+  p.vine=L>=21?`<g opacity=".55"><path d="M80 6q40 14 80 4t80 4 80-2" fill="none" stroke="currentColor" stroke-width="2.2"/>${[150,170,190,210,230,250,270,290,310].slice(0,Math.min(9,L-20)).map((x,i)=>`<g transform="translate(${x} ${10+(i%2)*3})"><circle cx="-3" cy="4" r="2.6"/><circle cx="3" cy="4" r="2.6"/><circle cx="0" cy="8.5" r="2.6"/><circle cx="-3" cy="13" r="2.3"/><circle cx="3" cy="13" r="2.3"/><circle cx="0" cy="17" r="2"/></g>`).join('')}${L>=30?[96,124,182,262,302].map(x=>`<path transform="translate(${x} 8)" d="M0 0q-8 2-10 10 8 0 10-10zM0 0q8 2 10 10-8 0-10-10z" opacity=".8"/>`).join(''):''}</g>`:'';
+  p.altar=L>=31?`<g transform="translate(274 206)" opacity=".5"><path d="M-10 0h20v-10h-20z"/><path d="M-12-10h24v-3h-24z"/><path d="M0-14q-6-10 2-18t0-18" fill="none" stroke="currentColor" stroke-width="2" opacity=".55" class="tw"/></g>`:'';
+  p.ark=L>=33?`<g opacity=".5"><path d="M196 150l44-46 44 46z" opacity=".35"/><g transform="translate(240 102)"><path d="M-16 0h32l-5 7h-22z"/><path d="M-10 0v-6h20v6M-11-6l11-6 11 6" fill="none" stroke="currentColor" stroke-width="1.6"/></g></g>`:'';
+  p.tents=L>=35?`<g transform="translate(176 218)" opacity=".45"><path d="M-12 0l12-16 12 16z"/><path d="M0-16v16" stroke="currentColor" stroke-width="1" opacity=".5"/><path d="M14 2l10-13 10 13z" opacity=".8"/></g>`:'';
+  p.pillar=L>=37?`<g opacity=".22"><path d="M288 196q-6-40 2-80t-2-80q12-12 24 0-10 40-2 80t2 80z"/><circle cx="300" cy="34" r="16"/><circle cx="292" cy="46" r="12"/><circle cx="309" cy="48" r="12"/></g>`:'';
+  p.sheaves=L>=38?`<g transform="translate(140 226)" opacity=".5"><path d="M0 0l-5-14M0 0V-16M0 0l5-14" stroke="currentColor" stroke-width="2" fill="none"/><path d="M-6-4h12" stroke="currentColor" stroke-width="2.4"/><path d="M-6-14q-2-4 1-6 2 3-1 6zM0-16q-2-4 1-6 2 3-1 6zM6-14q-2-4 1-6 2 3-1 6z"/></g>`:'';
+  p.sheep=L>=39?`<g opacity=".5">${[[214,234],[236,238]].map(([x,y])=>`<g transform="translate(${x} ${y})"><ellipse cx="0" cy="0" rx="8" ry="5"/><circle cx="8" cy="-2" r="3"/><path d="M-4 4v4M4 4v4" stroke="currentColor" stroke-width="1.6"/></g>`).join('')}</g>`:'';
+  p.clouds=L>=40?`<g opacity=".18">${[100,150,200,250,300].map((x,i)=>`<g transform="translate(${x} ${46+(i%2)*8})"><circle cx="0" cy="0" r="12"/><circle cx="14" cy="2" r="10"/><circle cx="-13" cy="3" r="9"/></g>`).join('')}</g>`:'';
+  p.city=L>=41?`${L>=49?`<g opacity="${L>=50?.14:.1}"><path d="M200 168L120 0h40zM200 168L200 0h-30zM200 168L240 0h40zM200 168L330 30v30zM200 168L70 30v30z"/><circle cx="200" cy="170" r="${L>=50?70:50}" opacity=".6"/></g>`:''}
+    <g transform="translate(200 196)" opacity="${L>=45?.34:.26}"><path d="M-76 0V-34h10v-8h10v8h20v-14h10v14h20v-8h12v8h20v-14h10v14h20v-8h10v8h10V0z"/>
+      ${L>=43?[-46,0,46].map(x=>`<path transform="translate(${x} 0)" d="M-7 0v-14a7 7 0 0 1 14 0v14z" fill="#FFFFFF" opacity=".95"/>`).join(''):''}
+      ${L>=45?STONES.map((s,i)=>`<rect x="${-76+i*12.6}" y="0" width="12" height="5" fill="${s.c}" opacity="${i<shown?1:.2}"/>`).join(''):''}</g>`:'';
+  p.life=L>=47?`<g opacity=".4">${[128,272].map(x=>`<g transform="translate(${x} 236)"><rect x="-2" y="-14" width="4" height="14"/><circle cx="0" cy="-20" r="10"/><circle cx="-4" cy="-22" r="1.6" fill="#FFFFFF"/><circle cx="4" cy="-18" r="1.6" fill="#FFFFFF"/></g>`).join('')}</g>`:'';
+  return p;
+}
 function heroTheme(L){
   if(L<9)return null;
-  const k=L-9,th=THEMES[k%THEMES.length],tier=Math.min(3,Math.floor(k/THEMES.length)+1);
-  return {...th,tier,glowR:10+k*2,glowA:Math.min(.95,.35+k*.05)};
+  const k=L-9;
+  const th=L<=20?THEMES[k%THEMES.length]:L<=30?VINE[(L-21)%3]:L<=40?DESERT[(L-31)%3]:L<50?{...STONES[L-41],glow:STONES[L-41].c}:PEARL;
+  const tier=L<=20?Math.min(3,Math.floor(k/THEMES.length)+1):3;
+  return {...th,tier,glowR:Math.min(48,10+k*2),glowA:Math.min(.95,.35+k*.05)};
 }
 const TITLES=ARMOR.map(a=>a.t);
 function lvl(){
@@ -1105,17 +1218,30 @@ const PIECE_ICON={
 // sex 'm' or 'f' (the player's choice, S.sex): the same armour on both; she has long hair, a skirt and a flower
 // Past level 8 the armour itself changes: gold (levels 9–13), pearl with gold trim (14–18), then
 // radiant white-and-sky (19+), and the glow around the warrior grows each level.
+// From 21: a fruit a level beside the warrior (21–29) and vine leaves on the helmet (30); a cloak (31),
+// gold-hemmed (35), standing on a cloud (40, 히 12:1); a crown set with the foundation stones on the
+// helmet (41+); and at 50 the white robe and a palm branch (계 7:9).
+const BERRY_AT=[[18,46],[26,46],[14,53],[22,53],[30,53],[18,60],[26,60],[22,67],[22,39]];
+const GEM_AT=[[60,13],[50,18],[70,18],[44,20.5],[76,20.5]];
 function avatar(L,size=104,cls='',sex){
-  const has=p=>L>=ARMOR.findIndex(a=>a.piece===p)+1,full=L>=8,f=(sex||S.sex)==='f';
+  const has=p=>L>=ARMOR.findIndex(a=>a.piece===p)+1,full=L>=8,f=(sex||S.sex)==='f',robe=L>=50;
   const tier=L>=9?Math.min(3,Math.floor((L-9)/5)+1):0;
-  const skin='#F3C9A2',hair='#3B2A1F',tunic='#F4EFE3',pants='#4A6FA5',gold='#F2C14E',goldD='#B8862B',ink='#2B2B2B';
+  const skin='#F3C9A2',hair='#3B2A1F',tunic=robe?'#FFFFFF':'#F4EFE3',pants=robe?'#EEF4FB':'#4A6FA5',gold='#F2C14E',goldD='#B8862B',ink='#2B2B2B';
   const [silver,silverD]=[['#D6DBE3','#8E97A4'],['#F2C14E','#B8862B'],['#F7F2E8','#C9A227'],['#FFFFFF','#7FB3EA']][tier];
   const glowA=full?Math.min(.6,.28+(L-8)*.03):0,glowR=58+Math.min(10,(L-8));
+  const fruit=L>=21?`<g>${BERRY_AT.slice(0,Math.min(9,L-20)).map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4.2" fill="#7B3F8C" stroke="#4E2459" stroke-width="1"/><circle cx="${x-1.3}" cy="${y-1.4}" r="1.1" fill="#fff" opacity=".6"/>`).join('')}${L>=30?`<path d="M22 35q2-6 8-7-1 6-8 7z" fill="#6DBE6D"/><path d="M22 35v-4" stroke="#4E7A35" stroke-width="1.5"/>`:''}</g>`:'';
+  const cloak=L>=31?`<path d="M36 66Q18 108 24 138H96Q102 108 84 66Z" fill="#6A3D8F"/>${L>=35?`<path d="M25 135h70" stroke="${gold}" stroke-width="4"/>`:''}`:'';
+  const cloud=L>=40?`<g fill="#FFFFFF" opacity=".75"><ellipse cx="60" cy="146" rx="48" ry="5"/><circle cx="22" cy="143" r="6"/><circle cx="36" cy="146" r="7"/><circle cx="84" cy="146" r="7"/><circle cx="98" cy="143" r="6"/></g>`:'';
+  const wreath=L>=30&&has('helmet')?`<g fill="#5FA34A"><path d="M31 44q-6-2-7-8 6 0 7 8z"/><path d="M33 38q-5-4-4-10 5 3 4 10z"/><path d="M89 44q6-2 7-8-6 0-7 8z"/><path d="M87 38q5-4 4-10-5 3-4 10z"/></g>`:'';
+  const gems=L>=41?STONES.slice(0,robe?5:Math.min(5,Math.ceil((L-40)/2))):[];
+  const crown=L>=41?`<path d="M41 23L39 8l10 7 11-11 11 11 10-7-2 15z" fill="${gold}" stroke="${goldD}" stroke-width="1.6" stroke-linejoin="round"/>${gems.map((s,i)=>`<circle cx="${GEM_AT[i][0]}" cy="${GEM_AT[i][1]}" r="2.6" fill="${s.c}" stroke="#fff" stroke-width=".8"/>`).join('')}`:'';
+  const palm=robe?`<g stroke="#3F8A3A" stroke-width="2" fill="none" stroke-linecap="round"><path d="M99 70Q106 40 114 8"/><path d="M110 20q-7-1-10 3M108 28q7 0 9 4M106 36q-7 0-10 4M104 44q7 0 9 4M103 52q-6 1-9 5"/></g>`:'';
   return `<svg class="avatar ${cls}" viewBox="0 0 120 150" width="${size}" height="${Math.round(size*1.25)}" aria-hidden="true">
     ${full?`<circle cx="60" cy="82" r="${glowR}" fill="${tier>=3?'#BFE0FF':gold}" opacity="${glowA}"><animate attributeName="r" values="${glowR-3};${glowR+3};${glowR-3}" dur="3s" repeatCount="indefinite"/></circle>
       <g fill="${tier>=3?'#FFFFFF':gold}"><path d="M14 40l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M104 26l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M102 122l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z"/>
       ${tier>=2?`<path d="M10 100l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z"/><path d="M112 70l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z"/>`:''}
       ${tier>=3?`<path d="M60 4l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M24 14l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z"/>`:''}</g>`:''}
+    ${palm}${cloud}${cloak}
     ${f?`<path d="M36 44q-6 36 4 62h40q10-26 4-62z" fill="${hair}"/>
       <rect x="45" y="110" width="12" height="32" rx="6" fill="${skin}"/><rect x="63" y="110" width="12" height="32" rx="6" fill="${skin}"/>
       <path d="M36 104h48l6 20H30z" fill="${pants}"/>`
@@ -1124,7 +1250,7 @@ function avatar(L,size=104,cls='',sex){
       :`<rect x="41" y="138" width="18" height="10" rx="5" fill="#8A6A4F"/><rect x="61" y="138" width="18" height="10" rx="5" fill="#8A6A4F"/>`}
     ${has('sword')?`<path d="M93 34l5 4v62h-10V38z" fill="${silver}" stroke="${silverD}" stroke-width="1.5"/>${full?`<path d="M90 40h4v40h-4z" fill="#fff" opacity=".7"/>`:''}<rect x="84" y="100" width="20" height="6" rx="2" fill="${gold}"/><rect x="90" y="106" width="8" height="16" rx="3" fill="#6B4A2B"/>`:''}
     <path d="M38 78L26 106" stroke="${skin}" stroke-width="12" stroke-linecap="round"/><path d="M82 78l12 28" stroke="${skin}" stroke-width="12" stroke-linecap="round"/>
-    <rect x="34" y="64" width="52" height="52" rx="16" fill="${tunic}"/>
+    <rect x="34" y="64" width="52" height="52" rx="16" fill="${tunic}" ${robe?'stroke="#D9E8F7" stroke-width="2"':''}/>
     ${has('plate')?`<path d="M42 70h36v26q0 10-18 14-18-4-18-14z" fill="${silver}" stroke="${silverD}" stroke-width="2"/><path d="M58 78h4v16h-4zM52 84h16v4H52z" fill="${gold}"/>`:''}
     ${has('belt')?`<rect x="34" y="100" width="52" height="10" fill="${goldD}"/><rect x="53" y="98" width="14" height="14" rx="3" fill="${gold}" stroke="${goldD}" stroke-width="2"/>`:''}
     ${has('shield')?`<path d="M8 84h32v22q0 14-16 20-16-6-16-20z" fill="#3B6FD6" stroke="#223F8A" stroke-width="2.5"/><path d="M22 92h4v22h-4zM14 100h20v4H14z" fill="${gold}"/>`:''}
@@ -1135,12 +1261,35 @@ function avatar(L,size=104,cls='',sex){
     <circle cx="51" cy="44" r="2.6" fill="${ink}"/><circle cx="69" cy="44" r="2.6" fill="${ink}"/>
     <path d="M52 52q8 7 16 0" stroke="${ink}" stroke-width="2.2" stroke-linecap="round" fill="none"/>
     <circle cx="45" cy="50" r="3" fill="#F08A8A" opacity=".45"/><circle cx="75" cy="50" r="3" fill="#F08A8A" opacity=".45"/>
-    ${has('helmet')?`<path d="M35 42q0-26 25-26t25 26v2H35z" fill="${silver}" stroke="${silverD}" stroke-width="2"/><rect x="31" y="40" width="58" height="7" rx="3.5" fill="${silverD}"/><path d="M56 16q4-10 8 0 2 6-4 6-6 0-4-6z" fill="#D9534F"/>`
+    ${has('helmet')?`<path d="M35 42q0-26 25-26t25 26v2H35z" fill="${silver}" stroke="${silverD}" stroke-width="2"/><rect x="31" y="40" width="58" height="7" rx="3.5" fill="${silverD}"/>${L>=41?'':`<path d="M56 16q4-10 8 0 2 6-4 6-6 0-4-6z" fill="#D9534F"/>`}`
       :f?`<g fill="#F2A0B0"><circle cx="79" cy="27" r="3.4"/><circle cx="85" cy="24" r="3.4"/><circle cx="85" cy="31" r="3.4"/></g><circle cx="83" cy="27.5" r="2.2" fill="${gold}"/>`:''}
+    ${wreath}${crown}${fruit}
   </svg>`;
 }
+// From 21 the row under the hero card shows this chapter's nine fruits, nine people, or twelve
+// foundation stones (one a level, all twelve at 50), the way levels 2–7 fill in the armour.
+const FRUIT_C=['#D94A5A','#F2B33D','#6CB4E4','#8A6BC9','#E98AB0','#6DBE6D','#E07B39','#9AD0C2','#B58A5A'];
+const fruitIcon=c=>`<svg viewBox="0 0 24 24"><circle cx="12" cy="14" r="7" fill="${c}"/><circle cx="9.5" cy="11.5" r="1.8" fill="#fff" opacity=".55"/><path d="M12 7q1-4 5-4-1 4-5 4z" fill="#6DBE6D"/></svg>`;
+// 아벨 제단 · 에녹 발자국 · 노아 방주 · 아브라함 별 · 사라 장막 · 요셉 채색옷 · 모세 지팡이 · 룻 이삭 · 다윗 수금
+const PEOPLE_ICON=[
+  '<path d="M5 20h14v-6H5z" opacity=".5"/><path d="M12 13q-4-3-1-8 1 3 3 3 2 3-2 5z"/>',
+  '<ellipse cx="8" cy="15" rx="2.6" ry="4"/><ellipse cx="16" cy="8" rx="2.6" ry="4"/>',
+  '<path d="M3 15h18l-3 5H6z"/><path d="M7 15V10h10v5z" opacity=".5"/>',
+  '<path d="M12 3l2.5 6 6.5.5-5 4 1.5 6.5L12 16.5 6.5 20 8 13.5l-5-4 6.5-.5z"/>',
+  '<path d="M3 20L12 5l9 15z" opacity=".5"/><path d="M11 20l1-6 1 6z"/><path d="M11.3 5h1.4v15h-1.4z"/>',
+  '<path d="M8 4L4 8l3 3 1-1v10h8V10l1 1 3-3-4-4z" opacity=".5"/><path d="M8 12h8v2H8zM8 16h8v2H8z"/>',
+  '<path d="M11 4h2v17h-2z"/><path d="M13 4q5 0 4 5-1 2-4 1z" opacity=".6"/>',
+  '<path d="M11 8h2v13h-2z"/><path d="M12 9q-4-1-4-5 4 0 4 5zM12 9q4-1 4-5-4 0-4 5zM12 13q-4-1-4-5 4 0 4 5zM12 13q4-1 4-5-4 0-4 5z" opacity=".6"/>',
+  '<path d="M6 4q12 2 12 16H8z" opacity=".5"/><path d="M8 6h2v14H8zM12 8h1.5v12H12zM15 11h1.5v9H15z"/>'];
+const gemIcon=c=>`<svg viewBox="0 0 24 24"><path d="M5 9l3.5-5h7L19 9l-7 12z" fill="${c}"/><path d="M5 9h14M8.5 4L12 9l3.5-5M12 9v12" stroke="#fff" stroke-width=".8" opacity=".6" fill="none"/></svg>`;
 function armorRow(L){
-  return `<div class="armor-row" aria-label="전신갑주 ${Math.min(L-1,6)}/6">${ARMOR.slice(1,7).map((a,i)=>`<span class="piece ${L>=i+2?'on':''}" title="${a.t}">${PIECE_ICON[a.piece]}<small>${a.short}</small></span>`).join('')}</div>`;
+  if(L<=20)return `<div class="armor-row" aria-label="전신갑주 ${Math.min(L-1,6)}/6">${ARMOR.slice(1,7).map((a,i)=>`<span class="piece ${L>=i+2?'on':''}" title="${a.t}">${PIECE_ICON[a.piece]}<small>${a.short}</small></span>`).join('')}</div>`;
+  if(L<=30){const n=Math.min(9,L-20);
+    return `<div class="armor-row ch" aria-label="성령의 열매 ${n}/9"><span class="row-head">성령의 열매 ${n}/9 (갈 5:22–23)</span>${ARMOR.slice(20,29).map((a,i)=>`<span class="piece col ${i<n?'on':''}" title="${a.t}">${fruitIcon(FRUIT_C[i])}<small>${a.short}</small></span>`).join('')}</div>`}
+  if(L<=40){const n=Math.min(9,L-30);
+    return `<div class="armor-row ch" aria-label="믿음의 선진 ${n}/9"><span class="row-head">믿음의 선진 ${n}/9 (히 11)</span>${ARMOR.slice(30,39).map((a,i)=>`<span class="piece ${i<n?'on':''}" title="${a.t}"><svg viewBox="0 0 24 24" fill="currentColor">${PEOPLE_ICON[i]}</svg><small>${a.short}</small></span>`).join('')}</div>`}
+  const n=L>=50?12:L-40;
+  return `<div class="armor-row ch" style="--n:6" aria-label="성의 기초석 ${n}/12"><span class="row-head">성의 기초석 ${n}/12 (계 21:19–20)</span>${STONES.map((s,i)=>`<span class="piece col ${i<n?'on':''}" title="${s.name}">${gemIcon(s.c)}<small>${s.name}</small></span>`).join('')}</div>`;
 }
 const filtered=()=>S.series==='all'?VERSES:VERSES.filter(v=>v.s===S.series);
 
@@ -1333,7 +1482,7 @@ function homeView(){
         <div class="lv-name">${SYNC_URL&&!cloud?(S.name&&syncCode?`<span>${esc(S.name)}</span><button data-act="panel" data-p="rename" aria-label="닉네임 바꾸기">✎</button>`:''):S.name?`<span>${esc(S.name)}</span><button data-act="panel" data-p="name" aria-label="닉네임 바꾸기">✎</button>`:`<button data-act="panel" data-p="name">닉네임 정하기</button>`}</div>
         <div class="lv-title">${l.title}</div>
         <div class="bar"><i style="width:${l.need?l.into/l.need*100:100}%"></i></div>
-        <p class="tiny">${l.next?`${l.L>=8?'다음 칭호':'다음 갑주'} <b>${l.next.t}</b>까지 <span style="white-space:nowrap">${l.need-l.into} XP</span>`:'모든 칭호를 받았어요! 계속 XP를 모아 순위를 올려요'}${th?` · <span style="white-space:nowrap">${th.name} 갑주 ${th.tier}단계</span>`:''}</p></div>
+        <p class="tiny">${l.next?`${l.L>=8?'다음 칭호':'다음 갑주'} <b>${l.next.t}</b>까지 <span style="white-space:nowrap">${l.need-l.into} XP</span>`:'모든 칭호를 받았어요! 계속 XP를 모아 순위를 올려요'}${th?` · <span style="white-space:nowrap">${l.L>20?th.name:`${th.name} 갑주 ${th.tier}단계`}</span>`:''}</p></div>
     </div>
     ${armorRow(l.L)}
     ${heroSave()}
@@ -1434,7 +1583,7 @@ function tourSlides(){
      p:'노란 버튼을 누르면 <b>10문제</b> 퀴즈가 시작돼요. 말씀, 주소, <b>제목</b>, <b>시리즈</b>를 맞혀요. 아래 <b>범위 · 문제 종류 고르기</b>에서 지금 외우는 구절만 골라 둘 수 있어요. 어려움부터는 직접 쓰는 문제도 나와요. 하루에 게임 3번이면 <b>오늘의 목표</b> 달성, 내가 한 것은 <b>내 기록</b>에서 볼 수 있어요.'},
     {pic:`<div class="t-avatars">${avatar(1,56)}<span class="arrow">→</span>${avatar(4,64)}<span class="arrow">→</span>${avatar(8,76)}</div>`,
      h:'XP를 모아 전신갑주를 입어요',
-     p:'연습과 도전으로 XP를 얻으면 레벨이 오르고, 에베소서 6장의 <b>전신갑주</b>가 한 벌씩 입혀져요. 진리의 허리띠부터 성령의 검까지 다 갖추면 <b>말씀의 용사</b>!'}];
+     p:'연습과 도전으로 XP를 얻으면 레벨이 오르고, 에베소서 6장의 <b>전신갑주</b>가 한 벌씩 입혀져요. 진리의 허리띠부터 성령의 검까지 다 갖추면 <b>말씀의 용사</b>! 그 뒤로도 성령의 열매, 믿음의 선진, 새 예루살렘까지 레벨 50의 칭호가 이어져요.'}];
   if(SYNC_URL&&!cloud)slides.push(
     {pic:`<div class="t-quiz"><div class="t-save"><span class="h-in">닉네임</span><span class="h-in">비밀번호</span><span class="h-btn">진도 저장</span></div>
        <div class="t-board"><div><span class="rk">1</span><span>은혜</span><span>1,240 XP</span></div><div><span class="rk">2</span><span>${esc(S.name||'나')}</span><span>980 XP</span></div></div></div>`,
