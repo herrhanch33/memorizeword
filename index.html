@@ -931,7 +931,7 @@ function boardView(){
     // top 10 always; ranks 11-30 behind the 더 보기 button; my own row below if I'm further down
     const total=Math.min(BOARD_MAX,board.rows.length),shown=board.open?total:Math.min(BOARD_TOP,total);
     const mi=board.rows.findIndex(r=>r.id===myId);
-    const more=total>BOARD_TOP?`<button class="board-more" data-act="boardMore" aria-expanded="${board.open}">${board.open?'접기 ▴':`${BOARD_TOP+1}~${total}위 더 보기 ▾`}</button>`:'';
+    const more=total>BOARD_TOP?`<button class="board-more" data-act="boardMore" aria-expanded="${board.open}">${board.open?'접기 ▴':'더 보기 ▾'}</button>`:'';
     body=`<ol>${board.rows.slice(0,shown).map(boardRow).join('')}${mi>=shown?`<li class="gap">…</li>${boardRow(board.rows[mi],mi)}`:''}</ol>${more}
       <p class="tiny">정복: 쉬움·보통·어려움·오직말씀 순으로 정복한 구절 수예요.${board.err?' · '+esc(board.err):''}</p>`;
   }
