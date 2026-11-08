@@ -1001,7 +1001,7 @@ function boardCard(r,i){
   return `<div class="b-card" id="bc-${esc(r.id)}" ${th?`style="--bc:${th.bg};--bci:${th.ink}"`:''}>${floats}
     <div class="bc-top">${avatar(L,60,'',r.sex)}<div><b class="bc-name">${esc(r.name)}</b><span class="bc-title">Lv.${L} ${esc(a.t)}</span>${a.ref?`<span class="bc-verse">“${esc(a.desc)}” <small>${esc(a.ref)}</small></span>`:''}</div></div>
     <div class="bc-box">${armorRow(L)}
-    ${own.length?`<div class="bc-orn" aria-label="모은 상징 ${own.length}개"><button class="ho-head" data-act="fold" data-k="corn" aria-expanded="${!fold.corn}">상징 ${own.length} <i aria-hidden="true">${fold.corn?'▸':'▾'}</i></button>${fold.corn?'':own.map(o=>`<span title="${esc(o.name)} · ${esc(o.ref)}">${ornSvg(o)}</span>`).join('')}</div>`:''}</div>
+    ${own.length?`<div class="bc-orn" aria-label="모은 상징 ${own.length}개"><button class="ho-head" data-act="fold" data-k="corn" aria-expanded="${!fold.corn}">모은 상징 ${own.length}개 <i aria-hidden="true">${fold.corn?'▸':'▾'}</i></button>${fold.corn?'':own.map(o=>`<span title="${esc(o.name)} · ${esc(o.ref)}">${ornSvg(o)}</span>`).join('')}</div>`:''}</div>
     <div class="bc-chips">${chip(i+1+'위','순위')}${chip(r.xp.toLocaleString(),'XP')}${chip(r.streak+'일','연속')}${r.g!=null?chip(r.g>=200?'200+':r.g,'게임'):''}</div>
     <p class="bc-sub">정복 ${r.m.map((c,k)=>`${DIFF[k+1].name} <b>${c}</b>`).join(' · ')}${fv?`<br>가장 많이 연습한 말씀 <b>${fv.n}. ${esc(fv.t)}</b>`:''}</p></div>`;
 }
@@ -1318,7 +1318,7 @@ function heroOrn(L){
   if(!own.length&&!next)return '';
   const item=(o,on)=>`<span class="${on?'on':''}" title="${esc(o.name)} · ${esc(o.ref)}${on?'':` · Lv.${o.L}에 받아요`}">${ornSvg(o)}</span>`;
   return `<div class="hero-orn" aria-label="모은 상징 ${own.length}개">
-    ${own.length?`<button class="ho-head" data-act="fold" data-k="orn" aria-expanded="${!fold.orn}">상징 ${own.length} <i aria-hidden="true">${fold.orn?'▸':'▾'}</i></button>
+    ${own.length?`<button class="ho-head" data-act="fold" data-k="orn" aria-expanded="${!fold.orn}">모은 상징 ${own.length}개 <i aria-hidden="true">${fold.orn?'▸':'▾'}</i></button>
     ${fold.orn?'':`<div class="ho-line">${own.map(o=>item(o,true)).join('')}${later.map(o=>item(o,false)).join('')}</div>`}`:''}
     <p class="ho-next">${next?`다음 상징: 레벨 ${next.L}에서 <b>${esc(next.name)}</b> (${esc(next.ref)})`:'성경의 상징을 모두 모았어요'}</p></div>`;
 }
