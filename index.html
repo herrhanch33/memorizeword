@@ -965,7 +965,7 @@ async function loadBoard(force){
   board.busy=false;
   if(view.name==='home')render();
 }
-// Tapping a name (or resting the mouse on it for a moment on a computer) opens that person's card under
+// Tapping or clicking a name opens that person's card under
 // the row: only what the board already shares, plus games played and the verse they practise most.
 function boardCard(r,i){
   const L=Math.min(r.lv,ARMOR.length),a=ARMOR[L-1],th=heroTheme(L),orn=ORN.filter(o=>o.L<=L).length,fv=r.fav?byN(r.fav):null;
@@ -2772,12 +2772,6 @@ app.addEventListener('input',e=>{
   else if(t.id==='pin2')ui.pin2=t.value.replace(/\D/g,'');
 });
 app.addEventListener('toggle',e=>{if(e.target.matches('details.adv'))ui.adv=e.target.open},true);
-// on a computer, resting the mouse on a name for a moment opens the same card (phones tap instead)
-let hoverT=null;
-app.addEventListener('mouseover',e=>{const b=e.target.closest('.b-row');clearTimeout(hoverT);
-  if(!b||!matchMedia('(hover:hover)').matches||board.card===b.dataset.id)return;
-  hoverT=setTimeout(()=>{board.card=b.dataset.id;render()},700)});
-app.addEventListener('mouseout',e=>{if(e.target.closest('.b-row'))clearTimeout(hoverT)});
 // developer mode's level slider: the label follows while dragging, the page redraws on release
 app.addEventListener('input',e=>{if(e.target.id==='devL'){const b=$('#devLv');if(b)b.textContent='Lv.'+e.target.value}});
 app.addEventListener('change',e=>{if(e.target.id==='devL'){dev.L=+e.target.value;render()}});
