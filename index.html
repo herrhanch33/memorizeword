@@ -119,6 +119,8 @@ main{max-width:560px;margin:0 auto;padding-block:16px 48px;display:flex;flex-dir
 .tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 
 .group{display:grid;gap:10px}
+.group .ser-btn{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;border:0;background:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;min-height:44px}
+.group .ser-btn i{font-style:normal;font-size:13px;color:var(--muted)}
 .vlist{list-style:none;padding:0;margin:0;display:grid;gap:10px}
 .vrow{width:100%;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:0 3px 0 var(--line);cursor:pointer}
 .vrow:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
@@ -1916,7 +1918,7 @@ function homeView(){
   ${boardView()}
   <div class="tabs" role="tablist" aria-label="시리즈">${tabs}</div>
   <p class="tiny">구절을 눌러 빈칸 채우기, 순서 맞추기, 직접 써보기를 통과하면 별 3개로 그 난이도를 정복해요. 네 난이도를 모두 정복해 보세요. <button class="link" data-act="tourOpen">사용법 보기</button></p>
-  ${groups.map(s=>`<section class="group" style="--sc:var(--c${s.c})"><h2 class="sec"><span><span class="sheet-no">${s.sheet}</span> ${esc(s.name)}</span><span class="range">${s.range}</span></h2><ul class="vlist">${VERSES.filter(v=>v.s===s.id).map(row).join('')}</ul></section>`).join('')}
+  ${groups.map(s=>{const k='s_'+s.id,shut=!!fold[k];return `<section class="group ${shut?'shut':''}" style="--sc:var(--c${s.c})"><h2 class="sec"><button class="ser-btn" data-act="fold" data-k="${k}" aria-expanded="${!shut}"><span><span class="sheet-no">${s.sheet}</span> ${esc(s.name)}</span><span class="range">${s.range} <i aria-hidden="true">${shut?'▸':'▾'}</i></span></button></h2>${shut?'':`<ul class="vlist">${VERSES.filter(v=>v.s===s.id).map(row).join('')}</ul>`}</section>`}).join('')}
   ${keepView()}
   <p class="tiny" style="text-align:center">주평예수교회 말씀암송 · 교회 식구들과 함께 외워요</p>
   <div class="foot">
