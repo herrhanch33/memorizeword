@@ -191,30 +191,32 @@ main{max-width:560px;margin:0 auto;padding-block:16px 48px;display:flex;flex-dir
 .board li.me .b-row{outline:2px solid var(--accent);outline-offset:-2px}
 .board li.open .b-row{border-radius:12px 12px 0 0}
 .b-card{--bc:var(--accent);--bci:var(--accent-ink);position:relative;overflow:hidden;isolation:isolate;background:var(--bc);color:var(--bci);border-radius:0 0 14px 14px;padding:12px;display:grid;gap:10px;animation:bcIn .2s ease-out}
-.b-card > .scene{position:absolute;inset:0;width:100%;height:100%;z-index:-1;color:var(--bci);pointer-events:none;opacity:.6}
+.b-card > .scene{position:absolute;inset:0;width:100%;height:100%;z-index:-1;color:var(--bci);pointer-events:none;opacity:.35}
 .bc-float{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
-.bc-float span{position:absolute;left:6%;top:100%;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--f-verse);font-size:14px;color:var(--bci);opacity:.2;animation:bcfloat var(--dur) linear infinite}
+.bc-float span{position:absolute;left:6%;top:100%;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--f-verse);font-size:14px;color:var(--bci);opacity:0;animation:bcfloat var(--dur) linear infinite}
 .bc-float span.r{left:auto;right:6%;text-align:right}
-@keyframes bcfloat{to{top:-8%}}
+@keyframes bcfloat{0%{top:100%;opacity:0}18%{opacity:.17}82%{opacity:.17}100%{top:-6%;opacity:0}}
 @media (prefers-reduced-motion:reduce){.bc-float{display:none}}
 @keyframes bcIn{from{opacity:0;transform:translateY(-4px)}}
 @media (prefers-reduced-motion:reduce){.b-card{animation:none}}
-.bc-top{display:grid;grid-template-columns:84px minmax(0,1fr);gap:10px;align-items:center}
+.b-card{--accent-ink:var(--bci)}
+.bc-top{display:grid;grid-template-columns:60px minmax(0,1fr);gap:10px;align-items:center}
 .bc-top .avatar{filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
-.bc-name{display:block;font-family:var(--f-display);font-size:20px;line-height:1.2}
-.bc-title{display:block;font-family:var(--f-display);font-size:15px;opacity:.95}
-.bc-verse{display:block;font-family:var(--f-verse);font-size:13px;line-height:1.45;opacity:.9;margin-top:4px}
-.bc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(48px,1fr));gap:5px}
-.bc-st{background:color-mix(in srgb,var(--bci) 14%,transparent);border-radius:10px;padding:6px 4px;text-align:center;display:grid}
-.bc-st b{font-family:var(--f-display);font-size:14px;font-variant-numeric:tabular-nums}
-.bc-st span{font-size:11px;opacity:.85}
-.bc-m{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:11px;text-align:center}
-.bc-m span{display:grid;opacity:.92}
-.bc-m b{font-family:var(--f-display);font-size:15px}
-.bc-fav{margin:0;font-size:13px}
-.bc-orn{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;padding-top:8px;border-top:1px solid color-mix(in srgb,var(--bci) 25%,transparent)}
-.bc-orn span{width:30px;height:30px;display:grid;place-items:center;border-radius:8px;background:color-mix(in srgb,var(--bci) 12%,transparent)}
-.bc-orn svg{width:22px;height:22px;filter:drop-shadow(0 0 4px color-mix(in srgb,var(--bci) 45%,transparent))}
+.bc-name{display:block;font-family:var(--f-display);font-size:18px;line-height:1.2}
+.bc-title{display:block;font-family:var(--f-display);font-size:14px;opacity:.95}
+.bc-title small{font-family:var(--f-body);font-size:12px;opacity:.85}
+.b-card .armor-row{padding:6px 4px;gap:2px}
+.b-card .armor-row small{display:none}
+.b-card .armor-row .row-head{font-size:11px}
+.b-card .armor-row .piece svg{width:20px;height:20px}
+.bc-orn{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+.bc-orn::-webkit-scrollbar{display:none}
+.bc-orn span{flex:none;width:26px;height:26px;display:grid;place-items:center;border-radius:7px;background:color-mix(in srgb,var(--bci) 12%,transparent)}
+.bc-orn svg{width:19px;height:19px;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--bci) 45%,transparent))}
+.bc-chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(56px,1fr));gap:5px}
+.bc-chips span{display:grid;text-align:center;padding:4px 2px;border-radius:9px;background:color-mix(in srgb,var(--bci) 14%,transparent);font-size:11px;opacity:.95}
+.bc-chips b{font-family:var(--f-display);font-size:14px;font-variant-numeric:tabular-nums}
+.bc-sub{margin:0;font-size:12px;line-height:1.5;opacity:.92}
 /* 개발자 모드 · 칭호 전체 목록 · 말씀별 오답률 */
 .dev{background:var(--surface);border:2px dashed var(--gold-deep);border-radius:18px;padding:14px;display:grid;gap:10px;margin-bottom:14px}
 .dev .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -976,18 +978,17 @@ async function loadBoard(force){
 // Tapping or clicking a name opens that person's card under
 // the row: only what the board already shares, plus games played and the verse they practise most.
 function boardCard(r,i){
-  const L=Math.min(r.lv,ARMOR.length),a=ARMOR[L-1],th=heroTheme(L),orn=ORN.filter(o=>o.L<=L).length,fv=r.fav?byN(r.fav):null;
-  const st=(b,s)=>`<div class="bc-st"><b>${b}</b><span>${s}</span></div>`;
-  // the verses they have mastered drift up behind the card, faintly, like the titles behind the home page
-  const won=r.mv?VERSES.filter((v,k)=>r.mv[k]>0):[],nf=Math.min(8,won.length),dur=26,now=Date.now()/1000;
-  const floats=nf?`<div class="bc-float" aria-hidden="true">${won.slice(0,nf).map((v,i)=>`<span class="${i%2?'r':''}" style="--dur:${dur}s;animation-delay:${-((now+i*dur/nf)%dur).toFixed(1)}s">${esc(v.t.length>16?v.t.slice(0,16)+'…':v.t)} · ${esc(v.b)} ${v.c}:${esc(v.v)}</span>`).join('')}</div>`:'';
+  const L=Math.min(r.lv,ARMOR.length),a=ARMOR[L-1],th=heroTheme(L),own=ORN.filter(o=>o.L<=L),fv=r.fav?byN(r.fav):null;
+  // the verses they have mastered scroll slowly up behind the card, fading in and out
+  const won=r.mv?VERSES.filter((v,k)=>r.mv[k]>0):[],nf=Math.min(6,won.length),dur=34,now=Date.now()/1000;
+  const floats=nf?`<div class="bc-float" aria-hidden="true">${won.slice(0,nf).map((v,k)=>`<span class="${k%2?'r':''}" style="--dur:${dur}s;animation-delay:${-((now+k*dur/nf)%dur).toFixed(1)}s">${esc(v.t.length>14?v.t.slice(0,14)+'…':v.t)} · ${esc(v.b)} ${v.c}:${esc(v.v)}</span>`).join('')}</div>`:'';
+  const chip=(b,t)=>`<span><b>${b}</b>${t}</span>`;
   return `<div class="b-card" id="bc-${esc(r.id)}" ${th?`style="--bc:${th.bg};--bci:${th.ink}"`:''}>${sceneView(L)}${floats}
-    <div class="bc-top">${avatar(L,84,'',r.sex)}<div><b class="bc-name">${esc(r.name)}</b><span class="bc-title">Lv.${L} ${esc(a.t)}</span>
-      ${a.ref?`<span class="bc-verse">“${esc(a.desc)}” (${esc(a.ref)})</span>`:''}</div></div>
-    <div class="bc-grid">${st(i+1+'위','순위')}${st(r.xp.toLocaleString(),'XP')}${st(r.streak+'일','연속')}${st(orn+'개','받은 상징')}${r.g!=null?st(r.g>=200?'200+':r.g,'한 게임'):''}</div>
-    <div class="bc-m">${r.m.map((c,k)=>`<span><b>${c}</b>${DIFF[k+1].name}</span>`).join('')}</div>
-    ${fv?`<p class="bc-fav">가장 많이 연습한 말씀 <b>${fv.n}. ${esc(fv.t)}</b></p>`:''}
-    ${orn?`<div class="bc-orn" aria-label="모은 상징 ${orn}개">${ORN.filter(o=>o.L<=L).map(o=>`<span title="${esc(o.name)} · ${esc(o.ref)}">${ornSvg(o)}</span>`).join('')}</div>`:''}</div>`;
+    <div class="bc-top">${avatar(L,60,'',r.sex)}<div><b class="bc-name">${esc(r.name)}</b><span class="bc-title">Lv.${L} ${esc(a.t)}${a.ref?` <small>${esc(a.ref)}</small>`:''}</span></div></div>
+    ${armorRow(L)}
+    ${own.length?`<div class="bc-orn" aria-label="모은 상징 ${own.length}개">${own.map(o=>`<span title="${esc(o.name)} · ${esc(o.ref)}">${ornSvg(o)}</span>`).join('')}</div>`:''}
+    <div class="bc-chips">${chip(i+1+'위','순위')}${chip(r.xp.toLocaleString(),'XP')}${chip(r.streak+'일','연속')}${r.g!=null?chip(r.g>=200?'200+':r.g,'게임'):''}</div>
+    <p class="bc-sub">정복 ${r.m.map((c,k)=>`${DIFF[k+1].name} <b>${c}</b>`).join(' · ')}${fv?`<br>가장 많이 연습한 말씀 <b>${fv.n}. ${esc(fv.t)}</b>`:''}</p></div>`;
 }
 function boardRow(r,i){
   const title=ARMOR[Math.min(r.lv-1,ARMOR.length-1)].t,open=board.card===r.id;
