@@ -918,6 +918,7 @@ async function computeId(){
   myId='';
   if(!syncCode||!crypto.subtle)return;
   try{const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(syncCode));myId=[...new Uint8Array(h)].slice(0,5).map(b=>b.toString(16).padStart(2,'0')).join('')}catch(e){}
+  checkDev();
 }
 async function loadBoard(force){
   if(!SYNC_URL||!syncCode||!S.name||board.busy)return;
@@ -1237,7 +1238,7 @@ function gardenView(L,th){
   if(!have)return '';
   // what I have plus only the next two, so the strip looks a little way ahead and never shows how far it goes
   // (developer mode can show them all)
-  const ahead=ORN.filter(o=>o.L>L).slice(0,dev.on&&dev.all?ORN.length:2);
+  const ahead=ORN.filter(o=>o.L>L).slice(0,devOn()&&dev.all?ORN.length:2);
   const shown=new Set([...ORN.filter(o=>o.L<=L),...ahead]);
   const groups=ORN_GROUPS.filter(([,a,b])=>ORN.some(o=>o.L>=a&&o.L<=b&&shown.has(o)));
   const item=o=>`<span class="g-item ${o.L<=L?'on':'off'}" title="${esc(o.name)} · ${esc(o.ref)}${o.L>L?` · Lv.${o.L}에 받아요`:''}">${ornSvg(o)}<small>${o.L<=L?esc(o.name):`Lv.${o.L}`}</small></span>`;
@@ -1673,7 +1674,19 @@ if(location.hash==='#dev'){
   history.replaceState(null,'',location.pathname+location.search);
 }
 function lvlAt(L){return {L,title:ARMOR[L-1].t,into:0,need:L<LV_AT.length?LV_AT[L]-LV_AT[L-1]:0,next:ARMOR[L]||null}}
-function shownLvl(){return dev.on&&dev.L?lvlAt(dev.L):lvl()}
+// Developer mode opens only for the developer's own account (signed in, so it takes that account's PIN): the page keeps
+// a hash of that nickname, not the name. It only changes what the home page shows, never XP or the board.
+const DEV_HASH='6348f6e49612ee3124ef0f7721955cd55301f82fcf29e624c9e96a701bd66915';
+let devFor=null;
+async function checkDev(){
+  devFor=null;
+  if(!syncCode||!S.name||!crypto.subtle)return;
+  const key=S.name.normalize('NFKC').replace(/ /g,'').toLowerCase();
+  try{const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('malsseum-dev:'+key));
+    if([...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('')===DEV_HASH){devFor=S.name;if(dev.on&&view.name==='home')render()}}catch(e){}
+}
+const devOn=()=>dev.on&&!!syncCode&&devFor!==null&&S.name===devFor;
+function shownLvl(){return devOn()&&dev.L?lvlAt(dev.L):lvl()}
 function devPanel(){
   const cur=shownLvl().L;
   return `<section class="dev" aria-label="개발자 모드"><h2 class="sec"><span>개발자 모드</span><button class="link" data-act="devOff">끄기</button></h2>
@@ -1814,7 +1827,7 @@ function homeView(){
   const sel=S.series==='all'?null:seriesOf(S.series);
   const groups=sel?[sel]:SERIES;
   const tabs=[{id:'all',short:'전체'},...SERIES].map(s=>`<button class="tab" role="tab" aria-selected="${S.series===s.id}" data-act="series" data-id="${s.id}" ${s.c?`style="--sc:var(--c${s.c})"`:''}>${esc(s.short)}</button>`).join('');
-  return `${dev.on?devPanel():''}${decoView(l.L,th)}
+  return `${devOn()?devPanel():''}${decoView(l.L,th)}
   <section class="hero ${th?'lit':''}" aria-label="나의 기록" ${th?`style="--accent:${th.bg};--accent-deep:${th.deep};--accent-ink:${th.ink};--glow:${th.glow};--glow-r:${th.glowR}px;--glow-a:${th.glowA};--tier:${th.tier}"`:''}>
     ${sceneView(l.L)}
     <div class="hero-top">
