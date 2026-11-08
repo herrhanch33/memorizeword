@@ -1236,10 +1236,12 @@ const ORN_GROUPS=[['',1,20],['성령의 열매',21,30],['믿음의 선진',31,40
 function gardenView(L,th){
   const next=ORN.find(o=>o.L>L),have=ORN.filter(o=>o.L<=L).length;
   if(!have)return '';
-  // what I have plus only the next two, so the strip looks a little way ahead and never shows how far it goes
-  // (developer mode can show them all)
+  // what I have, plus the whole group (row) of the next two, so the strip looks a little way ahead and never
+  // shows how far it goes (developer mode can show them all)
   const ahead=ORN.filter(o=>o.L>L).slice(0,devOn()&&dev.all?ORN.length:2);
-  const shown=new Set([...ORN.filter(o=>o.L<=L),...ahead]);
+  const inGroup=o=>ORN_GROUPS.find(([,a,b])=>o.L>=a&&o.L<=b);
+  const near=new Set(ahead.map(inGroup));
+  const shown=new Set([...ORN.filter(o=>o.L<=L),...ahead,...ORN.filter(o=>near.has(inGroup(o)))]);
   const groups=ORN_GROUPS.filter(([,a,b])=>ORN.some(o=>o.L>=a&&o.L<=b&&shown.has(o)));
   const item=o=>`<span class="g-item ${o.L<=L?'on':'off'}" title="${esc(o.name)} · ${esc(o.ref)}${o.L>L?` · Lv.${o.L}에 받아요`:''}">${ornSvg(o)}<small>${o.L<=L?esc(o.name):`Lv.${o.L}`}</small></span>`;
   // the item colour leans toward the page's ink, so a pale card colour (백색, 진주) or a deep one in dark mode stays readable
