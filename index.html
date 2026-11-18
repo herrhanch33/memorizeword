@@ -604,6 +604,7 @@ main{position:relative;z-index:1}
 .qv[aria-pressed="true"] b{color:var(--sc)}
 .seg.seg3{grid-template-columns:repeat(3,1fr)}
 .seg.seg2{grid-template-columns:repeat(2,1fr)}
+.en-credit{font-size:11px;opacity:.75}
 .qgo{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:grid;gap:6px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(6px);border-radius:18px;padding:8px}
 .qgo .btn:disabled{opacity:.5;cursor:default}
 /* 내 기록 */
@@ -755,50 +756,97 @@ const KEYS={
 // The same 42 references in English, for people who memorise in English. S.lang picks the language: the
 // verse text, the Bible book names and the way a reference is written change (Romans 8:15); the handout
 // titles and the menus stay Korean. Stars are kept per language (S.verses / S.en); XP and level are shared.
-const EN_NAME='King James Version';
+const EN_NAME='NIV (1984)';
+// the credit line the publisher asks for wherever its text is quoted
+const EN_CREDIT='Scripture quotations taken from The Holy Bible, New International Version® NIV®. Copyright © 1973, 1978, 1984 by Biblica, Inc.™ Used by permission. All rights reserved worldwide.';
 const EN={
-  1:{b:'2 Corinthians',p:[[7,'But we have this treasure in earthen vessels, that the excellency of the power may be of God, and not of us.']]},
-  2:{b:'2 Corinthians',p:[[6,'For God, who commanded the light to shine out of darkness, hath shined in our hearts, to give the light of the knowledge of the glory of God in the face of Jesus Christ.']]},
-  3:{b:'2 Corinthians',p:[[10,'Always bearing about in the body the dying of the Lord Jesus, that the life also of Jesus might be made manifest in our body.']]},
-  4:{b:'2 Corinthians',p:[[12,'So then death worketh in us, but life in you.']]},
-  5:{b:'Galatians',p:[[20,'I am crucified with Christ: nevertheless I live; yet not I, but Christ liveth in me: and the life which I now live in the flesh I live by the faith of the Son of God, who loved me, and gave himself for me.']]},
-  6:{b:'John',p:[[34,'A new commandment I give unto you, That ye love one another; as I have loved you, that ye also love one another.'],[35,'By this shall all men know that ye are my disciples, if ye have love one to another.']]},
-  7:{b:'Colossians',p:[[2,'Set your affection on things above, not on things on the earth.'],[3,'For ye are dead, and your life is hid with Christ in God.']]},
-  8:{b:'Acts',p:[[5,'For John truly baptized with water; but ye shall be baptized with the Holy Ghost not many days hence.']]},
-  9:{b:'Acts',p:[[8,'But ye shall receive power, after that the Holy Ghost is come upon you: and ye shall be witnesses unto me both in Jerusalem, and in all Judaea, and in Samaria, and unto the uttermost part of the earth.']]},
-  10:{b:'Acts',p:[[36,'Therefore let all the house of Israel know assuredly, that God hath made that same Jesus, whom ye have crucified, both Lord and Christ.']]},
-  11:{b:'Acts',p:[[38,'Then Peter said unto them, Repent, and be baptized every one of you in the name of Jesus Christ for the remission of sins, and ye shall receive the gift of the Holy Ghost.']]},
-  12:{b:'Acts',p:[[42,'And they continued stedfastly in the apostles’ doctrine and fellowship, and in breaking of bread, and in prayers.']]},
-  13:{b:'Acts',p:[[6,'Then Peter said, Silver and gold have I none; but such as I have give I thee: In the name of Jesus Christ of Nazareth rise up and walk.']]},
-  14:{b:'Acts',p:[[12,'Neither is there salvation in any other: for there is none other name under heaven given among men, whereby we must be saved.']]},
-  15:{b:'Acts',p:[[24,'And when they heard that, they lifted up their voice to God with one accord, and said, Lord, thou art God, which hast made heaven, and earth, and the sea, and all that in them is:']]},
-  16:{b:'Acts',p:[[29,'Then Peter and the other apostles answered and said, We ought to obey God rather than men.']]},
-  17:{b:'Acts',p:[[33,'Then said the Lord to him, Put off thy shoes from thy feet: for the place where thou standest is holy ground.']]},
-  18:{b:'Acts',p:[[17,'And Ananias went his way, and entered into the house; and putting his hands on him said, Brother Saul, the Lord, even Jesus, that appeared unto thee in the way as thou camest, hath sent me, that thou mightest receive thy sight, and be filled with the Holy Ghost.']]},
-  19:{b:'Acts',p:[[34,'Then Peter opened his mouth, and said, Of a truth I perceive that God is no respecter of persons:'],[35,'But in every nation he that feareth him, and worketh righteousness, is accepted with him.']]},
-  20:{b:'Acts',p:[[25,'Then departed Barnabas to Tarsus, for to seek Saul:'],[26,'And when he had found him, he brought him unto Antioch. And it came to pass, that a whole year they assembled themselves with the church, and taught much people. And the disciples were called Christians first in Antioch.']]},
-  21:{b:'Isaiah',p:[[13,'Behold, my servant shall deal prudently, he shall be exalted and extolled, and be very high.']]},
-  22:{b:'Isaiah',p:[[2,'For he shall grow up before him as a tender plant, and as a root out of a dry ground: he hath no form nor comeliness; and when we shall see him, there is no beauty that we should desire him.']]},
-  23:{b:'Isaiah',p:[[5,'But he was wounded for our transgressions, he was bruised for our iniquities: the chastisement of our peace was upon him; and with his stripes we are healed.']]},
-  24:{b:'Isaiah',p:[[7,'He was oppressed, and he was afflicted, yet he opened not his mouth: he is brought as a lamb to the slaughter, and as a sheep before her shearers is dumb, so he openeth not his mouth.']]},
-  25:{b:'Isaiah',p:[[11,'He shall see of the travail of his soul, and shall be satisfied: by his knowledge shall my righteous servant justify many; for he shall bear their iniquities.']]},
-  26:{b:'Genesis',p:[[28,'And he said, Thy name shall be called no more Jacob, but Israel: for as a prince hast thou power with God and with men, and hast prevailed.']]},
-  27:{b:'Job',p:[[5,'I have heard of thee by the hearing of the ear: but now mine eye seeth thee.']]},
-  28:{b:'Exodus',p:[[14,'And God said unto Moses, I AM THAT I AM: and he said, Thus shalt thou say unto the children of Israel, I AM hath sent me unto you.']]},
-  29:{b:'Isaiah',p:[[7,'And he laid it upon my mouth, and said, Lo, this hath touched thy lips; and thine iniquity is taken away, and thy sin purged.']]},
-  30:{b:'Luke',p:[[10,'For the Son of man is come to seek and to save that which was lost.']]},
-  31:{b:'John',p:[[5,'Jesus answered, Verily, verily, I say unto thee, Except a man be born of water and of the Spirit, he cannot enter into the kingdom of God.']]},
-  32:{b:'1 Peter',p:[[23,'Being born again, not of corruptible seed, but of incorruptible, by the word of God, which liveth and abideth for ever.']]},
-  33:{b:'1 Thessalonians',p:[[9,'For they themselves shew of us what manner of entering in we had unto you, and how ye turned to God from idols to serve the living and true God;']]},
-  34:{b:'1 Peter',p:[[25,'For ye were as sheep going astray; but are now returned unto the Shepherd and Bishop of your souls.']]},
-  35:{b:'Romans',p:[[8,'But God commendeth his love toward us, in that, while we were yet sinners, Christ died for us.']]},
-  36:{b:'Romans',p:[[25,'Whom God hath set forth to be a propitiation through faith in his blood, to declare his righteousness for the remission of sins that are past, through the forbearance of God;']]},
-  37:{b:'Romans',p:[[6,'Knowing this, that our old man is crucified with him, that the body of sin might be destroyed, that henceforth we should not serve sin.'],[7,'For he that is dead is freed from sin.']]},
-  38:{b:'Romans',p:[[16,'Know ye not, that to whom ye yield yourselves servants to obey, his servants ye are to whom ye obey; whether of sin unto death, or of obedience unto righteousness?']]},
-  39:{b:'Romans',p:[[7,'What shall we say then? Is the law sin? God forbid. Nay, I had not known sin, but by the law: for I had not known lust, except the law had said, Thou shalt not covet.']]},
-  40:{b:'Romans',p:[[15,'For ye have not received the spirit of bondage again to fear; but ye have received the Spirit of adoption, whereby we cry, Abba, Father.']]},
-  41:{b:'Job',p:[[26,'And though after my skin worms destroy this body, yet in my flesh shall I see God:']]},
-  42:{b:'Romans',p:[[25,'Who was delivered for our offences, and was raised again for our justification.']]}
+  1:{b:'2 Corinthians',p:[[7,'But we have this treasure in jars of clay to show that this all-surpassing power is from God and not from us.']]},
+  2:{b:'2 Corinthians',p:[[6,'For God, who said, "Let light shine out of darkness," made his light shine in our hearts to give us the light of the knowledge of the glory of God in the face of Christ.']]},
+  3:{b:'2 Corinthians',p:[[10,'We always carry around in our body the death of Jesus, so that the life of Jesus may also be revealed in our body.']]},
+  4:{b:'2 Corinthians',p:[[12,'So then, death is at work in us, but life is at work in you.']]},
+  5:{b:'Galatians',p:[[20,'I have been crucified with Christ and I no longer live, but Christ lives in me. The life I live in the body, I live by faith in the Son of God, who loved me and gave himself for me.']]},
+  6:{b:'John',p:[[34,'"A new command I give you: Love one another. As I have loved you, so you must love one another.'],[35,'By this all men will know that you are my disciples, if you love one another."']]},
+  7:{b:'Colossians',p:[[2,'Set your minds on things above, not on earthly things.'],[3,'For you died, and your life is now hidden with Christ in God.']]},
+  8:{b:'Acts',p:[[5,'For John baptized with water, but in a few days you will be baptized with the Holy Spirit."']]},
+  9:{b:'Acts',p:[[8,'But you will receive power when the Holy Spirit comes on you; and you will be my witnesses in Jerusalem, and in all Judea and Samaria, and to the ends of the earth."']]},
+  10:{b:'Acts',p:[[36,'"Therefore let all Israel be assured of this: God has made this Jesus, whom you crucified, both Lord and Christ."']]},
+  11:{b:'Acts',p:[[38,'Peter replied, "Repent and be baptized, every one of you, in the name of Jesus Christ for the forgiveness of your sins. And you will receive the gift of the Holy Spirit.']]},
+  12:{b:'Acts',p:[[42,'They devoted themselves to the apostles\' teaching and to the fellowship, to the breaking of bread and to prayer.']]},
+  13:{b:'Acts',p:[[6,'Then Peter said, "Silver or gold I do not have, but what I have I give you. In the name of Jesus Christ of Nazareth, walk."']]},
+  14:{b:'Acts',p:[[12,'Salvation is found in no one else, for there is no other name under heaven given to men by which we must be saved."']]},
+  15:{b:'Acts',p:[[24,'When they heard this, they raised their voices together in prayer to God. "Sovereign Lord," they said, "you made the heaven and the earth and the sea, and everything in them.']]},
+  16:{b:'Acts',p:[[29,'Peter and the other apostles replied: "We must obey God rather than men!']]},
+  17:{b:'Acts',p:[[33,'"Then the Lord said to him, \'Take off your sandals; the place where you are standing is holy ground.']]},
+  18:{b:'Acts',p:[[17,'Then Ananias went to the house and entered it. Placing his hands on Saul, he said, "Brother Saul, the Lord—Jesus, who appeared to you on the road as you were coming here—has sent me so that you may see again and be filled with the Holy Spirit."']]},
+  19:{b:'Acts',p:[[34,'Then Peter began to speak: "I now realize how true it is that God does not show favoritism'],[35,'but accepts men from every nation who fear him and do what is right.']]},
+  20:{b:'Acts',p:[[25,'Then Barnabas went to Tarsus to look for Saul,'],[26,'and when he found him, he brought him to Antioch. So for a whole year Barnabas and Saul met with the church and taught great numbers of people. The disciples were called Christians first at Antioch.']]},
+  21:{b:'Isaiah',p:[[13,'See, my servant will act wisely; he will be raised and lifted up and highly exalted.']]},
+  22:{b:'Isaiah',p:[[2,'He grew up before him like a tender shoot, and like a root out of dry ground. He had no beauty or majesty to attract us to him, nothing in his appearance that we should desire him.']]},
+  23:{b:'Isaiah',p:[[5,'But he was pierced for our transgressions, he was crushed for our iniquities; the punishment that brought us peace was upon him, and by his wounds we are healed.']]},
+  24:{b:'Isaiah',p:[[7,'He was oppressed and afflicted, yet he did not open his mouth; he was led like a lamb to the slaughter, and as a sheep before her shearers is silent, so he did not open his mouth.']]},
+  25:{b:'Isaiah',p:[[11,'After the suffering of his soul, he will see the light of life and be satisfied; by his knowledge my righteous servant will justify many, and he will bear their iniquities.']]},
+  26:{b:'Genesis',p:[[28,'Then the man said, "Your name will no longer be Jacob, but Israel, because you have struggled with God and with men and have overcome."']]},
+  27:{b:'Job',p:[[5,'My ears had heard of you but now my eyes have seen you.']]},
+  28:{b:'Exodus',p:[[14,'God said to Moses, "I AM WHO I AM. This is what you are to say to the Israelites: \'I AM has sent me to you.\'"']]},
+  29:{b:'Isaiah',p:[[7,'With it he touched my mouth and said, "See, this has touched your lips; your guilt is taken away and your sin atoned for."']]},
+  30:{b:'Luke',p:[[10,'For the Son of Man came to seek and to save what was lost."']]},
+  31:{b:'John',p:[[5,'Jesus answered, "I tell you the truth, no one can enter the kingdom of God unless he is born of water and the Spirit.']]},
+  32:{b:'1 Peter',p:[[23,'For you have been born again, not of perishable seed, but of imperishable, through the living and enduring word of God.']]},
+  33:{b:'1 Thessalonians',p:[[9,'for they themselves report what kind of reception you gave us. They tell how you turned to God from idols to serve the living and true God,']]},
+  34:{b:'1 Peter',p:[[25,'For you were like sheep going astray, but now you have returned to the Shepherd and Overseer of your souls.']]},
+  35:{b:'Romans',p:[[8,'But God demonstrates his own love for us in this: While we were still sinners, Christ died for us.']]},
+  36:{b:'Romans',p:[[25,'God presented him as a sacrifice of atonement, through faith in his blood. He did this to demonstrate his justice, because in his forbearance he had left the sins committed beforehand unpunished—']]},
+  37:{b:'Romans',p:[[6,'For we know that our old self was crucified with him so that the body of sin might be done away with, that we should no longer be slaves to sin—'],[7,'because anyone who has died has been freed from sin.']]},
+  38:{b:'Romans',p:[[16,'Don\'t you know that when you offer yourselves to someone to obey him as slaves, you are slaves to the one whom you obey—whether you are slaves to sin, which leads to death, or to obedience, which leads to righteousness?']]},
+  39:{b:'Romans',p:[[7,'What shall we say, then? Is the law sin? Certainly not! Indeed I would not have known what sin was except through the law. For I would not have known what coveting really was if the law had not said, "Do not covet."']]},
+  40:{b:'Romans',p:[[15,'For you did not receive a spirit that makes you a slave again to fear, but you received the Spirit of sonship. And by him we cry, "Abba, Father."']]},
+  41:{b:'Job',p:[[26,'And after my skin has been destroyed, yet in my flesh I will see God;']]},
+  42:{b:'Romans',p:[[25,'He was delivered over to death for our sins and was raised to life for our justification.']]}
+};
+// the key words of each English verse, as written in the text (see KEYS)
+const KEYS_EN={
+  1:['treasure','jars','clay','all-surpassing','power','God'],
+  2:['shine','darkness','hearts','knowledge','glory','face'],
+  3:['carry','body','death','life','revealed'],
+  4:['death','work','life'],
+  5:['crucified','Christ','live','lives','faith','loved','gave'],
+  6:['command','Love','loved','disciples'],
+  7:['minds','above','earthly','died','hidden','Christ'],
+  8:['John','baptized','water','days','Holy','Spirit'],
+  9:['power','Spirit','witnesses','Jerusalem','Judea','Samaria','ends','earth'],
+  10:['Israel','assured','Jesus','crucified','Lord','Christ'],
+  11:['Repent','baptized','name','forgiveness','sins','gift','Spirit'],
+  12:['devoted','teaching','fellowship','breaking','bread','prayer'],
+  13:['Silver','gold','name','Nazareth','walk'],
+  14:['Salvation','name','heaven','saved'],
+  15:['voices','together','prayer','Sovereign','heaven','earth','sea'],
+  16:['obey','God','men'],
+  17:['sandals','place','standing','holy','ground'],
+  18:['Ananias','hands','Saul','road','see','filled','Spirit'],
+  19:['realize','favoritism','accepts','nation','fear','right'],
+  20:['Barnabas','Tarsus','Saul','Antioch','year','church','disciples','Christians'],
+  21:['servant','wisely','raised','lifted','exalted'],
+  22:['tender','shoot','root','dry','beauty','majesty','desire'],
+  23:['pierced','transgressions','crushed','iniquities','punishment','peace','wounds','healed'],
+  24:['oppressed','afflicted','mouth','lamb','slaughter','sheep','silent'],
+  25:['suffering','soul','light','satisfied','knowledge','righteous','justify','iniquities'],
+  26:['name','Jacob','Israel','struggled','overcome'],
+  27:['ears','heard','eyes','seen'],
+  28:['Moses','WHO','Israelites','sent'],
+  29:['touched','mouth','lips','guilt','sin','atoned'],
+  30:['Son','Man','seek','save','lost'],
+  31:['truth','kingdom','born','water','Spirit'],
+  32:['born','perishable','seed','imperishable','living','enduring','word'],
+  33:['turned','idols','serve','living','true'],
+  34:['sheep','astray','returned','Shepherd','Overseer','souls'],
+  35:['demonstrates','love','sinners','Christ','died'],
+  36:['sacrifice','atonement','faith','blood','justice','forbearance','unpunished'],
+  37:['old','self','crucified','body','sin','slaves','died','freed'],
+  38:['offer','obey','slaves','sin','death','obedience','righteousness'],
+  39:['law','sin','coveting','covet'],
+  40:['spirit','slave','fear','sonship','Abba','Father'],
+  41:['skin','destroyed','flesh','see','God'],
+  42:['delivered','death','sins','raised','justification']
 };
 const VERSES_EN=VERSES_KO.map(v=>EN[v.n]?{...v,b:EN[v.n].b,p:EN[v.n].p}:v);
 let VERSES=VERSES_KO;
@@ -830,7 +878,7 @@ function toks(v){const out=[];v.p.forEach(([num,txt])=>txt.split(/\s+/).filter(B
 const AWKWARD=/보지|자지/;
 const awk=w=>AWKWARD.test(norm(w));
 // indices of the verse's key words among its tokens (a word listed twice, like 사랑하라, counts at both places)
-function keyIdx(v,t){if(isEn())return t.map((x,i)=>i).filter(i=>{const w=norm(t[i].w);return w.length>=4&&!STOP.has(w)});const ks=new Set((KEYS[v.n]||[]).map(norm));return t.map((x,i)=>i).filter(i=>ks.has(norm(t[i].w)))}
+function keyIdx(v,t){if(isEn()&&!KEYS_EN[v.n])return t.map((x,i)=>i).filter(i=>{const w=norm(t[i].w);return w.length>=4&&!STOP.has(w)});const ks=new Set(((isEn()?KEYS_EN:KEYS)[v.n]||[]).map(norm));return t.map((x,i)=>i).filter(i=>ks.has(norm(t[i].w)))}
 // the small verse numbers show when reading a verse but never while solving one: the number alone
 // gave the answer away (church feedback); the chapter and verse themselves stay visible at every level
 const vnHtml=x=>x.vn&&!G?`<sup class="vn">${x.vn}</sup>`:'';
@@ -2033,7 +2081,7 @@ function homeView(){
     <div class="seg">${[1,2,3,4].map(i=>`<button class="d${i}" aria-pressed="${d===i}" data-act="diff" data-d="${i}">${DIFF[i].name}</button>`).join('')}</div>
     <p class="tiny">${df.desc} · XP ×${df.mult}</p>
     <div class="seg seg2" aria-label="암송 언어"><button aria-pressed="${!isEn()}" data-act="lang" data-l="ko">한국어로 암송</button><button aria-pressed="${isEn()}" data-act="lang" data-l="en">English로 암송</button></div>
-    ${isEn()?`<p class="tiny">영어 본문: ${EN_NAME} · 영어 별은 한국어 별과 따로 모아요. XP와 레벨은 함께 올라가요.</p>`:''}
+    ${isEn()?`<p class="tiny">영어 본문: ${EN_NAME} · 영어 별은 한국어 별과 따로 모아요. XP와 레벨은 함께 올라가요.</p><p class="tiny en-credit">${EN_CREDIT}</p>`:''}
   </section>
   <div class="ctabox"><button class="cta" data-act="quiz"><span><span class="cta-main">오늘의 도전</span><span class="cta-sub">${esc(scopeText())}에서 10문제 · ${QMODE[S.qmode].name} · ${df.name} · 문제당 ${df.qt/1000}초</span></span>${ICON.go}</button>
     <button class="cta-set" data-act="qsetOpen">범위 · 문제 종류 고르기</button></div>
