@@ -603,6 +603,7 @@ main{position:relative;z-index:1}
 .qv[aria-pressed="true"]{border-color:var(--sc);background:color-mix(in srgb,var(--sc) 14%,var(--surface));color:var(--ink)}
 .qv[aria-pressed="true"] b{color:var(--sc)}
 .seg.seg3{grid-template-columns:repeat(3,1fr)}
+.seg.seg2{grid-template-columns:repeat(2,1fr)}
 .qgo{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:grid;gap:6px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(6px);border-radius:18px;padding:8px}
 .qgo .btn:disabled{opacity:.5;cursor:default}
 /* 내 기록 */
@@ -655,7 +656,7 @@ const SERIES=[
   {id:'isa',c:3,sheet:'말씀암송 (3)',name:'고난의 종의 노래 · 하나님을 만남',short:'고난의 종 · 하나님을 만남',range:'21–30'},
   {id:'gospel',c:4,sheet:'말씀암송 (4)',name:'복음 시리즈',short:'복음',range:'31–42'}
 ];
-const VERSES=[
+const VERSES_KO=[
   {n:1,s:'church',t:'교회를 향한 하나님의 비전',b:'고린도후서',c:4,v:'7',p:[[7,'우리가 이 보배를 질그릇에 가졌으니 이는 심히 큰 능력은 하나님께 있고 우리에게 있지 아니함을 알게 하려 함이라']]},
   {n:2,s:'church',t:'교회를 향한 하나님의 비전(2) · 우리의 존재를 통해 그리스도를 드러냄',b:'고린도후서',c:4,v:'6',p:[[6,'어두운 데에 빛이 비치라 말씀하셨던 그 하나님께서 예수 그리스도의 얼굴에 있는 하나님의 영광을 아는 빛을 우리 마음에 비추셨느니라']]},
   {n:3,s:'church',t:'교회를 향한 하나님의 비전(4) · 고난으로 드러나는 주님',b:'고린도후서',c:4,v:'10',p:[[10,'우리가 항상 예수의 죽음을 몸에 짊어짐은 예수의 생명이 또한 우리 몸에 나타나게 하려 함이라']]},
@@ -750,15 +751,72 @@ const KEYS={
   42:['범죄한','내줌이','의롭다','살아나셨느니라']
 };
 
+/* ---------- 영어 본문 ---------- */
+// The same 42 references in English, for people who memorise in English. S.lang picks the language: the
+// verse text, the Bible book names and the way a reference is written change (Romans 8:15); the handout
+// titles and the menus stay Korean. Stars are kept per language (S.verses / S.en); XP and level are shared.
+const EN_NAME='King James Version';
+const EN={
+  1:{b:'2 Corinthians',p:[[7,'But we have this treasure in earthen vessels, that the excellency of the power may be of God, and not of us.']]},
+  2:{b:'2 Corinthians',p:[[6,'For God, who commanded the light to shine out of darkness, hath shined in our hearts, to give the light of the knowledge of the glory of God in the face of Jesus Christ.']]},
+  3:{b:'2 Corinthians',p:[[10,'Always bearing about in the body the dying of the Lord Jesus, that the life also of Jesus might be made manifest in our body.']]},
+  4:{b:'2 Corinthians',p:[[12,'So then death worketh in us, but life in you.']]},
+  5:{b:'Galatians',p:[[20,'I am crucified with Christ: nevertheless I live; yet not I, but Christ liveth in me: and the life which I now live in the flesh I live by the faith of the Son of God, who loved me, and gave himself for me.']]},
+  6:{b:'John',p:[[34,'A new commandment I give unto you, That ye love one another; as I have loved you, that ye also love one another.'],[35,'By this shall all men know that ye are my disciples, if ye have love one to another.']]},
+  7:{b:'Colossians',p:[[2,'Set your affection on things above, not on things on the earth.'],[3,'For ye are dead, and your life is hid with Christ in God.']]},
+  8:{b:'Acts',p:[[5,'For John truly baptized with water; but ye shall be baptized with the Holy Ghost not many days hence.']]},
+  9:{b:'Acts',p:[[8,'But ye shall receive power, after that the Holy Ghost is come upon you: and ye shall be witnesses unto me both in Jerusalem, and in all Judaea, and in Samaria, and unto the uttermost part of the earth.']]},
+  10:{b:'Acts',p:[[36,'Therefore let all the house of Israel know assuredly, that God hath made that same Jesus, whom ye have crucified, both Lord and Christ.']]},
+  11:{b:'Acts',p:[[38,'Then Peter said unto them, Repent, and be baptized every one of you in the name of Jesus Christ for the remission of sins, and ye shall receive the gift of the Holy Ghost.']]},
+  12:{b:'Acts',p:[[42,'And they continued stedfastly in the apostles’ doctrine and fellowship, and in breaking of bread, and in prayers.']]},
+  13:{b:'Acts',p:[[6,'Then Peter said, Silver and gold have I none; but such as I have give I thee: In the name of Jesus Christ of Nazareth rise up and walk.']]},
+  14:{b:'Acts',p:[[12,'Neither is there salvation in any other: for there is none other name under heaven given among men, whereby we must be saved.']]},
+  15:{b:'Acts',p:[[24,'And when they heard that, they lifted up their voice to God with one accord, and said, Lord, thou art God, which hast made heaven, and earth, and the sea, and all that in them is:']]},
+  16:{b:'Acts',p:[[29,'Then Peter and the other apostles answered and said, We ought to obey God rather than men.']]},
+  17:{b:'Acts',p:[[33,'Then said the Lord to him, Put off thy shoes from thy feet: for the place where thou standest is holy ground.']]},
+  18:{b:'Acts',p:[[17,'And Ananias went his way, and entered into the house; and putting his hands on him said, Brother Saul, the Lord, even Jesus, that appeared unto thee in the way as thou camest, hath sent me, that thou mightest receive thy sight, and be filled with the Holy Ghost.']]},
+  19:{b:'Acts',p:[[34,'Then Peter opened his mouth, and said, Of a truth I perceive that God is no respecter of persons:'],[35,'But in every nation he that feareth him, and worketh righteousness, is accepted with him.']]},
+  20:{b:'Acts',p:[[25,'Then departed Barnabas to Tarsus, for to seek Saul:'],[26,'And when he had found him, he brought him unto Antioch. And it came to pass, that a whole year they assembled themselves with the church, and taught much people. And the disciples were called Christians first in Antioch.']]},
+  21:{b:'Isaiah',p:[[13,'Behold, my servant shall deal prudently, he shall be exalted and extolled, and be very high.']]},
+  22:{b:'Isaiah',p:[[2,'For he shall grow up before him as a tender plant, and as a root out of a dry ground: he hath no form nor comeliness; and when we shall see him, there is no beauty that we should desire him.']]},
+  23:{b:'Isaiah',p:[[5,'But he was wounded for our transgressions, he was bruised for our iniquities: the chastisement of our peace was upon him; and with his stripes we are healed.']]},
+  24:{b:'Isaiah',p:[[7,'He was oppressed, and he was afflicted, yet he opened not his mouth: he is brought as a lamb to the slaughter, and as a sheep before her shearers is dumb, so he openeth not his mouth.']]},
+  25:{b:'Isaiah',p:[[11,'He shall see of the travail of his soul, and shall be satisfied: by his knowledge shall my righteous servant justify many; for he shall bear their iniquities.']]},
+  26:{b:'Genesis',p:[[28,'And he said, Thy name shall be called no more Jacob, but Israel: for as a prince hast thou power with God and with men, and hast prevailed.']]},
+  27:{b:'Job',p:[[5,'I have heard of thee by the hearing of the ear: but now mine eye seeth thee.']]},
+  28:{b:'Exodus',p:[[14,'And God said unto Moses, I AM THAT I AM: and he said, Thus shalt thou say unto the children of Israel, I AM hath sent me unto you.']]},
+  29:{b:'Isaiah',p:[[7,'And he laid it upon my mouth, and said, Lo, this hath touched thy lips; and thine iniquity is taken away, and thy sin purged.']]},
+  30:{b:'Luke',p:[[10,'For the Son of man is come to seek and to save that which was lost.']]},
+  31:{b:'John',p:[[5,'Jesus answered, Verily, verily, I say unto thee, Except a man be born of water and of the Spirit, he cannot enter into the kingdom of God.']]},
+  32:{b:'1 Peter',p:[[23,'Being born again, not of corruptible seed, but of incorruptible, by the word of God, which liveth and abideth for ever.']]},
+  33:{b:'1 Thessalonians',p:[[9,'For they themselves shew of us what manner of entering in we had unto you, and how ye turned to God from idols to serve the living and true God;']]},
+  34:{b:'1 Peter',p:[[25,'For ye were as sheep going astray; but are now returned unto the Shepherd and Bishop of your souls.']]},
+  35:{b:'Romans',p:[[8,'But God commendeth his love toward us, in that, while we were yet sinners, Christ died for us.']]},
+  36:{b:'Romans',p:[[25,'Whom God hath set forth to be a propitiation through faith in his blood, to declare his righteousness for the remission of sins that are past, through the forbearance of God;']]},
+  37:{b:'Romans',p:[[6,'Knowing this, that our old man is crucified with him, that the body of sin might be destroyed, that henceforth we should not serve sin.'],[7,'For he that is dead is freed from sin.']]},
+  38:{b:'Romans',p:[[16,'Know ye not, that to whom ye yield yourselves servants to obey, his servants ye are to whom ye obey; whether of sin unto death, or of obedience unto righteousness?']]},
+  39:{b:'Romans',p:[[7,'What shall we say then? Is the law sin? God forbid. Nay, I had not known sin, but by the law: for I had not known lust, except the law had said, Thou shalt not covet.']]},
+  40:{b:'Romans',p:[[15,'For ye have not received the spirit of bondage again to fear; but ye have received the Spirit of adoption, whereby we cry, Abba, Father.']]},
+  41:{b:'Job',p:[[26,'And though after my skin worms destroy this body, yet in my flesh shall I see God:']]},
+  42:{b:'Romans',p:[[25,'Who was delivered for our offences, and was raised again for our justification.']]}
+};
+const VERSES_EN=VERSES_KO.map(v=>EN[v.n]?{...v,b:EN[v.n].b,p:EN[v.n].p}:v);
+let VERSES=VERSES_KO;
+const isEn=()=>S.lang==='en';
+// a blank is as wide as its word: Latin letters are about half as wide as Hangul
+const slotLen=w=>isEn()?Math.max(2,Math.ceil(norm(w).length*.55)):norm(w).length;
+// small words that are never a key word in an English verse
+const STOP=new Set('the and that this with from have hath for not but unto into your their them they shall will were was are his her him you thou thee thy thine our who whom which what when then than also upon may might been being had has did does doth nay yet one all any these those there here said saith'.split(' '));
+
 /* ---------- 도우미 ---------- */
 const $=s=>document.querySelector(s);
 const app=$('#app');
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const SKIP=/[\s.,?!·"'“”‘’()\[\]:;~…\-0-9]/;
-const norm=w=>[...w].filter(c=>!SKIP.test(c)).join('');
+const SKIP=/[\s.,?!·"'“”‘’()\[\]:;~…\-–—0-9]/;
+const norm=w=>[...String(w).toLowerCase()].filter(c=>!SKIP.test(c)).join('');
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const pick=(a,k)=>shuffle(a).slice(0,k);
-const ref=v=>`${v.b} ${v.c}장 ${v.v}절`;
+const ref=v=>isEn()?`${v.b} ${v.c}:${v.v}`:`${v.b} ${v.c}장 ${v.v}절`;
 // the heading printed on the church handout above each verse: "말씀암송 (1) 교회 시리즈 - 1"; the verse title goes under it
 const head=v=>{const s=seriesOf(v.s);return `${s.sheet} ${s.name} - ${v.n}`};
 const headHtml=(v,cls='')=>`<div class="vhead ${cls}"><small>${esc(head(v))}</small><b>${esc(v.t)}</b></div>`;
@@ -772,7 +830,7 @@ function toks(v){const out=[];v.p.forEach(([num,txt])=>txt.split(/\s+/).filter(B
 const AWKWARD=/보지|자지/;
 const awk=w=>AWKWARD.test(norm(w));
 // indices of the verse's key words among its tokens (a word listed twice, like 사랑하라, counts at both places)
-function keyIdx(v,t){const ks=new Set((KEYS[v.n]||[]).map(norm));return t.map((x,i)=>i).filter(i=>ks.has(norm(t[i].w)))}
+function keyIdx(v,t){if(isEn())return t.map((x,i)=>i).filter(i=>{const w=norm(t[i].w);return w.length>=4&&!STOP.has(w)});const ks=new Set((KEYS[v.n]||[]).map(norm));return t.map((x,i)=>i).filter(i=>ks.has(norm(t[i].w)))}
 // the small verse numbers show when reading a verse but never while solving one: the number alone
 // gave the answer away (church feedback); the chapter and verse themselves stay visible at every level
 const vnHtml=x=>x.vn&&!G?`<sup class="vn">${x.vn}</sup>`:'';
@@ -817,7 +875,7 @@ const KEY='malsseum-amsong-v1';
 const z4=()=>[0,0,0,0];
 // log: the games played, newest first (내 기록) · qset: the verses 오늘의 도전 asks about (null = the series tab)
 // qmode: what it asks — 'verse' 말씀, 'name' 제목·시리즈, 'mix' both
-function blank(){return {xp:0,streak:0,lastDay:null,today:{day:null,games:0},verses:{},log:[],name:'',sex:'m',diff:2,sound:true,series:'all',qset:null,qmode:'mix',updatedAt:0}}
+function blank(){return {xp:0,streak:0,lastDay:null,today:{day:null,games:0},verses:{},en:{},lang:'ko',log:[],name:'',sex:'m',diff:2,sound:true,series:'all',qset:null,qmode:'mix',updatedAt:0}}
 const LOG_MAX=200;
 // a log entry: t time · k b/o/w/q (빈칸·순서·써보기·도전) · n verse (0 for 도전) · d difficulty · p passed 0/1
 // s mistakes (b/o), accuracy % (w) or right answers (q) · x XP · m verses missed in a 도전 · z the 도전's range
@@ -825,6 +883,7 @@ function cleanLog(a){
   const num=x=>Math.max(0,Math.floor(+x||0));
   return (Array.isArray(a)?a:[]).filter(e=>e&&typeof e==='object'&&'bowq'.includes(e.k)&&e.k.length===1).map(e=>{
     const o={t:num(e.t),k:e.k,n:Math.min(42,num(e.n)),d:Math.min(ND,Math.max(1,num(e.d)||1)),p:e.p?1:0,s:Math.min(100,num(e.s)),x:Math.min(9999,num(e.x))};
+    if(e.l)o.l=1;
     if(e.k==='q'){o.m=(Array.isArray(e.m)?e.m:[]).map(num).filter(n=>n>=1&&n<=42).slice(0,10);o.z=String(e.z||'').replace(/[<>]/g,'').slice(0,40)}
     return o}).filter(e=>e.t);
 }
@@ -839,11 +898,12 @@ function migrateVerse(x){
 }
 function migrateAll(vv){const out={};Object.keys(vv||{}).forEach(k=>{const m=migrateVerse(vv[k]);if(m)out[k]=m});return out}
 function load(){
-  try{const r=localStorage.getItem(KEY);if(r){const s=Object.assign(blank(),JSON.parse(r));s.verses=migrateAll(s.verses);s.diff=Math.min(ND,Math.max(1,+s.diff||2));s.name=String(s.name||'').slice(0,10);s.sex=s.sex==='f'?'f':'m';
+  try{const r=localStorage.getItem(KEY);if(r){const s=Object.assign(blank(),JSON.parse(r));s.verses=migrateAll(s.verses);s.en=migrateAll(s.en);s.lang=s.lang==='en'?'en':'ko';s.diff=Math.min(ND,Math.max(1,+s.diff||2));s.name=String(s.name||'').slice(0,10);s.sex=s.sex==='f'?'f':'m';
     s.log=cleanLog(s.log);s.qset=Array.isArray(s.qset)?[...new Set(s.qset.map(Number).filter(n=>n>=1&&n<=42))].sort((a,b)=>a-b):null;if(s.qset&&!s.qset.length)s.qset=null;s.qmode=['verse','name','mix'].includes(s.qmode)?s.qmode:'mix';return s}}catch(e){}
   return blank();
 }
 let S=load();
+VERSES=isEn()?VERSES_EN:VERSES_KO;
 function save(){S.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}queueCloud();queueSync()}
 
 function merge(a,b){
@@ -854,24 +914,26 @@ function merge(a,b){
   const ta=a.today||{},tb=b.today||{};
   m.today=(ta.day||'')>(tb.day||'')?ta:(tb.day||'')>(ta.day||'')?tb:{day:ta.day||null,games:Math.max(ta.games||0,tb.games||0)};
   m.name=((a.updatedAt||0)>=(b.updatedAt||0)?a.name:b.name)||a.name||b.name||'';
-  m.verses={};
   const mx=(p,q)=>z4().map((_,i)=>Math.max(p[i]||0,q[i]||0));
-  new Set([...Object.keys(a.verses||{}),...Object.keys(b.verses||{})]).forEach(k=>{
-    const x=migrateVerse((a.verses||{})[k])||{b:z4(),o:z4(),t:z4()},y=migrateVerse((b.verses||{})[k])||{b:z4(),o:z4(),t:z4()};
-    m.verses[k]={b:mx(x.b,y.b),o:mx(x.o,y.o),t:mx(x.t,y.t),last:Math.max(x.last||0,y.last||0)};
-  });
+  // the Korean stars (verses) and the English ones (en) merge the same way
+  for(const part of ['verses','en']){m[part]={};
+    new Set([...Object.keys(a[part]||{}),...Object.keys(b[part]||{})]).forEach(k=>{
+      const x=migrateVerse((a[part]||{})[k])||{b:z4(),o:z4(),t:z4()},y=migrateVerse((b[part]||{})[k])||{b:z4(),o:z4(),t:z4()};
+      m[part][k]={b:mx(x.b,y.b),o:mx(x.o,y.o),t:mx(x.t,y.t),last:Math.max(x.last||0,y.last||0)};
+    })}
   m.log=mergeLog(a.log,b.log);
   m.updatedAt=Math.max(a.updatedAt||0,b.updatedAt||0);
   return m;
 }
 // what the leaderboard shows about me; sent with each sync when a nickname is set
 function pubSummary(){
-  const m=z4();VERSES.forEach(v=>{for(let d=1;d<=ND;d++)if(mastered(v.n,d))m[d-1]++});
+  // a verse counts as mastered in either language
+  const m=z4();VERSES.forEach(v=>{for(let d=1;d<=ND;d++)if(masteredAny(v.n,d))m[d-1]++});
   // for the profile card: games played (the log keeps the last 200) and the verse I practise most
   const cnt={};(S.log||[]).forEach(e=>{if('bow'.includes(e.k)&&e.n)cnt[e.n]=(cnt[e.n]||0)+1});
   const fav=+(Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||a-b)[0]||0);
   // mv: for each verse 1-42, the highest difficulty mastered (0 = none), so the card can list them
-  const mv=VERSES.map(v=>{let h=0;for(let d=1;d<=ND;d++)if(mastered(v.n,d))h=d;return h});
+  const mv=VERSES.map(v=>{let h=0;for(let d=1;d<=ND;d++)if(masteredAny(v.n,d))h=d;return h});
   return {name:S.name,sex:S.sex==='f'?'f':'m',xp:S.xp,lv:lvl().L,streak:curStreak(),m,g:(S.log||[]).length,fav,mv,at:Date.now()};
 }
 
@@ -908,9 +970,11 @@ function clean(d){
   const num=x=>Math.max(0,Math.floor(+x||0)),day=x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)?x:null;
   const arr=(a,cap)=>z4().map((_,i)=>Array.isArray(a)?Math.min(cap,num(a[i])):0);
   const o={xp:num(d.xp),streak:num(d.streak),lastDay:day(d.lastDay),today:{day:day(d.today&&d.today.day),games:num(d.today&&d.today.games)},
-    name:String(d.name||'').replace(/[<>]/g,'').trim().slice(0,10),verses:{},log:cleanLog(d.log).slice(0,LOG_MAX),updatedAt:num(d.updatedAt)};
+    name:String(d.name||'').replace(/[<>]/g,'').trim().slice(0,10),verses:{},en:{},log:cleanLog(d.log).slice(0,LOG_MAX),updatedAt:num(d.updatedAt)};
   const vv=d.verses&&typeof d.verses==='object'?d.verses:{};
-  VERSES.forEach(v=>{const x=migrateVerse(vv[v.n]);if(x)o.verses[v.n]={b:arr(x.b,1),o:arr(x.o,1),t:arr(x.t,100),last:num(x.last)}});
+  const ee=d.en&&typeof d.en==='object'?d.en:{};
+  VERSES.forEach(v=>{const x=migrateVerse(vv[v.n]);if(x)o.verses[v.n]={b:arr(x.b,1),o:arr(x.o,1),t:arr(x.t,100),last:num(x.last)};
+    const y=migrateVerse(ee[v.n]);if(y)o.en[v.n]={b:arr(y.b,1),o:arr(y.o,1),t:arr(y.t,100),last:num(y.last)}});
   return o;
 }
 const BK='MALSSEUM1:';
@@ -1083,11 +1147,16 @@ function recordGame(xp,e){
   if(S.lastDay!==t){S.streak=S.lastDay===yesterday()?S.streak+1:1;S.lastDay=t}
   if(!S.today||S.today.day!==t)S.today={day:t,games:0};
   S.today.games++;S.xp+=xp;
+  if(e&&isEn())e.l=1;
   if(e)S.log=[...cleanLog([{...e,t:Date.now(),x:xp}]),...(S.log||[])].slice(0,LOG_MAX);
   save();
 }
-const vs=n=>S.verses[n]||(S.verses[n]={b:z4(),o:z4(),t:z4(),last:0});
-function stars(n,d=S.diff){const x=S.verses[n];if(!x)return [false,false,false];const i=d-1;return [!!x.b[i],!!x.o[i],(x.t[i]||0)>=DIFF[d].pass]}
+// the stars of the language being memorised
+const PV=()=>isEn()?(S.en||(S.en={})):S.verses;
+const vs=n=>{const P=PV();return P[n]||(P[n]={b:z4(),o:z4(),t:z4(),last:0})};
+const masteredIn=(P,n,d)=>{const x=P&&P[n];return !!x&&Array.isArray(x.b)&&!!x.b[d-1]&&!!x.o[d-1]&&(x.t[d-1]||0)>=DIFF[d].pass};
+const masteredAny=(n,d)=>masteredIn(S.verses,n,d)||masteredIn(S.en,n,d);
+function stars(n,d=S.diff){const x=PV()[n];if(!x)return [false,false,false];const i=d-1;return [!!x.b[i],!!x.o[i],(x.t[i]||0)>=DIFF[d].pass]}
 const starCount=(n,d)=>stars(n,d).filter(Boolean).length;
 const mastered=(n,d)=>starCount(n,d)===3;
 function topMastered(n){let t=0;for(let d=1;d<=ND;d++)if(mastered(n,d))t=d;return t}
@@ -1675,7 +1744,9 @@ function buzz(){try{navigator.vibrate&&navigator.vibrate(60)}catch(e){}}
 const canSpeak='speechSynthesis' in window;
 let RECORDED=new Set(),player=null;
 fetch('audio/manifest.json',{cache:'no-store'}).then(r=>r.ok?r.json():[]).then(a=>{RECORDED=new Set(Array.isArray(a)?a.map(Number):[]);if(view.name==='verse'||view.name==='home')render()}).catch(()=>{});
-const hasVoice=v=>RECORDED.has(v.n)||canSpeak;
+// the recordings are Korean: English is read by the phone's English voice
+const recd=v=>!isEn()&&RECORDED.has(v.n);
+const hasVoice=v=>recd(v)||canSpeak;
 function koVoice(){
   const vs=speechSynthesis.getVoices().filter(x=>/^ko/i.test(x.lang));
   // the newer neural/enhanced voices sound far less robotic than the default
@@ -1684,10 +1755,15 @@ function koVoice(){
 }
 function speak(v){
   stopSpeech();if(PL.on)plStop();
-  if(RECORDED.has(v.n)){player=new Audio(`audio/${v.n}.mp3`);player.play().catch(()=>speakTts(v));return}
+  if(recd(v)){player=new Audio(`audio/${v.n}.mp3`);player.play().catch(()=>speakTts(v));return}
   speakTts(v);
 }
-function speakTts(v){try{const u=new SpeechSynthesisUtterance(ref(v)+'. '+fullText(v));u.lang='ko-KR';u.rate=.92;const vo=koVoice();if(vo)u.voice=vo;speechSynthesis.speak(u)}catch(e){}}
+function enVoice(){
+  const vs=speechSynthesis.getVoices().filter(x=>/^en/i.test(x.lang));
+  const score=x=>(/samantha|premium|enhanced|natural|neural|google/i.test(x.name)?2:0)+(/en[-_]US/i.test(x.lang)?1:0);
+  return vs.sort((a,b)=>score(b)-score(a))[0]||null;
+}
+function speakTts(v){try{const en=isEn(),u=new SpeechSynthesisUtterance(ref(v)+'. '+fullText(v));u.lang=en?'en-US':'ko-KR';u.rate=.92;const vo=en?enVoice():koVoice();if(vo)u.voice=vo;speechSynthesis.speak(u)}catch(e){}}
 function stopSpeech(){try{if(player){player.pause();player=null}if(canSpeak)speechSynthesis.cancel()}catch(e){}}
 if(canSpeak)speechSynthesis.onvoiceschanged=()=>{};
 
@@ -1702,7 +1778,7 @@ plAudio.addEventListener('pause',()=>{PL.playing=false;plUi()});
 plAudio.addEventListener('error',()=>{if(PL.on)plStep(1,true)});
 const plCur=()=>PL.list[PL.i];
 function plStart(list,i){
-  const l=list.filter(v=>RECORDED.has(v.n));if(!l.length)return;
+  const l=list.filter(recd);if(!l.length)return;
   stopSpeech();PL.on=true;PL.list=l;PL.i=Math.max(0,l.indexOf(list[i]));
   document.body.classList.add('pl-on');plLoad();render();
 }
@@ -1956,10 +2032,12 @@ function homeView(){
   <section class="diffbox" aria-label="난이도">
     <div class="seg">${[1,2,3,4].map(i=>`<button class="d${i}" aria-pressed="${d===i}" data-act="diff" data-d="${i}">${DIFF[i].name}</button>`).join('')}</div>
     <p class="tiny">${df.desc} · XP ×${df.mult}</p>
+    <div class="seg seg2" aria-label="암송 언어"><button aria-pressed="${!isEn()}" data-act="lang" data-l="ko">한국어로 암송</button><button aria-pressed="${isEn()}" data-act="lang" data-l="en">English로 암송</button></div>
+    ${isEn()?`<p class="tiny">영어 본문: ${EN_NAME} · 영어 별은 한국어 별과 따로 모아요. XP와 레벨은 함께 올라가요.</p>`:''}
   </section>
   <div class="ctabox"><button class="cta" data-act="quiz"><span><span class="cta-main">오늘의 도전</span><span class="cta-sub">${esc(scopeText())}에서 10문제 · ${QMODE[S.qmode].name} · ${df.name} · 문제당 ${df.qt/1000}초</span></span>${ICON.go}</button>
     <button class="cta-set" data-act="qsetOpen">범위 · 문제 종류 고르기</button></div>
-  ${RECORDED.size?`<button class="listen" data-act="listen"><span class="micon">${ICON.headset}</span><span><b>연속 듣기</b><small>${sel?esc(sel.short):'전체'} ${list.filter(v=>RECORDED.has(v.n)).length}구절을 차례로 들려줘요 · 화면을 꺼도 이어져요</small></span>${ICON.play}</button>`:''}
+  ${RECORDED.size&&!isEn()?`<button class="listen" data-act="listen"><span class="micon">${ICON.headset}</span><span><b>연속 듣기</b><small>${sel?esc(sel.short):'전체'} ${list.filter(recd).length}구절을 차례로 들려줘요 · 화면을 꺼도 이어져요</small></span>${ICON.play}</button>`:''}
   ${boardView()}
   <div class="tabs" role="tablist" aria-label="시리즈">${tabs}</div>
   <p class="tiny">구절을 눌러 빈칸 채우기, 순서 맞추기, 직접 써보기를 통과하면 별 3개로 그 난이도를 정복해요. 네 난이도를 모두 정복해 보세요. <button class="link" data-act="tourOpen">사용법 보기</button></p>
@@ -2081,15 +2159,15 @@ function cycleHide(v){
   if(ui.hide===1){const t=toks(v);ui.mask=new Set(pick(t.map((x,i)=>i),Math.ceil(t.length*.45)))}
 }
 function verseView(v){
-  const d=S.diff,df=DIFF[d],st=stars(v.n),x=S.verses[v.n],best=x?x.t[d-1]:0,idx=VERSES.indexOf(v),prev=VERSES[idx-1],next=VERSES[idx+1];
+  const d=S.diff,df=DIFF[d],st=stars(v.n),x=PV()[v.n],best=x?x.t[d-1]:0,idx=VERSES.indexOf(v),prev=VERSES[idx-1],next=VERSES[idx+1];
   return `
   <article class="vcard" ${sc(v)}>
     <div class="vc-head">${ring(v.n,true)}<div><div class="vc-series">${esc(head(v))}</div><h2 class="vc-title">${esc(v.t)}</h2><div class="vc-ref">${ref(v)}</div></div></div>
     <p class="verse">${studyText(v)}</p>
     <div class="vc-tools">
       <button class="btn small" data-act="hide">${HIDE_NEXT[ui.hide]}</button>
-      ${hasVoice(v)?`<button class="btn small ghost" data-act="speak">${ICON.play} ${RECORDED.has(v.n)?'들려주기':'읽어주기'}</button>`:''}
-      ${RECORDED.has(v.n)?`<button class="btn small ghost" data-act="listenHere">${ICON.headset} 여기부터 쭉 듣기</button>`:''}
+      ${hasVoice(v)?`<button class="btn small ghost" data-act="speak">${ICON.play} ${recd(v)?'들려주기':'읽어주기'}</button>`:''}
+      ${recd(v)?`<button class="btn small ghost" data-act="listenHere">${ICON.headset} 여기부터 쭉 듣기</button>`:''}
     </div>
     ${ui.hide?'<p class="tiny">가려진 단어를 누르면 살짝 보여요.</p>':''}
   </article>
@@ -2129,7 +2207,7 @@ const REF_HIDE_TYPE=[null,[],['b','v'],['t','b','c','v'],['s','t','b','c','v']];
 const refHideSet=(type,d)=>(type==='type'?REF_HIDE_TYPE:REF_HIDE)[d];
 const REF_LABEL={s:'시리즈',t:'제목',b:'책',c:'장',v:'절'};
 const refHidden=p=>!!G&&refHideSet(G.type,G.d).includes(p)&&!(G.refShow&&G.refShow.has(p))&&!G.res;
-const refText=v=>`${refHidden('b')?'□□':v.b} ${refHidden('c')?'?':v.c}장 ${refHidden('v')?'?':v.v}절`;
+const refText=v=>isEn()?`${refHidden('b')?'□□':v.b} ${refHidden('c')?'?':v.c}:${refHidden('v')?'?':v.v}`:`${refHidden('b')?'□□':v.b} ${refHidden('c')?'?':v.c}장 ${refHidden('v')?'?':v.v}절`;
 const seriesLabel=s=>`${s.sheet} ${s.name}`;
 // a typed title counts when it is close enough: spaces, punctuation and the (2)-style numbers are ignored
 function similar(a,b){
@@ -2222,7 +2300,7 @@ function blankView(){
     const bi=G.blanks.indexOf(i),vn=vnHtml(x);
     if(bi<0)return vn+esc(x.w);
     if(bi<G.cur)return vn+`<span class="slot filled ${bi===G.cur-1?'just':''}">${esc(x.w)}</span>`;
-    return vn+`<span class="slot ${bi===G.cur?'cur':''}" style="--len:${norm(x.w).length}"></span>`;
+    return vn+`<span class="slot ${bi===G.cur?'cur':''}" style="--len:${slotLen(x.w)}"></span>`;
   }).join(' ');
   return gameTop(v,G.cur,G.blanks.length)+`<p class="verse game-verse">${text}</p>
     <div class="tray"><div class="chips">${G.chips.map((c,i)=>`<button class="chip ${c.used?'used':''}" data-act="chip" data-i="${i}" ${c.used?'disabled aria-hidden="true"':''}>${esc(c.w)}</button>`).join('')}</div></div>`;
@@ -2292,18 +2370,23 @@ function finishOrder(){
 
 /* ---------- 직접 써보기 ---------- */
 function startType(n){G={type:'type',n,d:S.diff,hint:DIFF[S.diff].hint==='on',input:'',res:null,passed:false,recorded:false,result:null,refShow:new Set(),refS:'',refT:'',refB:'',refC:'',refV:'',refV2:''};go({name:'type',n})}
-const BOOKS=[...new Set(VERSES.map(v=>v.b))];
+let BOOKS=[...new Set(VERSES.map(v=>v.b))];
+// switching the language being memorised: other verse objects, other book names
+function setLang(l){S.lang=l==='en'?'en':'ko';VERSES=isEn()?VERSES_EN:VERSES_KO;BOOKS=[...new Set(VERSES.map(v=>v.b))];if(PL.on)plStop();stopSpeech();save()}
+const BOOK_ABBR_EN={'2 Corinthians':['2cor','2co','iicorinthians','2corinthian'],Galatians:['gal','ga'],John:['jn','jhn','joh'],Colossians:['col'],Acts:['act','ac'],Isaiah:['isa','is'],Genesis:['gen','ge','gn'],Job:['jb'],Exodus:['exo','ex','exod'],Luke:['lk','luk','lu'],'1 Peter':['1pet','1pe','1pt','ipeter'],'1 Thessalonians':['1thess','1th','1thes','1thessalonian','ithessalonians'],Romans:['rom','ro','rm','roman']};
+const bookEx=()=>isEn()?'Romans, Rom':'로마서, 롬';
 // a typed book name counts with or without spaces, and by its usual short form (고후, 롬, 벧전 …)
 const BOOK_ABBR={고린도후서:'고후',갈라디아서:'갈',요한복음:'요',골로새서:'골',사도행전:'행',이사야:'사',창세기:'창',욥기:'욥',출애굽기:'출',누가복음:'눅',베드로전서:'벧전',데살로니가전서:'살전',로마서:'롬'};
 function normBook(s){
   const k=String(s||'').replace(/[\s.]/g,'');
   if(!k)return '';
+  if(isEn()){const e=k.toLowerCase();return BOOKS.find(b=>b.toLowerCase().replace(/\s/g,'')===e||(BOOK_ABBR_EN[b]||[]).includes(e))||k}
   return BOOKS.find(b=>b===k||BOOK_ABBR[b]===k||b.replace(/서$|기$|음$|야$|전$/,'')===k.replace(/서$|기$|음$|야$|전$/,''))||k;
 }
 function grade(v,input){
   const orig=fullText(v),oc=[],pos=[];
-  [...orig].forEach((ch,i)=>{if(!SKIP.test(ch)){oc.push(ch);pos.push(i)}});
-  const ic=[...input].filter(ch=>!SKIP.test(ch));
+  [...orig].forEach((ch,i)=>{if(!SKIP.test(ch)){oc.push(ch.toLowerCase());pos.push(i)}});
+  const ic=[...input.toLowerCase()].filter(ch=>!SKIP.test(ch));
   const n=oc.length,m=ic.length;
   const dp=Array.from({length:n+1},()=>new Uint16Array(m+1));
   for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)dp[i][j]=oc[i]===ic[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
@@ -2329,14 +2412,14 @@ function typeView(){
   return `<div class="gtop">${gref(v)}</div>
   ${df.hint==='none'?'':`<div class="hintbox ${G.hint?'':'off'}" aria-label="첫 글자 힌트">${G.hint?hint:'힌트를 껐어요. 힌트 없이 통과하면 보너스 XP를 받아요.'}</div>`}
   <label class="lbl" for="typeBox">기억나는 대로 구절을 써 보세요. 띄어쓰기와 문장부호는 채점하지 않아요.</label>
-  <textarea id="typeBox" rows="6" lang="ko" maxlength="600" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="여기에 구절을 써 보세요">${esc(G.input)}</textarea>
+  <textarea id="typeBox" rows="6" lang="${isEn()?'en':'ko'}" maxlength="600" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="여기에 구절을 써 보세요">${esc(G.input)}</textarea>
   <div class="refrow"><span class="lbl" id="refLbl">${hs.includes('t')?'제목과 ':''}어느 책 몇 장 몇 절인지도 써 보세요. ${hs.length?'위에서 가려진 부분을 힌트 없이 맞히면 보너스 XP':'이 난이도에서는 위에 다 보여서 보너스는 없어요'}</span>
     ${hs.includes('s')?`<select id="refS" class="refin" aria-label="시리즈"><option value="">시리즈 고르기</option>${SERIES.map(s=>`<option value="${s.id}" ${G.refS===s.id?'selected':''}>${esc(seriesLabel(s))}</option>`).join('')}</select>`:''}
     ${hs.includes('t')?`<input id="refT" class="refin" lang="ko" maxlength="60" autocomplete="off" autocorrect="off" spellcheck="false" value="${esc(G.refT||'')}" placeholder="말씀 제목 (예: 오직 예수)" aria-label="말씀 제목">`:''}
     <!-- the book: a list up to 보통, typed from 어려움; three number boxes, because a phone's number pad has no ":" or space -->
     <div class="refnums" role="group" aria-labelledby="refLbl">
       ${G.d<=2?`<select id="refB" class="refin refbook" aria-label="책"><option value="">책 고르기</option>${BOOKS.map(b=>`<option ${G.refB===b?'selected':''}>${esc(b)}</option>`).join('')}</select>`
-        :`<input id="refB" class="refin refbook" lang="ko" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false" value="${esc(G.refB||'')}" placeholder="책 이름 (예: 로마서, 롬)" aria-label="책 이름">`}
+        :`<input id="refB" class="refin refbook" lang="ko" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false" value="${esc(G.refB||'')}" placeholder="책 이름 (예: ${bookEx()})" aria-label="책 이름">`}
     </div>
     <div class="refnums" role="group" aria-labelledby="refLbl">
       <input id="refC" class="refin" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="${esc(G.refC||'')}" aria-label="장"><span>장</span>
@@ -2461,7 +2544,7 @@ function makeQ(v,kind,d,typed){
     const close=dp.filter(w=>Math.abs(w.length-ans.length)<=1);if(close.length>=3)dp=close;
     const verse=slot=>`<p class="verse q-verse">${t.map((x,i)=>i===bi?slot:esc(x.w)).join(' ')}</p>`;
     // once answered, right or wrong, the blank shows the word that belongs there
-    return {n:v.n,kind,label:typed?'빈칸에 들어갈 말을 써 보세요':'빈칸에 들어갈 말은?',sub,typed:typed?'word':null,body:verse(`<span class="slot cur" style="--len:${ans.length}"></span>`),done:verse(`<span class="slot filled just">${esc(t[bi].w)}</span>`),
+    return {n:v.n,kind,label:typed?'빈칸에 들어갈 말을 써 보세요':'빈칸에 들어갈 말은?',sub,typed:typed?'word':null,body:verse(`<span class="slot cur" style="--len:${slotLen(ans)}"></span>`),done:verse(`<span class="slot filled just">${esc(t[bi].w)}</span>`),
       opts:typed?null:shuffle([{label:ans,ok:true},...pick(dp,3).map(w=>({label:w,ok:false}))]),answer:ans};
   }
   const me=halves(v);
@@ -2494,7 +2577,7 @@ function typedForm(q,a){
   const val=k=>esc((G.typed||{})[k]||''),dis=a?'disabled':'';
   if(q.typed==='ref')return `<div class="qtype refrow">
     <div class="refnums">${G.d<=3?`<select id="qaB" class="refin refbook" aria-label="책" ${dis}><option value="">책 고르기</option>${BOOKS.map(b=>`<option ${G.typed.qaB===b?'selected':''}>${esc(b)}</option>`).join('')}</select>`
-      :`<input id="qaB" class="refin refbook" lang="ko" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false" value="${val('qaB')}" placeholder="책 이름 (예: 롬)" aria-label="책 이름" ${dis}>`}</div>
+      :`<input id="qaB" class="refin refbook" lang="ko" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false" value="${val('qaB')}" placeholder="책 이름 (예: ${bookEx()})" aria-label="책 이름" ${dis}>`}</div>
     <div class="refnums"><input id="qaC" class="refin" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="${val('qaC')}" aria-label="장" ${dis}><span>장</span>
       <input id="qaV" class="refin" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="${val('qaV')}" aria-label="절" ${dis}><span>절</span>
       <span class="refto">~</span><input id="qaV2" class="refin" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="${val('qaV2')}" placeholder="끝" aria-label="끝 절 (여러 절일 때만)" ${dis}><span>절</span></div>
@@ -2621,7 +2704,7 @@ function logLine(e){
     :e.k==='w'?`정확도 ${e.s}%${e.p?' · 통과':''}`
     :e.p?(e.s?`실수 ${e.s}번`:'실수 없이'):'기회를 다 썼어요';
   return `<li class="lg ${e.p?'ok':'no'}"><span class="lg-time">${timeStr(e.t)}</span>
-    <span class="lg-main"><b>${KIND_NAME[e.k]} · ${dn}</b>${v?`<button class="link" data-act="open" data-n="${v.n}">${v.n}. ${esc(v.t)}</button>`:''}<small>${what}</small>
+    <span class="lg-main"><b>${KIND_NAME[e.k]} · ${dn}${e.l?' · English':''}</b>${v?`<button class="link" data-act="open" data-n="${v.n}">${v.n}. ${esc(v.t)}</button>`:''}<small>${what}</small>
       ${e.m&&e.m.length?`<span class="lg-miss">틀린 구절 ${e.m.map(n=>`<button class="link" data-act="open" data-n="${n}">${n}번</button>`).join(' ')}</span>`:''}</span>
     <span class="lg-xp">+${e.x}</span></li>`;
 }
@@ -2693,6 +2776,7 @@ app.addEventListener('click',e=>{
     case 'devGo':dev.L=+el.dataset.l;go({name:'home'});break;
     case 'misses':go({name:'misses'});loadMiss(true);break;
     case 'missRefresh':miss.at=0;miss.rows=null;render();loadMiss(true);break;
+    case 'lang':setLang(el.dataset.l);render();break;
     case 'sound':S.sound=!S.sound;save();if(S.sound)unlockAudio();render();break;
     case 'series':S.series=el.dataset.id;save();render();break;
     case 'open':openVerse(n);break;
@@ -2744,7 +2828,7 @@ app.addEventListener('click',e=>{
     case 'reset':ui.confirmReset=true;render();break;
     case 'resetNo':ui.confirmReset=false;render();break;
     case 'sex':S.sex=S.sex==='f'?'m':'f';save();render();break;
-    case 'resetYes':S=Object.assign(blank(),{sound:S.sound,series:S.series,name:S.name,sex:S.sex,diff:S.diff});ui.confirmReset=false;save();render();
+    case 'resetYes':S=Object.assign(blank(),{sound:S.sound,series:S.series,name:S.name,sex:S.sex,diff:S.diff,lang:S.lang});ui.confirmReset=false;save();render();
       // merging would bring the old record back, so overwrite the server copy
       if(SYNC_URL&&syncCode){clearTimeout(sync.timer);syncFetch('PUT',S).catch(()=>{})}
       break;
